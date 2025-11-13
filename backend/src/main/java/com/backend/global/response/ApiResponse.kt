@@ -11,7 +11,7 @@ class ApiResponse<T>(
     val message: String,
     val data: T? = null
 ) {
-
+    // TODO : 추후 JvmStatic 어노테이션 제거
     companion object {
         // ResponseCode Status Created인 경우
         @JvmStatic
