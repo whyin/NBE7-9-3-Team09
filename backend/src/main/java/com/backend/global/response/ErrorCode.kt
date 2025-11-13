@@ -1,11 +1,12 @@
-package com.backend.global.response;
+package com.backend.global.response
 
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus
 
-@Getter
-public enum ErrorCode {
-
+enum class ErrorCode(
+    val code: String,
+    val status: HttpStatus,
+    val message: String
+) {
     // 회원 (Member)
     DUPLICATE_MEMBER_ID("M003", HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
     DUPLICATE_EMAIL("M004", HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
@@ -41,16 +42,16 @@ public enum ErrorCode {
     FORBIDDEN_BOOKMARK("B003", HttpStatus.FORBIDDEN, "북마크에 대한 권한이 없습니다."),
 
     //리뷰
-    NOT_FOUND_REVIEW("R001",HttpStatus.NOT_FOUND,"리뷰를 찾을 수 없습니다."),
-    GIVEN_REVIEW("R002",HttpStatus.NOT_FOUND,"이미 별점을 남겼습니다."),
-  
+    NOT_FOUND_REVIEW("R001", HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."),
+    GIVEN_REVIEW("R002", HttpStatus.NOT_FOUND, "이미 별점을 남겼습니다."),
+
     // 인증/인가
     TOKEN_NOT_FOUND("A005", HttpStatus.UNAUTHORIZED, "요청에 토큰이 존재하지 않습니다."),
 
     UNAUTHORIZED_REQUEST("A015", HttpStatus.UNAUTHORIZED, "인증되지 않은 요청입니다."),
     ACCESS_DENIED("A016", HttpStatus.FORBIDDEN, "인가되지 않은 요청입니다."),
 
-    INACTIVE_MEMBER("A017",HttpStatus.FORBIDDEN, "비활성화된 계정입니다. 로그인할 수 없습니다."),
+    INACTIVE_MEMBER("A017", HttpStatus.FORBIDDEN, "비활성화된 계정입니다. 로그인할 수 없습니다."),
 
 
     UNAUTHORIZED_MEMBER("A006", HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
@@ -64,16 +65,6 @@ public enum ErrorCode {
     MISMATCH_REFRESH_TOKEN("A004", HttpStatus.UNAUTHORIZED, "저장된 리프레시 토큰과 일치하지 않습니다."),
 
     INVALID_ACCESS_TOKEN("A010", HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다."),
-    EXPIRED_ACCESS_TOKEN("A009", HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다.")
-    ;
+    EXPIRED_ACCESS_TOKEN("A009", HttpStatus.UNAUTHORIZED, "액세스 토큰이 만료되었습니다.");
 
-    private final String code;
-    private final HttpStatus status;
-    private final String message;
-
-    ErrorCode(String code, HttpStatus status, String message) {
-        this.code = code;
-        this.status = status;
-        this.message = message;
-    }
 }
