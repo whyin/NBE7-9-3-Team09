@@ -4,8 +4,6 @@ import com.backend.domain.member.entity.Member
 import com.backend.domain.member.entity.Role
 import com.backend.domain.member.repository.MemberRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
-import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -52,6 +50,8 @@ class BaseInitData(
                 memberRepository.saveAll(List.of(member1, member2, admin))
                 log.info { "초기 member 데이터 세팅 완료: " }
             }
+
+
         }
     }
 }

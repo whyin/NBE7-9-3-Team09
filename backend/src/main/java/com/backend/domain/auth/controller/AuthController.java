@@ -20,7 +20,7 @@ public class AuthController {
     @PostMapping("/login")
     public ApiResponse<TokenResponse> login(@RequestBody MemberLoginRequest request,
                                             HttpServletResponse response) {
-        TokenResponse tokenResponse = authService.login(request.memberId(), request.password());
+        TokenResponse tokenResponse = authService.login(request.memberId, request.password);
 
         cookieManager.addRefreshTokenCookie(
                 response,
