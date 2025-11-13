@@ -34,4 +34,5 @@ class JwtAuthenticationEntryPoint(
         log.warn { "인증되지 않은 요청입니다. URI: ${request.requestURI}" }
         jwtErrorResponseWriter.write(response, ErrorCode.UNAUTHORIZED_REQUEST)
     }
+
 }

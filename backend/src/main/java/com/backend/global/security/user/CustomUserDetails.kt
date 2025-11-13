@@ -26,4 +26,5 @@ class CustomUserDetails(member: Member) : UserDetails {
     override fun isCredentialsNonExpired() = true
 
     override fun isEnabled() = true
+
 }

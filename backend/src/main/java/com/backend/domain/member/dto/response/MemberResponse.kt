@@ -20,4 +20,5 @@ data class MemberResponse(
                 role = member.role
             )
     }
+
 }

@@ -24,4 +24,5 @@ class JwtErrorResponseWriter(
 
         objectMapper.writeValue(response.writer, errorBody)
     }
+
 }

@@ -32,4 +32,5 @@ class JwtAccessDeniedHandler(
         log.warn { "접근 권한이 없는 요청입니다. URI: ${request.requestURI}" }
         jwtErrorResponseWriter.write(response, ErrorCode.ACCESS_DENIED)
     }
+
 }

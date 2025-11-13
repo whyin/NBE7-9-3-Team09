@@ -115,4 +115,5 @@ class JwtTokenProvider(
     companion object {
         private val log = LoggerFactory.getLogger(JwtTokenProvider::class.java)
     }
+
 }

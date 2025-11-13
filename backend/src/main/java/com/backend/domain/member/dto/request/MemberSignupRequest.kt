@@ -34,4 +34,5 @@ data class MemberSignupRequest(
             nickname = nickname,
             role = Role.USER
         )
+
 }

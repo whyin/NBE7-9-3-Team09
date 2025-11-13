@@ -58,4 +58,5 @@ class Member(
     fun updateEmail(newEmail: String) {
         this.email = newEmail
     }
+
 }

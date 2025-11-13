@@ -47,4 +47,5 @@ class MemberController(
         val response = memberService.deleteMember(member.id!!)
         return ApiResponse.success(response, "회원 탈퇴가 완료되었습니다.")
     }
+
 }

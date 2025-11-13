@@ -96,4 +96,5 @@ class MemberService(
             throw BusinessException(ErrorCode.DUPLICATE_NICKNAME)
         }
     }
+
 }
