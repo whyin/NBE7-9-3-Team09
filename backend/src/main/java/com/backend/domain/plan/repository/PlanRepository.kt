@@ -15,4 +15,9 @@ interface PlanRepository : JpaRepository<Plan?, Long?> {
     fun getPlansByMember_Id(memberId: Long?): MutableList<Plan?>?
 
     fun getPlanByStartDateAndMemberId(startDate: LocalDateTime?, memberId: Long?): Optional<Plan?>?
+
+
+    fun getPlanByTitle(title: String?): Plan?
+
+    fun getPlanByStartDateBeforeAndEndDateAfter(startDateBefore: LocalDateTime?, endDateAfter: LocalDateTime?): Plan?
 }
