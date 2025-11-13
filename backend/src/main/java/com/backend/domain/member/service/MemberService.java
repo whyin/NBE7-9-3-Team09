@@ -1,3 +1,4 @@
+/*
 package com.backend.domain.member.service;
 
 import com.backend.domain.member.dto.request.MemberSignupRequest;
@@ -59,7 +60,9 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
-    /** 회원 조회용 */
+    */
+/** 회원 조회용 *//*
+
     @Transactional
     public MemberResponse getMember(Long id) {
         Member member = findById(id);
@@ -101,3 +104,4 @@ public class MemberService {
         }
     }
 }
+*/

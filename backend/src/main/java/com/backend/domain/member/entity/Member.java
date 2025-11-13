@@ -1,3 +1,4 @@
+/*
 package com.backend.domain.member.entity;
 
 import com.backend.global.entity.BaseEntity;
@@ -68,3 +69,4 @@ public class Member extends BaseEntity {
         this.email = newEmail;
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.backend.domain.member.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
@@ -13,3 +14,4 @@ public record MemberLoginRequest (
         @Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.")
         String password
 ){ }
+*/

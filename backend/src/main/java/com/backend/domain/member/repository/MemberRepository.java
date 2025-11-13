@@ -1,3 +1,4 @@
+/*
 package com.backend.domain.member.repository;
 
 import com.backend.domain.member.entity.Member;
@@ -16,3 +17,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByNickname(String nickname);
 
 }
+*/

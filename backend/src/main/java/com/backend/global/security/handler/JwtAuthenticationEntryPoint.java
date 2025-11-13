@@ -1,3 +1,4 @@
+/*
 package com.backend.global.security.handler;
 
 import com.backend.global.response.ErrorCode;
@@ -13,9 +14,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+*/
 /**
  * 인증되지 않은 사용자가 보호된 리소스에 접근했을 때 (401 Unauthorized)
- */
+ *//*
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -31,4 +34,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         log.warn("인증되지 않은 요청입니다. URI: {}", request.getRequestURI());
         jwtErrorResponseWriter.write(response, ErrorCode.UNAUTHORIZED_REQUEST);
     }
-}
+}*/

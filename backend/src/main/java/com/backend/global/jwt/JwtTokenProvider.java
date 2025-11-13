@@ -1,3 +1,4 @@
+/*
 package com.backend.global.jwt;
 
 import com.backend.domain.member.entity.Role;
@@ -84,7 +85,9 @@ public class JwtTokenProvider {
         }
     }
 
-    /** 토큰 파싱 관련 (Claims 읽기) */
+    */
+/** 토큰 파싱 관련 (Claims 읽기) *//*
+
 
     // Claims 파싱 (JWT → 내부 데이터 복호화 + 서명 검증)
     private Claims parseClaims(String token) {
@@ -130,7 +133,9 @@ public class JwtTokenProvider {
         return type != null ? type.toString() : "unknown";
     }
 
-    /** 토큰 만료시간 조회 (쿠키 설정 등에서 사용) */
+    */
+/** 토큰 만료시간 조회 (쿠키 설정 등에서 사용) *//*
+
 
     public long getAccessTokenExpireTime() {
         return ACCESS_TOKEN_EXPIRE_TIME / 1000; // 초 단위로 변환 (쿠키에서 사용하기 좋음)
@@ -140,3 +145,4 @@ public class JwtTokenProvider {
         return REFRESH_TOKEN_EXPIRE_TIME / 1000;
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.backend.domain.member.dto.response;
 
 import com.backend.domain.member.entity.Member;
@@ -20,3 +21,4 @@ public record MemberResponse(
         );
     }
 }
+*/

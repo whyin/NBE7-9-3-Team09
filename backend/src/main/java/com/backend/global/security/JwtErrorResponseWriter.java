@@ -1,3 +1,4 @@
+/*
 package com.backend.global.security;
 
 import com.backend.global.response.ErrorCode;
@@ -28,3 +29,4 @@ public class JwtErrorResponseWriter {
         objectMapper.writeValue(response.getWriter(), errorBody);
     }
 }
+*/

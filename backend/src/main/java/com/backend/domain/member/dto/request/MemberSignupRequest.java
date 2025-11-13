@@ -1,3 +1,4 @@
+/*
 package com.backend.domain.member.dto.request;
 
 import com.backend.domain.member.entity.Member;
@@ -37,3 +38,4 @@ public record MemberSignupRequest(
                 .build();
     }
 }
+*/

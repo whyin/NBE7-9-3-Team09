@@ -1,3 +1,4 @@
+/*
 package com.backend.global.security;
 
 import com.backend.domain.member.entity.Member;
@@ -52,3 +53,4 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() { return true; }
 }
+*/

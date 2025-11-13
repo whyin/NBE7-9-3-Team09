@@ -1,3 +1,4 @@
+/*
 package com.backend.global.security;
 
 import com.backend.domain.member.entity.Member;
@@ -27,3 +28,4 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(member);
     }
 }
+*/
