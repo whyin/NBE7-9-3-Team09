@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
+    kotlin("jvm")
 }
 
 group = "com"
@@ -60,6 +61,7 @@ dependencies {
 
     // API 명세 관련
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<Test> {
