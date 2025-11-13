@@ -52,7 +52,7 @@ public class PlanServiceTest {
 
         assertThat(planList).isNotNull();
         assertThat(planList).size().isEqualTo(2);
-        assertThat(planList.get(0).title()).isEqualTo("초기 일정 데이터1");
+        assertThat(planList.get(0).title).isEqualTo("초기 일정 데이터1");
     }
 
     @Test
@@ -111,7 +111,7 @@ public class PlanServiceTest {
 
         PlanResponseBody toBePlanResponseBody =  new PlanResponseBody(plan);
 
-        assertThat(planResponseBody.title()).isEqualTo(toBePlanResponseBody.title());
+        assertThat(planResponseBody.title).isEqualTo(toBePlanResponseBody.title);
 
     }
 

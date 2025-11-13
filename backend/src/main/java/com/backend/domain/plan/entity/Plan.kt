@@ -2,32 +2,27 @@ package com.backend.domain.plan.entity
 
 import com.backend.domain.member.entity.Member
 import com.backend.domain.plan.dto.PlanUpdateRequestBody
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.createDate
 import jakarta.persistence.*
-import lombok.AllArgsConstructor
-import lombok.Builder
-import lombok.Getter
-import lombok.NoArgsConstructor
-import org.springframework.data.annotation.CreatedDate
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
+import org.springframework.data.jpa.domain.AbstractAuditable_.createdDate
 import org.springframework.data.jpa.domain.AbstractPersistable_.id
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Entity
 class Plan(
-    id: Long?,
+    id: Long? = null,
     member: Member,
-    createdDate: LocalDateTime,
-    modifyDate: LocalDateTime,
+    createdDate: LocalDateTime? = LocalDateTime.now(),
+    modifyDate: LocalDateTime? = LocalDateTime.now(),
     startDate: LocalDateTime,
     endDate: LocalDateTime,
     title: String,
-    content: String,
+    content: String
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id = id ?: null
+    val id = id
 
     @ManyToOne(fetch = FetchType.LAZY)
     val member = member;
@@ -52,11 +47,6 @@ class Plan(
 
     @OneToMany(mappedBy = "plan", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     val planMembers: MutableList<PlanMember?> = ArrayList<PlanMember?>()
-
-
-    init {
-
-    }
 
     fun updatePlan(planUpdateRequestBody: PlanUpdateRequestBody, member: Member): Plan {
         return Plan(

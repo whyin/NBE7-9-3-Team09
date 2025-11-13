@@ -78,7 +78,7 @@ public class PlanMemberService {
             throw new BusinessException(ErrorCode.DUPLICATE_MEMBER_INVITE);
         };
 
-        PlanMember planMember = PlanMember.builder().member(invitedMember).plan(plan).build();
+        PlanMember planMember = new PlanMember(null,invitedMember,plan,null,null,0);
         return planMember;
     }
 
