@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.val;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDateTime;
@@ -28,14 +29,15 @@ public record PlanCreateRequestBody(
     }
 
     public Plan toEntity(Member member) {
-        return Plan.builder()
-                .member(member)
-                .createDate(LocalDateTime.now())
-                .modifyDate(LocalDateTime.now())
-                .title(title)
-                .content(content)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build();
+        return new Plan(
+                null,
+                member,
+                null,
+                null,
+                startDate,
+                endDate,
+                title,
+                content
+                );
     }
 }
