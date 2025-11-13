@@ -1,4 +1,4 @@
-package com.backend.global.security
+package com.backend.global.security.jwt
 
 import com.backend.global.response.ErrorCode
 import com.fasterxml.jackson.databind.ObjectMapper

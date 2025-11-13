@@ -1,4 +1,4 @@
-package com.backend.global.jwt
+package com.backend.global.security.jwt
 
 enum class TokenStatus {
     VALID,  // 유효한 토큰

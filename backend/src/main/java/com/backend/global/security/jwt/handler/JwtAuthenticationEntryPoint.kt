@@ -1,7 +1,7 @@
-package com.backend.global.security.handler
+package com.backend.global.security.jwt.handler
 
 import com.backend.global.response.ErrorCode
-import com.backend.global.security.JwtErrorResponseWriter
+import com.backend.global.security.jwt.JwtErrorResponseWriter
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest

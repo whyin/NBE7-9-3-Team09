@@ -1,8 +1,8 @@
-package com.backend.global.jwt
+package com.backend.global.security.jwt
 
 import com.backend.domain.member.entity.Role
-import com.backend.global.security.CustomUserDetails
-import com.backend.global.security.CustomUserDetailsService
+import com.backend.global.security.user.CustomUserDetails
+import com.backend.global.security.user.CustomUserDetailsService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.JwtException

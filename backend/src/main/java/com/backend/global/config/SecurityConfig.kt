@@ -1,23 +1,16 @@
 package com.backend.global.config
 
-import com.backend.global.security.JwtAuthenticationFilter
-import com.backend.global.security.handler.JwtAccessDeniedHandler
-import com.backend.global.security.handler.JwtAuthenticationEntryPoint
-import jakarta.servlet.http.HttpServletRequest
-import lombok.RequiredArgsConstructor
+import com.backend.global.security.jwt.JwtAuthenticationFilter
+import com.backend.global.security.jwt.handler.JwtAccessDeniedHandler
+import com.backend.global.security.jwt.handler.JwtAuthenticationEntryPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configurers.*
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer.AuthorizationManagerRequestMatcherRegistry
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
-import org.springframework.web.cors.CorsConfigurationSource
 
 /**
  * Spring Security의 전반적인 설정을 담당하는 클래스

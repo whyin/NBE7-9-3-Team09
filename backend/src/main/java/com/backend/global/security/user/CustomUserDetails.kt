@@ -1,4 +1,4 @@
-package com.backend.global.security
+package com.backend.global.security.user
 
 import com.backend.domain.member.entity.Member
 import org.springframework.security.core.GrantedAuthority

@@ -1,7 +1,5 @@
-package com.backend.global.security
+package com.backend.global.security.jwt
 
-import com.backend.global.jwt.JwtTokenProvider
-import com.backend.global.jwt.TokenStatus
 import com.backend.global.response.ErrorCode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.servlet.FilterChain
@@ -9,7 +7,6 @@ import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.springframework.http.HttpHeaders
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
