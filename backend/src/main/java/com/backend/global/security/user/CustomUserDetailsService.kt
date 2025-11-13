@@ -1,6 +1,5 @@
-package com.backend.global.security.user
-
 import com.backend.domain.member.repository.MemberRepository
+import com.backend.global.security.user.CustomUserDetails
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -13,7 +12,7 @@ class CustomUserDetailsService(
 
     override fun loadUserByUsername(memberId: String): UserDetails {
         val member = memberRepository.findByMemberId(memberId)
-            .orElseThrow { UsernameNotFoundException("해당 ID의 회원을 찾을 수 없습니다.") }
+            ?: throw UsernameNotFoundException("해당 ID의 회원을 찾을 수 없습니다.")
         return CustomUserDetails(member)
     }
 

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails
 
 class CustomUserDetails(member: Member) : UserDetails {
 
-    val id: Long = member.getId()
+    val id: Long? = member.id
     val memberId: String = member.memberId
     private val password: String = member.password
     val nickname: String = member.nickname
