@@ -13,9 +13,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.List
 
-@Slf4j
 @Configuration
-@RequiredArgsConstructor
 class BaseInitData(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder
