@@ -1,22 +1,24 @@
-package com.backend.domain.member.dto.response;
+package com.backend.domain.member.dto.response
 
-import com.backend.domain.member.entity.Member;
-import com.backend.domain.member.entity.Role;
+import com.backend.domain.member.entity.Member
+import com.backend.domain.member.entity.Role
 
-public record MemberResponse(
-        Long id,
-        String memberId,
-        String email,
-        String nickname,
-        Role role
+data class MemberResponse(
+    val id: Long?,
+    val memberId: String,
+    val email: String,
+    val nickname: String,
+    val role: Role
 ) {
-    public static MemberResponse from(Member member) {
-        return new MemberResponse(
-                member.getId(),
-                member.getMemberId(),
-                member.getEmail(),
-                member.getNickname(),
-                member.getRole()
-        );
+    companion object {
+        fun from(member: Member): MemberResponse =
+            MemberResponse(
+                id = member.id,
+                memberId = member.memberId,
+                email = member.email,
+                nickname = member.nickname,
+                role = member.role
+            )
     }
+
 }

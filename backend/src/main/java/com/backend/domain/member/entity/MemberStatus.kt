@@ -1,6 +1,7 @@
-package com.backend.domain.member.entity;
+package com.backend.domain.member.entity
 
-public enum MemberStatus {
+enum class MemberStatus {
     ACTIVE,
     DELETED
+
 }

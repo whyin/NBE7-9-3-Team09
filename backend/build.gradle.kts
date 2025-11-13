@@ -2,6 +2,8 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.jetbrains.kotlin.plugin.spring") version "2.2.0"
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.0"
     kotlin("jvm")
 }
 
@@ -62,6 +64,18 @@ dependencies {
     // API 명세 관련
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
     implementation(kotlin("stdlib-jdk8"))
+
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+
+    // ↓ 이 두 줄 꼭 있어야 함
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
 }
 
 tasks.withType<Test> {

@@ -1,15 +1,15 @@
-package com.backend.domain.member.dto.request;
+package com.backend.domain.member.dto.request
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 
-public record MemberLoginRequest (
+data class MemberLoginRequest(
+    @field:NotBlank(message = "아이디는 필수 입력값입니다.")
+    @field:Size(min = 4, max = 20, message = "아이디는 4~20자여야 합니다.")
+    val memberId: String,
 
-        @NotBlank(message = "아이디는 필수 입력값입니다.")
-        @Size(min = 4, max = 20, message = "아이디는 4~20자여야 합니다.")
-        String memberId,
+    @field:NotBlank(message = "비밀번호는 필수 입력값입니다.")
+    @field:Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.")
+    val password: String
 
-        @NotBlank(message = "비밀번호는 필수 입력값입니다.")
-        @Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.")
-        String password
-){ }
+)

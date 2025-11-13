@@ -1,5 +1,6 @@
-package com.backend.domain.member.entity;
+package com.backend.domain.member.entity
 
-public enum Role {
+enum class Role {
     USER, ADMIN
+
 }
