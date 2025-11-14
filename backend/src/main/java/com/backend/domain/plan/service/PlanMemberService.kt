@@ -32,7 +32,8 @@ class PlanMemberService(
     }
 
     fun myInvitedPlanList(memberPkId: Long): MutableList<PlanMemberMyResponseBody?> {
-        val member: Member? = Member(memberPkId)
+        // TODO : 이후 ID 값만 있는 멤버 객체를 생성하는 방법 찾기
+        val member: Member? = memberService.findById(memberPkId)
 
         val planMemberList = planMemberRepository.getPlanMembersByMember(member)
         val myPlanMemberList =
@@ -84,7 +85,8 @@ class PlanMemberService(
     }
 
     private fun isMyInvite(requestBody: PlanMemberAnswerRequestBody, memberPkId: Long): PlanMember {
-        val member: Member = Member(memberPkId)
+        // TODO : 이후 ID 값만 있는 멤버 객체를 생성하는 방법 찾기
+        val member: Member = memberService.findById(memberPkId)
 
         val plan = planService!!.getPlanById(requestBody.planId)
 
