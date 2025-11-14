@@ -17,13 +17,13 @@ public class ModelRestaurantImportController {
     @PostMapping
     public ResponseEntity<ApiResponse<Integer>> importAll() {
         int saved = importService.importAllDistricts();
-        return ResponseEntity.ok(ApiResponse.success(saved, "모든 구 모범음식점 " + saved + "건 저장"));
+        return ResponseEntity.ok(ApiResponse.success( "모든 구 모범음식점 " + saved + "건 저장"));
     }
 
     // 특정 구만 (예: /internal/import/model-restaurants/ydp)
     @PostMapping("/{district}")
     public ResponseEntity<ApiResponse<Integer>> importOne(@PathVariable String district) {
         int saved = importService.importByDistrict(district);
-        return ResponseEntity.ok(ApiResponse.success(saved, district + " 모범음식점 " + saved + "건 저장"));
+        return ResponseEntity.ok(ApiResponse.success( district + " 모범음식점 " + saved + "건 저장"));
     }
 }

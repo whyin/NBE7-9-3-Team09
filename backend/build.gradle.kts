@@ -2,9 +2,9 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    kotlin("plugin.jpa") version "1.9.25"
+    id("org.jetbrains.kotlin.plugin.spring") version "2.2.0"
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.0"
+    kotlin("jvm")
 }
 
 group = "com"
@@ -32,6 +32,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    // 코틀린 관련 의존성
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     // 스프링 시큐리티 (나중에 SecurityConfig 적용할 때)
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -63,17 +66,19 @@ dependencies {
 
     // API 명세 관련
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
-
-    // 코틀린 관련
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+
+    // ↓ 이 두 줄 꼭 있어야 함
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
-kotlin {
-    compilerOptions{
-        freeCompilerArgs.addAll("-Xjsr305=strict")
-    }
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
 }
 
 tasks.withType<Test> {

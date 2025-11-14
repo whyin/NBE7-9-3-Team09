@@ -7,9 +7,10 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.entity.MemberStatus;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.exception.BusinessException;
-import com.backend.global.jwt.JwtTokenProvider;
-import com.backend.global.jwt.TokenStatus;
+
 import com.backend.global.response.ErrorCode;
+import com.backend.global.security.jwt.JwtTokenProvider;
+import com.backend.global.security.jwt.TokenStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
