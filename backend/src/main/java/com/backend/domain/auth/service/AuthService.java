@@ -37,8 +37,8 @@ public class AuthService {
     @Transactional
     public TokenResponse login(String loginId, String password) {
 
-        Member member = memberRepository.findByMemberId(loginId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findByMemberId(loginId);
+//                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member.getStatus() != MemberStatus.ACTIVE) {
             throw new BusinessException(ErrorCode.INACTIVE_MEMBER); // 새로운 에러 코드 추가
