@@ -5,18 +5,18 @@ import java.time.LocalDateTime
 
 
 data class ReviewResponseDto(
-    val memberId: String,
-    val reviewId: Long,
-    val rating: Int,
+    val memberId: String?,
+    val reviewId: Long?,
+    val rating: Int?,
     val modify_date: LocalDateTime?,
-    val category: String,
-    val placeName: String,
-    val address: String,
-    val gu: String
+    val category: String?,
+    val placeName: String?,
+    val address: String?,
+    val gu: String?
 
 ) {
     companion object {
-        fun from(review: Review?): ReviewResponseDto {
+        fun from(review: Review): ReviewResponseDto {
             val member = review.member
             val place = review.place
             return ReviewResponseDto(

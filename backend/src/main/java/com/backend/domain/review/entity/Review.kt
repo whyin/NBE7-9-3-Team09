@@ -29,7 +29,7 @@ class Review(
 
 
     @Column(nullable = false, name = "created_date")
-    var createdDate: LocalDateTime?
+    var createdDate: LocalDateTime? = null
 
     @Column(nullable = false, name = "modified_date")
     var modifiedDate: LocalDateTime? = null

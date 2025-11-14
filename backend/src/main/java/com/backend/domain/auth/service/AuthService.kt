@@ -115,7 +115,7 @@ class AuthService(
     // === 공통 유틸 메서드 === //
 
     /** 토큰에서 memberId 가져오기  */
-    fun getMemberId(accessTokenHeader: String): Long {
+    fun getMemberId(accessTokenHeader: String?): Long {
         val token = extractToken(accessTokenHeader)
         return jwtTokenProvider.getMemberIdFromToken(token)
     }
