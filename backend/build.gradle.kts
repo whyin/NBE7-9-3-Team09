@@ -73,6 +73,9 @@ dependencies {
     // ↓ 이 두 줄 꼭 있어야 함
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+    // Jackson Kotlin module 추가
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2")
 }
 
 allOpen {

@@ -14,11 +14,13 @@ class HotelApiService(
     @Value("\${seoul.api.base-url}")
     private val baseUrl: String,
 ) {
-
     private val restClient: RestClient = RestClient.create()
 
     fun fetchHotels(start: Int, end: Int): HotelRoot? {
-        val url = "$baseUrl/$apiKey/json/SebcHotelListKor/$start/$end"
+        val url = String.format(
+            "%s/%s/json/SebcHotelListKor/%d/%d",
+            baseUrl, apiKey, start, end
+        )
 
         return restClient.get()
             .uri(url)
