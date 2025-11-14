@@ -33,6 +33,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    // 코틀린 관련 의존성
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+
     // 스프링 시큐리티 (나중에 SecurityConfig 적용할 때)
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("me.paulschwarz:spring-dotenv:4.0.0")

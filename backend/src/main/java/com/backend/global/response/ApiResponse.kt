@@ -23,8 +23,8 @@ class ApiResponse<T>(
             )
         }
         @JvmStatic
-        fun <T> success(data: T?): ApiResponse<T?> {
-            return ApiResponse<T?>(
+        fun <T> success(data: T?): ApiResponse<T> {
+            return ApiResponse<T>(
                 ResponseCode.CREATED.code,
                 ResponseCode.CREATED.message,
                 data
