@@ -2,6 +2,9 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
+    kotlin("jvm") version "1.9.25"
+    kotlin("plugin.spring") version "1.9.25"
+    kotlin("plugin.jpa") version "1.9.25"
 }
 
 group = "com"
@@ -60,6 +63,17 @@ dependencies {
 
     // API 명세 관련
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
+
+    // 코틀린 관련
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+}
+
+kotlin {
+    compilerOptions{
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
 }
 
 tasks.withType<Test> {
