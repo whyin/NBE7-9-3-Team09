@@ -59,17 +59,17 @@ class PlanDetailController(
         val memberPkId = authService.getMemberId(accessToken)
 
         val planDetailsElementBodies = planDetailService.getPlanDetailsByPlanId(planId, memberPkId)
-        return success<List<PlanDetailsElementBody>>(planDetailsElementBodies) as ApiResponse<List<PlanDetailsElementBody>>
+        return success<List<PlanDetailsElementBody>>(planDetailsElementBodies as List<PlanDetailsElementBody>,"계획 상세 조회에 성공했습니다.") as ApiResponse<List<PlanDetailsElementBody>>
     }
 
     @GetMapping("/{planId}/todaylist")
     fun getTodayPlanDetail(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String,
         @PathVariable planId: @NotNull Long
-    ): ApiResponse<MutableList<PlanDetailsElementBody>> {
+    ): ApiResponse<MutableList<PlanDetailsElementBody>?> {
         val memberPkId = authService.getMemberId(accessToken)
         val planDetailsElementBodies = planDetailService.getTodayPlanDetails(planId, memberPkId)
-        return success<MutableList<PlanDetailsElementBody>>(planDetailsElementBodies) as ApiResponse<MutableList<PlanDetailsElementBody>>
+        return success<MutableList<PlanDetailsElementBody>?>(planDetailsElementBodies as MutableList<PlanDetailsElementBody>?,"오늘 계획 상세 조회에 성공했습니다.")
     }
 
 

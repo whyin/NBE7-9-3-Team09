@@ -97,7 +97,7 @@ class PlanDetailService(
     @Transactional
     fun deletePlanDetail(planDetailId: Long, memberPkId: Long) {
         val planDetail = getPlanDetailById(planDetailId)
-        getAvailableMember(planDetail.plan?.id, memberPkId)
+        getAvailableMember(planDetail?.plan?.id?:throw BusinessException(ErrorCode.INVALID_MEMBER), memberPkId)
         planDetailRepository.deleteById(planDetailId)
     }
 
@@ -135,11 +135,11 @@ class PlanDetailService(
         }
 
         //계획 안의 시간인지
-        if (planDetailRequestBody.startTime.isBefore(plan.startDate) || planDetailRequestBody.endTime?.isAfter(plan.endDate)) {
+        if (planDetailRequestBody.startTime.isBefore(plan.startDate) || planDetailRequestBody.endTime.isAfter(plan.endDate)) {
             throw BusinessException(ErrorCode.NOT_VALID_DATE)
         }
         // 지금으로부터 10년 뒤 까지만 계획 설정 가능
-        if (planDetailRequestBody.startTime?.isAfter(LocalDateTime.now().plusYears(10))) {
+        if (planDetailRequestBody.startTime.isAfter(LocalDateTime.now().plusYears(10))) {
             throw BusinessException(ErrorCode.NOT_VALID_DATE)
         }
     }

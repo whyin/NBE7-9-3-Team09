@@ -16,12 +16,12 @@ data class PlanDetailsElementBody(
     val content: @NotEmpty String?
 ) {
     constructor(planDetail: PlanDetail?) : this(
-        planDetail.id,
-        planDetail.place?.id?:0,
-        planDetail.place?.placeName,
-        planDetail.startTime,
-        planDetail.endTime,
-        planDetail.title,
-        planDetail.content
+        planDetail?.id,
+        planDetail?.place?.id?:0,
+        planDetail?.place?.placeName,
+        planDetail?.startTime,
+        planDetail?.endTime,
+        planDetail?.title,
+        planDetail?.content
     )
 }

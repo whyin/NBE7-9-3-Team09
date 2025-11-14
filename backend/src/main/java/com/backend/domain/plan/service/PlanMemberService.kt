@@ -104,7 +104,9 @@ class PlanMemberService(
     }
 
     fun isAvailablePlanMember(planId: Long?, member: Member): Boolean {
-        return planMemberRepository.existsByPlanIdAndMemberId(planId, member.id?:throw BusinessException(ErrorCode.INVALID_MEMBER))
+        return planMemberRepository.existsByPlanIdAndMemberId(
+            planId?:throw BusinessException(ErrorCode.NOT_FOUND_PLAN),
+            member.id?:throw BusinessException(ErrorCode.INVALID_MEMBER))
 
     //        return planMemberRepository.existsByMemberInPlanId(member.id?: throw BusinessException(ErrorCode.INVALID_MEMBER)
 //        , planId)

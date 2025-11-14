@@ -51,7 +51,7 @@ class ApiResponse<T>(
         }
 
         @JvmStatic
-        fun <T> success(customMessage: MutableList<PlanDetailsElementBody?>): ApiResponse<T?> {
+        fun <T> success(customMessage: String): ApiResponse<T?> {
             return ApiResponse<T?>(
                 ResponseCode.CREATED.code,
                 customMessage,
