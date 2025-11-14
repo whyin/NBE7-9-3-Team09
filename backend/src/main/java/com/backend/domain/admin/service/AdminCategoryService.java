@@ -29,7 +29,7 @@ public class AdminCategoryService {
     public ResponseCategoryDto getCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
-        return ResponseCategoryDto.from(category);
+        return ResponseCategoryDto.Companion.from(category);
     }
 
     /** 카테고리 생성 */
@@ -37,7 +37,7 @@ public class AdminCategoryService {
         Category category = new Category();
         category.setName(name);
         categoryRepository.save(category);
-        return ResponseCategoryDto.from(category);
+        return ResponseCategoryDto.Companion.from(category);
     }
 
     /** 카테고리 수정 */
@@ -46,7 +46,7 @@ public class AdminCategoryService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
 
         category.setName(newName);
-        return ResponseCategoryDto.from(category);
+        return ResponseCategoryDto.Companion.from(category);
     }
 
     /** 카테고리 삭제 */

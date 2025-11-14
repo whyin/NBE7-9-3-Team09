@@ -78,7 +78,7 @@ open class PlanService(
         return PlanResponseBody(getPlanById(planId))
     }
 
-    fun getPlanById(planId: Long): Plan {
+    fun getPlanById(planId: Long?): Plan {
         return planRepository.findById(planId).orElseThrow<BusinessException?>(
             java.util.function.Supplier { BusinessException(com.backend.global.response.ErrorCode.NOT_FOUND_PLAN) }
         )!!

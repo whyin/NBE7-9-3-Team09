@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +27,7 @@ public class AdminPlaceService {
 
     /** 전체 장소 조회 */
     public List<ResponsePlaceDto> getAllPlaces() {
-        return placeRepository.findAll()
-                .stream()
-                .map(ResponsePlaceDto::from)
-                .toList();
+        return null;
     }
 
     /** 특정 카테고리에 속한 장소 조회 */
@@ -43,17 +42,23 @@ public class AdminPlaceService {
 
     /** 장소 등록 (관리자 직접 등록) */
     public void createPlace(RequestPlaceDto dto) {
-        Category category = categoryRepository.findById(dto.categoryId)
+        Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
 
-        Place place = Place.builder()
-                .placeName(dto.placeName)
-                .address(dto.address)
-                .gu(dto.gu)
-                .description(dto.description)
-                .category(category)
-                .build();
-
+        Place place = new Place(
+                null,
+                dto.getPlaceName(),
+                dto.getAddress(),
+                dto.getGu(),
+                category,
+                dto.getDescription(),
+                0,
+                0,
+                0.0,
+                null,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
         placeRepository.save(place);
     }
 

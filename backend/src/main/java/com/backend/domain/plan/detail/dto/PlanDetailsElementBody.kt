@@ -15,7 +15,7 @@ data class PlanDetailsElementBody(
     val title: @NotEmpty String?,
     val content: @NotEmpty String?
 ) {
-    constructor(planDetail: PlanDetail) : this(
+    constructor(planDetail: PlanDetail?) : this(
         planDetail.id,
         planDetail.place?.id?:0,
         planDetail.place?.placeName,

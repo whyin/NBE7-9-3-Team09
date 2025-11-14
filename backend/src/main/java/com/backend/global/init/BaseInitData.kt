@@ -4,9 +4,16 @@ import com.backend.domain.member.entity.Member
 import com.backend.domain.member.entity.Role
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.domain.place.repository.PlaceRepository
+import com.backend.domain.plan.detail.dto.PlanDetailRequestBody
+import com.backend.domain.plan.detail.entity.PlanDetail
+import com.backend.domain.plan.detail.repository.PlanDetailRepository
 import com.backend.domain.plan.entity.Plan
+import com.backend.domain.plan.entity.PlanMember
+import com.backend.domain.plan.repository.PlanMemberRepository
 import com.backend.domain.plan.repository.PlanRepository
 import com.backend.external.seoul.hotel.controller.HotelImportController
+import com.backend.global.exception.BusinessException
+import com.backend.global.response.ErrorCode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -22,8 +29,10 @@ class BaseInitData(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
     private val planRepository: PlanRepository,
+    private val planMemberRepository: PlanMemberRepository,
     private val hotelImportController: HotelImportController,
     private val placeRepository: PlaceRepository,
+    private val planDetailRepository: PlanDetailRepository,
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -58,6 +67,9 @@ class BaseInitData(
 
                 memberRepository.saveAll(List.of(member1, member2, admin))
                 log.info { "초기 member 데이터 세팅 완료: " }
+            }
+            if(placeRepository.count() == 0L) {
+                hotelImportController.importHotels();
             }
 
             if (planRepository.count() == 0L) {
@@ -95,13 +107,61 @@ class BaseInitData(
                     "초기 일정 데이터 내용2"
                 )
 
+
                 planRepository.saveAll(List.of<Plan>(plan1, plan2, plan3))
+
+                val planMember1 = PlanMember(
+                    null,
+                    memberRepository.getReferenceById(1L),
+                    planRepository.getReferenceById(1L)?:throw Exception(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    1
+                )
+
+                val planMember2 = PlanMember(
+                    null,
+                    memberRepository.getReferenceById(2L),
+                    planRepository.getReferenceById(2L)?:throw Exception(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    1
+                )
+
+                val planMember3 = PlanMember(
+                    null,
+                    memberRepository.getReferenceById(1L),
+                    planRepository.getReferenceById(3L)?:throw Exception(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    1
+                )
+
+                planMemberRepository.saveAll(List.of<PlanMember>(planMember1, planMember2, planMember3))
                 log.info("초기 plan 데이터 세팅 완료: ")
             }
 
-            if(placeRepository.count() == 0L) {
-                hotelImportController.importHotels();
+            if(planDetailRepository.count() == 0L) {
+                var planDetailRequestBody : PlanDetailRequestBody = PlanDetailRequestBody(
+                    1L,
+                    1L,
+                    LocalDateTime.now().plusHours(1),
+                    LocalDateTime.now().plusHours(2),
+                    "초기 여행 데이터 상세1",
+                    "초기 여행 데이터 상세 내용1"
+                )
+
+                val planDetail1: PlanDetail = PlanDetail(
+                    memberRepository.getReferenceById(1L),
+                    planRepository.getReferenceById(1L)?:throw BusinessException(ErrorCode.NOT_FOUND_PLACE),
+                    placeRepository.getReferenceById(1L),
+                    planDetailRequestBody
+                )
+
+                planDetailRepository.save<PlanDetail>(planDetail1)
             }
+
+
         }
     }
 }
