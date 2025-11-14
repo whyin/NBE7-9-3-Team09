@@ -20,13 +20,13 @@ class PlanDetail() {
      val id: Long? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
-    val plan: Plan? = null
+    var plan: Plan? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     var place: Place? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
-    val member: Member? = null
+    var member: Member? = null
 
     var startTime: @NotNull LocalDateTime? = null
 
@@ -35,6 +35,20 @@ class PlanDetail() {
     var title: @NotNull String? = null
 
     var content: @NotNull String? = null
+    constructor(
+        member: Member,
+        plan: Plan,
+        place: Place?,
+        requestBody: PlanDetailRequestBody
+    ) : this() {
+        this.member = member
+        this.plan = plan
+        this.place = place
+        this.title = requestBody.title
+        this.content = requestBody.content
+        this.startTime = requestBody.startTime
+        this.endTime = requestBody.endTime
+    }
 
 
     fun updatePlanDetail(planDetailRequestBody: PlanDetailRequestBody, place: Place): PlanDetail {
