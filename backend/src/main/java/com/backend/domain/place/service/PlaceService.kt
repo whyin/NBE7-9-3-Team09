@@ -1,68 +1,57 @@
-package com.backend.domain.place.service;
+package com.backend.domain.place.service
 
-import com.backend.domain.category.entity.Category;
-import com.backend.domain.category.repository.CategoryRepository;
-import com.backend.domain.place.dto.RequestPlaceDto;
-import com.backend.domain.place.dto.ResponsePlaceDto;
-import com.backend.domain.place.entity.Place;
-import com.backend.domain.place.repository.PlaceRepository;
-import com.backend.global.exception.BusinessException;
-import com.backend.global.response.ErrorCode;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import com.backend.domain.category.repository.CategoryRepository
+import com.backend.domain.place.dto.RequestPlaceDto
+import com.backend.domain.place.dto.ResponsePlaceDto
+import com.backend.domain.place.entity.Place
+import com.backend.domain.place.repository.PlaceRepository
+import com.backend.global.exception.BusinessException
+import com.backend.global.response.ErrorCode
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-@RequiredArgsConstructor
-public class PlaceService {
+class PlaceService(
+    private val placeRepository: PlaceRepository,
+    private val categoryRepository: CategoryRepository,
+) {
 
-    private final PlaceRepository placeRepository;
-    private final CategoryRepository categoryRepository;
+    fun findPlaceById(id: Long): Place =
+        placeRepository.findById(id)
+            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_PLACE) }
 
-    public Place findPlaceById(Long id) {
-        return placeRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_PLACE));
-    }
+    fun findPlacesByCategoryId(categoryId: Int): List<ResponsePlaceDto> =
+        placeRepository.findByCategoryId(categoryId)
+            .map(ResponsePlaceDto::from)
 
-    public List<ResponsePlaceDto> findPlacesByCategoryId(int categoryId) {
-        return placeRepository.findByCategoryId(categoryId)
-                .stream()
-                .map(ResponsePlaceDto::from)
-                .toList();
-    }
+    fun findOnePlace(id: Long): ResponsePlaceDto =
+        ResponsePlaceDto.from(findPlaceById(id))
 
-    public ResponsePlaceDto findOnePlace(Long id) {
-        return ResponsePlaceDto.from(findPlaceById(id));
-    }
+    @Transactional
+    fun save(dto: RequestPlaceDto) {
+        val category = categoryRepository.findById(dto.categoryId)
+            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_CATEGORY) }
 
-    public void save(RequestPlaceDto dto) {
-        Category category = categoryRepository.findById(dto.categoryId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
-
-        Place place = dto.toEntity(category);
-
-        placeRepository.save(place);
+        val place = dto.toEntity(category)
+        placeRepository.save(place)
     }
 
     @Transactional
-    public ResponsePlaceDto update(Long id, RequestPlaceDto dto) {
-        Place place = findPlaceById(id);
+    fun update(id: Long, dto: RequestPlaceDto): ResponsePlaceDto {
+        val place = findPlaceById(id)
 
         place.update(
-                dto.placeName(),
-                dto.address(),
-                dto.gu(),
-                dto.description()
-        );
+            dto.placeName,
+            dto.address,
+            dto.gu,
+            dto.description
+        )
 
-        return ResponsePlaceDto.from(place);
+        return ResponsePlaceDto.from(place)
     }
 
     @Transactional
-    public void delete(Long id) {
-        placeRepository.delete(findPlaceById(id));
+    fun delete(id: Long) {
+        placeRepository.delete(findPlaceById(id))
     }
-
 }

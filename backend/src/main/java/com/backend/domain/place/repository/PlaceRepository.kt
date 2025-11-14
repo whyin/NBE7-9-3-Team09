@@ -1,16 +1,15 @@
-// PlaceRepository.java
-package com.backend.domain.place.repository;
+package com.backend.domain.place.repository
 
-import com.backend.domain.place.entity.Place;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.backend.domain.place.entity.Place
+import org.springframework.data.jpa.repository.JpaRepository
 
-import java.util.List;
+interface PlaceRepository : JpaRepository<Place, Long> {
 
-public interface PlaceRepository extends JpaRepository<Place, Long> {
-    boolean existsByPlaceNameAndAddress(String placeName, String address);
-    List<Place> findByCategoryId(int categoryId);
+    fun existsByPlaceNameAndAddress(placeName: String, address: String): Boolean
 
-    Place getPlaceById(Long id);
+    fun findByCategoryId(categoryId: Int): List<Place>
 
-    List<Place> findByCategory_Name(String name);
+    fun getPlaceById(id: Long): Place
+
+    fun findByCategory_Name(name: String): List<Place>
 }

@@ -1,58 +1,65 @@
-package com.backend.domain.place.entity;
+package com.backend.domain.place.entity
 
-import com.backend.domain.category.entity.Category;
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import com.backend.domain.category.entity.Category
+import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Place {
+class Place(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    var id: Long? = null,
 
     @Column(nullable = false)
-    private String placeName;
+    var placeName: String,
 
-    private String address;
+    var address: String? = null,
 
     @Column(length = 50)
-    private String gu;
+    var gu: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private Category category;
+    var category: Category,
 
     @Column(columnDefinition = "TEXT")
-    private String description;
+    var description: String? = null,
 
     @Column(nullable = false)
-    private long ratingSum = 0L;
+    var ratingSum: Long = 0L,
 
     @Column(nullable = false)
-    private int  ratingCount = 0;
+    var ratingCount: Int = 0,
 
     @Column(nullable = false)
-    private double ratingAvg = 0.0;
+    var ratingAvg: Double = 0.0,
 
-    @Version private Long version; // 동시성 대비(낙관적 락)
+    @Version
+    var version: Long? = null,
 
-    private LocalDateTime createdDate;
-    private LocalDateTime updatedDate;
+    var createdDate: LocalDateTime? = null,
+    var updatedDate: LocalDateTime? = null,
+) {
 
-    public void update(String placeName, String address, String gu, String description) {
-        this.placeName = placeName;
-        this.address = address;
-        this.gu = gu;
-        this.description = description;
+    // JPA 프록시용 protected no-arg 생성자
+    protected constructor() : this(
+        placeName = "",
+        address = null,
+        gu = null,
+        category = Category(),   // 임시값 — JPA가 실제로는 프록시로 교체함
+        description = null
+    )
+
+    fun update(
+        placeName: String,
+        address: String,
+        gu: String,
+        description: String?
+    ) {
+        this.placeName = placeName
+        this.address = address
+        this.gu = gu
+        this.description = description
     }
-
-
 }

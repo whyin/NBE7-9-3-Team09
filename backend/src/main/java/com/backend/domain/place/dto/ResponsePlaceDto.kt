@@ -1,23 +1,24 @@
-package com.backend.domain.place.dto;
+package com.backend.domain.place.dto
 
-import com.backend.domain.place.entity.Place;
+import com.backend.domain.place.entity.Place
 
-public record ResponsePlaceDto(
-        Long id,
-        String placeName,
-        String address,
-        String gu,
-        String category,
-        String description
+data class ResponsePlaceDto(
+    val id: Long?,
+    val placeName: String,
+    val address: String?,
+    val gu: String?,
+    val category: String,
+    val description: String?
 ) {
-    public static ResponsePlaceDto from(Place place) {
-        return new ResponsePlaceDto(
-                place.getId(),
-                place.getPlaceName(),
-                place.getAddress(),
-                place.getGu(),
-                place.getCategory().getName(),
-                place.getDescription()
-        );
+    companion object {
+        fun from(place: Place): ResponsePlaceDto =
+            ResponsePlaceDto(
+                id = place.id,
+                placeName = place.placeName,
+                address = place.address,
+                gu = place.gu,
+                category = place.category.name,
+                description = place.description
+            )
     }
 }

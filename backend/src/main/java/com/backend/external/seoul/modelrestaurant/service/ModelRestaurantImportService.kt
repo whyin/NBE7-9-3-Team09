@@ -1,92 +1,98 @@
-package com.backend.external.seoul.modelrestaurant.service;
+package com.backend.external.seoul.modelrestaurant.service
 
-import com.backend.domain.category.entity.Category;
-import com.backend.domain.category.repository.CategoryRepository;
-import com.backend.domain.place.entity.Place;
-import com.backend.domain.place.repository.PlaceRepository;
-import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantPage;
-import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantRow;
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import com.backend.domain.category.entity.Category
+import com.backend.domain.category.repository.CategoryRepository
+import com.backend.domain.place.entity.Place
+import com.backend.domain.place.repository.PlaceRepository
+import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantPage
+import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantRow
+import org.springframework.core.env.Environment
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
-@RequiredArgsConstructor
-public class ModelRestaurantImportService {
+class ModelRestaurantImportService(
+    private val env: Environment,
+    private val api: GenericModelRestaurantApiService,
+    private val placeRepository: PlaceRepository,
+    private val categoryRepository: CategoryRepository,
+) {
 
-    private final Environment env;
-    private final GenericModelRestaurantApiService api;
-    private final PlaceRepository placeRepository;
-    private final CategoryRepository categoryRepository;
+    companion object {
+        private const val CATEGORY_NAME = "맛집"
+    }
 
-    private static final String CATEGORY_NAME = "맛집";
-
-    public List<String> districts() {
-        String csv = env.getProperty("modelrestaurant.districts", "");
-        return Arrays.stream(csv.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .toList();
+    fun districts(): List<String> {
+        val csv = env.getProperty("modelrestaurant.districts", "") ?: ""
+        return csv.split(",")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
     }
 
     @Transactional
-    public int importAllDistricts() {
-        int total = 0;
-        for (String d : districts()) {
-            total += importByDistrict(d);
+    fun importAllDistricts(): Int {
+        var total = 0
+        for (d in districts()) {
+            total += importByDistrict(d)
         }
-        return total;
+        return total
     }
 
     @Transactional
-    public int importByDistrict(String district) {
-        Category category = getOrCreateCategory(CATEGORY_NAME);
+    fun importByDistrict(district: String): Int {
+        val category = getOrCreateCategory(CATEGORY_NAME)
 
-        int start = 1, page = 100, saved = 0;
+        var start = 1
+        val pageSize = 100
+        var saved = 0
+
         while (true) {
-            int end = start + page - 1;
+            val end = start + pageSize - 1
 
-            ModelRestaurantPage pageData = api.fetch(district, start, end);
-            var rows = pageData.rows();
-            if (rows == null || rows.isEmpty()) break;
+            val pageData: ModelRestaurantPage = api.fetch(district, start, end)
+            val rows: List<ModelRestaurantRow> = pageData.rows() ?: break
+            if (rows.isEmpty()) break
 
-            for (ModelRestaurantRow r : rows) {
-                if (r.name().isBlank() || r.address().isBlank()) continue;
-                if (placeRepository.existsByPlaceNameAndAddress(r.name(), r.address())) continue;
+            for (r in rows) {
+                val name = r.name()
+                val address = r.address()
 
-                Place p = Place.builder()
-                        .placeName(r.name())
-                        .address(r.address())
-                        .gu(r.gu())
-                        .category(category)
-                        .description(r.description())
-                        .createdDate(LocalDateTime.now())
-                        .updatedDate(LocalDateTime.now())
-                        .build();
+                if (name.isBlank() || address.isBlank()) continue
+                if (placeRepository.existsByPlaceNameAndAddress(name, address)) continue
 
-                placeRepository.save(p);
-                saved++;
+                val now = LocalDateTime.now()
+
+                val place = Place(
+                    placeName = name,
+                    address = address,
+                    gu = r.gu(),
+                    category = category,
+                    description = r.description(),
+                ).apply {
+                    createdDate = now
+                    updatedDate = now
+                }
+
+                placeRepository.save(place)
+                saved++
             }
 
-            if (rows.size() < page) break; // 마지막 페이지
-            start = end + 1;
+            if (rows.size < pageSize) break  // 마지막 페이지
+            start = end + 1
         }
-        return saved;
+
+        return saved
     }
 
-    private Category getOrCreateCategory(String name) {
-        return categoryRepository.findByName(name)
-                .orElseGet(() -> {
-                    Category c = new Category();
-                    c.setName(name);
-                    c.setCreatedDate(LocalDateTime.now());
-                    c.setUpdatedDate(LocalDateTime.now());
-                    return categoryRepository.save(c);
-                });
-    }
+    private fun getOrCreateCategory(name: String): Category =
+        categoryRepository.findByName(name)
+            .orElseGet {
+                val now = LocalDateTime.now()
+                Category(
+                    name = name,
+                    createdDate = now,
+                    updatedDate = now
+                ).let(categoryRepository::save)
+            }
 }

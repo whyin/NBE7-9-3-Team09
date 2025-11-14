@@ -1,26 +1,18 @@
-package com.backend.domain.category.entity;
+package com.backend.domain.category.entity
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-public class Category {
+class Category(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    var id: Long? = null,
 
     @Column(nullable = false, unique = true, length = 50)
-    private String name;   // "RESTAURANT", "LODGING", "NIGHTSPOT"
+    var name: String = "",
 
-    private LocalDateTime createdDate;
-    private LocalDateTime updatedDate;
-
-}
+    var createdDate: LocalDateTime? = null,
+    var updatedDate: LocalDateTime? = null
+)
