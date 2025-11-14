@@ -33,15 +33,15 @@ class HotelImportService(
 
         while (true) {
             val root: HotelRoot = hotelApiService.fetchHotels(start, end) ?: break
-            val list = root.SebcHotelListKor() ?: break
-            val rows: List<HotelRow> = list.row() ?: break
+            val list = root.SebcHotelListKor ?: break
+            val rows: List<HotelRow> = list.row ?: break
             if (rows.isEmpty()) break
 
             for (row in rows) {
-                val name = safe(row.NAME_KOR())
-                val city = safe(row.H_KOR_CITY()) // 서울특별시
-                val gu = safe(row.H_KOR_GU())     // 서초구
-                val dong = safe(row.H_KOR_DONG()) // 반포4동
+                val name = safe(row.NAME_KOR)
+                val city = safe(row.H_KOR_CITY) // 서울특별시
+                val gu = safe(row.H_KOR_GU)     // 서초구
+                val dong = safe(row.H_KOR_DONG) // 반포4동
 
                 val address = buildAddress(city, gu, dong)
 

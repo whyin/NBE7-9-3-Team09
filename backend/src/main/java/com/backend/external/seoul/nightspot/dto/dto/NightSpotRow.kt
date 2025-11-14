@@ -1,14 +1,13 @@
-package com.backend.external.seoul.nightspot.dto.dto;
+package com.backend.external.seoul.nightspot.dto.dto
 
-// 1️⃣ 개별 row
-public record NightSpotRow(
-        String TITLE,
-        String ADDR,
-        String LA,
-        String LO,
-        String URL,
-        String SUBJECT_CD,
-        String OPERATING_TIME,
-        String FREE_YN,
-        String ENTR_FEE
-) {}
+data class NightSpotRow(
+    val TITLE: String?,
+    val ADDR: String?,
+    val LA: String?,
+    val LO: String?,
+    val URL: String?,
+    val SUBJECT_CD: String?,
+    val OPERATING_TIME: String?,
+    val FREE_YN: String?,
+    val ENTR_FEE: String?
+)

@@ -1,43 +1,47 @@
-package com.backend.external.seoul.modelrestaurant.dto;
+package com.backend.external.seoul.modelrestaurant.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ModelRestaurantRoot {
+data class ModelRestaurantRoot(
 
     @JsonProperty("YdpModelRestaurantDesignate")
-    public Container ydp;
+    val ydp: Container? = null,
 
     @JsonProperty("YcModelRestaurantDesignate")
-    public Container yc;
+    val yc: Container? = null,
 
     @JsonProperty("DongdeamoonModelRestaurantDesignate")
-    public Container ddm;
+    val ddm: Container? = null,
 
     @JsonProperty("DjModelRestaurantDesignate")
-    public Container dj;
+    val dj: Container? = null,
+) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Container {
-        public List<Row> row;
-    }
+    data class Container(
+        val row: List<Row>? = emptyList()
+    )
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Row {
-        public String UPSO_NM;
-        public String SITE_ADDR_RD;
-        public String SITE_ADDR;
-        public String SNT_UPTAE_NM;
-        public String MAIN_EDF;
-    }
+    data class Row(
+        @JsonProperty("UPSO_NM")
+        val upsoNm: String? = null,
 
-    public Container getContainer() {
-        if (ydp != null) return ydp;
-        if (yc  != null) return yc;
-        if (ddm != null) return ddm;
-        if (dj  != null) return dj;
-        return null;
-    }
+        @JsonProperty("SITE_ADDR_RD")
+        val siteAddrRd: String? = null,
+
+        @JsonProperty("SITE_ADDR")
+        val siteAddr: String? = null,
+
+        @JsonProperty("SNT_UPTAE_NM")
+        val uptae: String? = null,
+
+        @JsonProperty("MAIN_EDF")
+        val mainEdf: String? = null,
+    )
+
+    fun getContainer(): Container? =
+        ydp ?: yc ?: ddm ?: dj
 }

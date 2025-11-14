@@ -26,15 +26,15 @@ class NightSpotImportService(
     fun importAll(): Int {
         // 총 개수 읽는 DTO가 없으니 일단 넉넉히 1~1000 요청 (51건이면 전부 포함)
         val root: NightSpotRoot = apiService.fetchNightSpots(1, 1000) ?: return 0
-        val resp: NightSpotResponse = root.viewNightSpot() ?: return 0
-        val rows: List<NightSpotRow> = resp.row() ?: return 0
+        val resp: NightSpotResponse = root.viewNightSpot ?: return 0
+        val rows: List<NightSpotRow> = resp.row ?: return 0
 
         val nightspot: Category = getOrCreateCategory(NIGHTSPOT)
 
         var saved = 0
         for (r in rows) {
-            val name = safe(r.TITLE())
-            val addr = safe(r.ADDR())
+            val name = safe(r.TITLE)
+            val addr = safe(r.ADDR)
 
             // 최소 데이터 검증
             if (name.isBlank() || addr.isBlank()) continue
@@ -83,16 +83,16 @@ class NightSpotImportService(
     private fun buildDescription(r: NightSpotRow): String {
         val sb = StringBuilder()
 
-        r.OPERATING_TIME()?.takeIf { it.isNotBlank() }?.let {
+        r.OPERATING_TIME?.takeIf { it.isNotBlank() }?.let {
             sb.append("운영시간: ").append(it).append('\n')
         }
-        r.FREE_YN()?.takeIf { it.isNotBlank() }?.let {
+        r.FREE_YN?.takeIf { it.isNotBlank() }?.let {
             sb.append("요금: ").append(it).append('\n')
         }
-        r.ENTR_FEE()?.takeIf { it.isNotBlank() }?.let {
+        r.ENTR_FEE?.takeIf { it.isNotBlank() }?.let {
             sb.append("입장료: ").append(it).append('\n')
         }
-        r.URL()?.takeIf { it.isNotBlank() }?.let {
+        r.URL?.takeIf { it.isNotBlank() }?.let {
             sb.append("URL: ").append(it)
         }
 

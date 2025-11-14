@@ -1,8 +1,6 @@
-package com.backend.external.seoul.hotel.dto;
+package com.backend.external.seoul.hotel.dto
 
-import java.util.List;
-
-public record HotelResponse(
-        Integer list_total_count,
-        List<HotelRow> row
-) {}
+data class HotelResponse(
+    val list_total_count: Int?,          // 총 개수
+    val row: List<HotelRow>?             // 호텔 목록
+)

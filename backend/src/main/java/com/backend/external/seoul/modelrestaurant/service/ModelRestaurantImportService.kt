@@ -51,12 +51,12 @@ class ModelRestaurantImportService(
             val end = start + pageSize - 1
 
             val pageData: ModelRestaurantPage = api.fetch(district, start, end)
-            val rows: List<ModelRestaurantRow> = pageData.rows() ?: break
+            val rows: List<ModelRestaurantRow> = pageData.rows ?: break
             if (rows.isEmpty()) break
 
             for (r in rows) {
-                val name = r.name()
-                val address = r.address()
+                val name = r.name
+                val address = r.address
 
                 if (name.isBlank() || address.isBlank()) continue
                 if (placeRepository.existsByPlaceNameAndAddress(name, address)) continue
@@ -66,9 +66,9 @@ class ModelRestaurantImportService(
                 val place = Place(
                     placeName = name,
                     address = address,
-                    gu = r.gu(),
+                    gu = r.gu,
                     category = category,
-                    description = r.description(),
+                    description = r.description,
                 ).apply {
                     createdDate = now
                     updatedDate = now

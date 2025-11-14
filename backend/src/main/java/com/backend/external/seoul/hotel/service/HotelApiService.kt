@@ -1,29 +1,28 @@
-package com.backend.external.seoul.hotel.service;
+package com.backend.external.seoul.hotel.service
 
-import com.backend.external.seoul.hotel.dto.HotelRoot;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
+import com.backend.external.seoul.hotel.dto.HotelRoot
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
+import org.springframework.web.client.RestClient
 
 @Service
-public class HotelApiService {
+class HotelApiService(
 
-    @Value("${seoul.api.key}")
-    private String apiKey;
+    @Value("\${seoul.api.key}")
+    private val apiKey: String,
 
-    @Value("${seoul.api.base-url}")
-    private String baseUrl;
+    @Value("\${seoul.api.base-url}")
+    private val baseUrl: String,
+) {
 
-    private final RestClient restClient = RestClient.create();
+    private val restClient: RestClient = RestClient.create()
 
-    public HotelRoot fetchHotels(int start, int end) {
-        String url = String.format(
-                "%s/%s/json/SebcHotelListKor/%d/%d",
-                baseUrl, apiKey, start, end
-        );
+    fun fetchHotels(start: Int, end: Int): HotelRoot? {
+        val url = "$baseUrl/$apiKey/json/SebcHotelListKor/$start/$end"
+
         return restClient.get()
-                .uri(url)
-                .retrieve()
-                .body(HotelRoot.class);
+            .uri(url)
+            .retrieve()
+            .body(HotelRoot::class.java)
     }
 }

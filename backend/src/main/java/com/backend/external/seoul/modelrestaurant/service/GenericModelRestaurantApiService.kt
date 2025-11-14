@@ -1,73 +1,81 @@
-package com.backend.external.seoul.modelrestaurant.service;
+package com.backend.external.seoul.modelrestaurant.service
 
-import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantPage;
-import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantRow;
-import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantRoot;
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantPage
+import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantRow
+import com.backend.external.seoul.modelrestaurant.dto.ModelRestaurantRoot
+import org.springframework.core.env.Environment
+import org.springframework.stereotype.Service
+import org.springframework.web.client.RestClient
 
 @Service
-@RequiredArgsConstructor
-public class GenericModelRestaurantApiService {
+class GenericModelRestaurantApiService(
+    private val env: Environment,
+) {
 
-    private final Environment env;
-    private final RestClient http = RestClient.create();
+    private val http: RestClient = RestClient.create()
 
-    public ModelRestaurantPage fetch(String district, int start, int end) {
-        String prefix   = district + ".api.";
-        String baseUrl  = env.getProperty(prefix + "base-url");
-        String apiKey   = env.getProperty(prefix + "key");
-        String endpoint = env.getProperty(prefix + "endpoint");
+    fun fetch(district: String, start: Int, end: Int): ModelRestaurantPage {
+        val prefix = "$district.api."
+        val baseUrl = env.getProperty("${prefix}base-url")
+        val apiKey = env.getProperty("${prefix}key")
+        val endpoint = env.getProperty("${prefix}endpoint")
 
-        if (baseUrl == null || apiKey == null || endpoint == null) {
-            return new ModelRestaurantPage(List.of());
+        if (baseUrl.isNullOrBlank() || apiKey.isNullOrBlank() || endpoint.isNullOrBlank()) {
+            return ModelRestaurantPage(emptyList())
         }
 
-        String url = String.format("%s/%s/json/%s/%d/%d", baseUrl, apiKey, endpoint, start, end);
-        // System.out.println("[ModelRestaurant] GET " + url);
+        val url = "$baseUrl/$apiKey/json/$endpoint/$start/$end"
 
-        ModelRestaurantRoot root = http.get()
-                .uri(url)
-                .retrieve()
-                .body(ModelRestaurantRoot.class);
+        val root = http.get()
+            .uri(url)
+            .retrieve()
+            .body(ModelRestaurantRoot::class.java)
 
-        ModelRestaurantRoot.Container container =
-                (root == null) ? null : root.getContainer();
+        val container = root?.getContainer()
+        val rows = container?.row ?: return ModelRestaurantPage(emptyList())
 
-        List<ModelRestaurantRow> out = new ArrayList<>();
-        if (container == null || container.row == null) {
-            return new ModelRestaurantPage(out);
+        val out = mutableListOf<ModelRestaurantRow>()
+
+        for (r in rows) {
+            val name = nz(r.upsoNm)
+            val addrFromRd = nz(r.siteAddrRd)
+            val addr = if (addrFromRd.isNotBlank()) addrFromRd else nz(r.siteAddr)
+
+            if (name.isBlank() || addr.isBlank()) continue
+
+            val gu = extractGu(addr)
+            val desc = buildDesc(r.uptae, r.mainEdf)
+
+            out.add(
+                ModelRestaurantRow(
+                    name = name,
+                    address = addr,
+                    gu = gu ?: "",          // Kotlin 쪽에서 non-null String으로 맞추기
+                    category = "맛집",
+                    description = desc
+                )
+            )
         }
 
-        for (ModelRestaurantRoot.Row r : container.row) {
-            String name = nz(r.UPSO_NM);
-            String addr = !nz(r.SITE_ADDR_RD).isBlank() ? r.SITE_ADDR_RD : nz(r.SITE_ADDR);
-            if (name.isBlank() || addr.isBlank()) continue;
-
-            String gu   = extractGu(addr);
-            String desc = buildDesc(r.SNT_UPTAE_NM, r.MAIN_EDF);
-            out.add(new ModelRestaurantRow(name, addr, gu, "맛집", desc));
-        }
-        return new ModelRestaurantPage(out);
+        return ModelRestaurantPage(out)
     }
 
-    private static String nz(String s){ return s==null? "": s.trim(); }
+    private fun nz(s: String?): String = s?.trim() ?: ""
 
-    private static String extractGu(String address) {
-        for (String p : address.split("\\s+")) if (p.endsWith("구")) return p;
-        return null;
+    private fun extractGu(address: String?): String? {
+        if (address.isNullOrBlank()) return null
+        return address.split("\\s+".toRegex())
+            .firstOrNull { it.endsWith("구") }
     }
 
-    private static String buildDesc(String uptae, String main) {
-        String u = nz(uptae), m = nz(main);
-        if (!u.isBlank() && !m.isBlank()) return u + " | " + m;
-        if (!u.isBlank()) return u;
-        if (!m.isBlank()) return m;
-        return "";
+    private fun buildDesc(uptae: String?, main: String?): String {
+        val u = nz(uptae)
+        val m = nz(main)
+        return when {
+            u.isNotBlank() && m.isNotBlank() -> "$u | $m"
+            u.isNotBlank() -> u
+            m.isNotBlank() -> m
+            else -> ""
+        }
     }
 }

@@ -1,29 +1,36 @@
-package com.backend.external.seoul.modelrestaurant.controller;
+package com.backend.external.seoul.modelrestaurant.controller
 
-import com.backend.external.seoul.modelrestaurant.service.ModelRestaurantImportService;
-import com.backend.global.response.ApiResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.backend.external.seoul.modelrestaurant.service.ModelRestaurantImportService
+import com.backend.global.response.ApiResponse
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/internal/import/model-restaurants")
-@RequiredArgsConstructor
-public class ModelRestaurantImportController {
+class ModelRestaurantImportController(
+    private val importService: ModelRestaurantImportService,
+) {
 
-    private final ModelRestaurantImportService importService;
-
-    // 모든 등록된 구 클라이언트 한번에
+    // 모든 등록된 구 한 번에
     @PostMapping
-    public ResponseEntity<ApiResponse<Integer>> importAll() {
-        int saved = importService.importAllDistricts();
-        return ResponseEntity.ok(ApiResponse.success( "모든 구 모범음식점 " + saved + "건 저장"));
+    fun importAll(): ResponseEntity<ApiResponse<String?>> {
+        val saved = importService.importAllDistricts()
+        return ResponseEntity.ok(
+            ApiResponse.success<String?>("모든 구 모범음식점 ${saved}건 저장")
+        )
     }
 
     // 특정 구만 (예: /internal/import/model-restaurants/ydp)
     @PostMapping("/{district}")
-    public ResponseEntity<ApiResponse<Integer>> importOne(@PathVariable String district) {
-        int saved = importService.importByDistrict(district);
-        return ResponseEntity.ok(ApiResponse.success( district + " 모범음식점 " + saved + "건 저장"));
+    fun importOne(
+        @PathVariable district: String,
+    ): ResponseEntity<ApiResponse<String?>> {
+        val saved = importService.importByDistrict(district)
+        return ResponseEntity.ok(
+            ApiResponse.success<String?>("${district} 모범음식점 ${saved}건 저장")
+        )
     }
 }

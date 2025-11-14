@@ -1,32 +1,31 @@
-// NightSpotImportController.java
-package com.backend.external.seoul.nightspot.controller.controller;
+package com.backend.external.seoul.nightspot.controller.controller
 
-import com.backend.external.seoul.nightspot.service.service.NightSpotImportService;
-import com.backend.global.response.ApiResponse;
-import com.backend.global.response.ResponseCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.backend.external.seoul.nightspot.service.service.NightSpotImportService
+import com.backend.global.response.ApiResponse
+import com.backend.global.response.ResponseCode
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/internal/import/nightspots")
-public class NightSpotImportController {
-
-    private final NightSpotImportService importService;
+class NightSpotImportController(
+    private val importService: NightSpotImportService,
+) {
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> importNightSpots() {
-        int saved = importService.importAll();
+    fun importNightSpots(): ResponseEntity<ApiResponse<Void?>> {
+        val saved = importService.importAll()
 
-        // 201 Created로 응답 (바디는 커스텀 메시지)
-        ApiResponse<Void> body = new ApiResponse<>(
-                ResponseCode.CREATED.getCode(),
-                "야간명소 " + saved + "건 저장 완료",
-                null
-        );
+        val body = ApiResponse<Void?>(
+            ResponseCode.CREATED.code,                 // 코드 그대로 사용
+            "야간명소 ${saved}건 저장 완료",            // 커스텀 메시지
+            null
+        )
+
         return ResponseEntity
-                .status(ResponseCode.CREATED.getStatus())
-                .body(body);
+            .status(ResponseCode.CREATED.status)       // HTTP 201
+            .body(body)
     }
 }
