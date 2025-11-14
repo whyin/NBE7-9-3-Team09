@@ -24,7 +24,7 @@ class ReviewController (
     //리뷰 등록
     @PostMapping("/add")
     fun createReview(
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String?,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String,
         @RequestBody reviewRequestDto: ReviewRequestDto
     ): ApiResponse<ReviewResponseDto?> {
         val memberId = authService.getMemberId(accessToken)
@@ -35,7 +35,7 @@ class ReviewController (
     //리뷰 수정
     @PatchMapping("/modify/{memberId}")
     fun modifyReview(
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String?,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String,
         @PathVariable memberId: Long, @RequestParam modifyRating: Int
     ): ApiResponse<Void?> {
         val authMemberId = authService.getMemberId(accessToken)
@@ -46,7 +46,7 @@ class ReviewController (
     //리뷰 삭제
     @DeleteMapping("/delete/{reviewId}")
     fun deleteReview(
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String?,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String,
         @PathVariable reviewId: Long
     ): ApiResponse<Void?> {
         val memberId = authService.getMemberId(accessToken)
@@ -57,7 +57,7 @@ class ReviewController (
     // 내가 작성한 리뷰 조회
     @GetMapping("/myReview") // 꼭 reviewId가 필요한가?
     fun getMyReview(
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String?
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String
     ): ApiResponse<List<ReviewResponseDto?>?> {
         val memberId = authService.getMemberId(accessToken)
         val response: List<ReviewResponseDto?> = reviewService.getMyReviews(memberId)
