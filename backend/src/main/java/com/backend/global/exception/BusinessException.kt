@@ -4,6 +4,6 @@ import com.backend.global.response.ErrorCode
 import lombok.Getter
 
 @Getter
-class BusinessException(val errorCode: ErrorCode) : RuntimeException(
-
-)
+class BusinessException(val errorCode: ErrorCode, ) : RuntimeException(){
+    override val message: String = errorCode.message
+}
