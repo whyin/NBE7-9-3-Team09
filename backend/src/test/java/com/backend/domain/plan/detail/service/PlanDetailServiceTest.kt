@@ -45,7 +45,7 @@ class PlanDetailServiceTest{
         )
 
         planDetailService.addPlanDetail(planDetailRequestBody,1L)
-        val planDetails = planDetailService.getPlanDetailsByPlanId(1L,1L);
+        val planDetails = planDetailRepository.getPlanDetailsByPlanId(1L);
 
         assertThat(planDetails.size).isEqualTo(1)
         assertThat(planDetails.get(0).title).isEqualTo(title)

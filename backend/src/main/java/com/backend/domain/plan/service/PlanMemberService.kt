@@ -75,7 +75,9 @@ class PlanMemberService(
         val invitedMember = memberService.findById(requestBody.memberId)
 
         // 데이터 베이스 오류 처리를 서비스 로직 처리로 변경
-        if (planMemberRepository.existsByMemberInPlanId(invitedMember.id?:1, plan.id)) {
+        if (planMemberRepository.existsByMemberInPlanId(
+                invitedMember.id?:throw BusinessException(ErrorCode.INVALID_MEMBER),
+                plan.id?:throw BusinessException(ErrorCode.NOT_FOUND_PLAN))) {
             throw BusinessException(ErrorCode.DUPLICATE_MEMBER_INVITE)
         }
 
@@ -101,7 +103,12 @@ class PlanMemberService(
         return planMember
     }
 
-    fun isAvailablePlanMember(planId: Long, member: Member): Boolean {
-        return planMemberRepository!!.existsByMemberInPlanId(member.id!!, planId)
+    fun isAvailablePlanMember(planId: Long?, member: Member): Boolean {
+        return planMemberRepository.existsByPlanIdAndMemberId(
+            planId?:throw BusinessException(ErrorCode.NOT_FOUND_PLAN),
+            member.id?:throw BusinessException(ErrorCode.INVALID_MEMBER))
+
+    //        return planMemberRepository.existsByMemberInPlanId(member.id?: throw BusinessException(ErrorCode.INVALID_MEMBER)
+//        , planId)
     }
 }

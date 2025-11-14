@@ -1,6 +1,6 @@
 package com.backend.global.response
 
-import com.backend.domain.bookmark.dto.BookmarkResponseDto
+import com.backend.domain.plan.detail.dto.PlanDetailsElementBody
 import lombok.AllArgsConstructor
 import lombok.Getter
 
@@ -11,7 +11,7 @@ class ApiResponse<T>(
     val message: String,
     val data: T? = null
 ) {
-    // TODO : 추후 JvmStatic 어노테이션 제거
+    // TODO : 추후 JvmStatic 어노테이션 제거 + @Getter 제거
     companion object {
         // ResponseCode Status Created인 경우
         @JvmStatic

@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 class PlanDetail() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     val id: Long? = null
+     var id: Long? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     var plan: Plan? = null
@@ -28,17 +28,18 @@ class PlanDetail() {
     @ManyToOne(fetch = FetchType.LAZY)
     var member: Member? = null
 
-    var startTime: @NotNull LocalDateTime? = null
+    var startTime: @NotNull LocalDateTime = LocalDateTime.now()
 
-    var endTime: @NotNull LocalDateTime? = null
+    var endTime: @NotNull LocalDateTime = LocalDateTime.now()
 
     var title: @NotNull String? = null
 
     var content: @NotNull String? = null
+
     constructor(
         member: Member,
         plan: Plan,
-        place: Place?,
+        place: Place,
         requestBody: PlanDetailRequestBody
     ) : this() {
         this.member = member
@@ -49,7 +50,6 @@ class PlanDetail() {
         this.startTime = requestBody.startTime
         this.endTime = requestBody.endTime
     }
-
 
     fun updatePlanDetail(planDetailRequestBody: PlanDetailRequestBody, place: Place): PlanDetail {
         this.place = place

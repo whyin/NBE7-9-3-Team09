@@ -14,13 +14,17 @@ interface PlanMemberRepository : JpaRepository<PlanMember, Long> {
 
     fun getPlanMembersByPlan(plan: Plan): MutableList<PlanMember>
 
+    fun existsByPlanIdAndMemberId(planId: Long, memberId: Long): Boolean
 
-    @Query(
-        Querys.EXISTS_BY_MEMBER_IN_PLANID
-    )
+    @Query("""
+SELECT COUNT(pm) > 0
+FROM PlanMember pm
+WHERE pm.plan.id = :planId
+AND pm.member.id = :memberId
+""" )
     fun existsByMemberInPlanId(
         @Param("memberId") memberId: Long,
-        @Param("planId") planId: Long?
+        @Param("planId") planId: Long
     ): Boolean
 
     fun deletePlanMembersByPlanId(planId: Long)
@@ -30,12 +34,4 @@ interface PlanMemberRepository : JpaRepository<PlanMember, Long> {
     fun getPlanMembersByMemberId(memberId: Long): MutableList<PlanMember>
 
 
-    object Querys{
-        const val EXISTS_BY_MEMBER_IN_PLANID = """
-SELECT COUNT(pm) > 0
-FROM PlanMember pm
-WHERE pm.plan.id = :planId
-AND pm.member.id = :memberId
-"""
-    }
 }
