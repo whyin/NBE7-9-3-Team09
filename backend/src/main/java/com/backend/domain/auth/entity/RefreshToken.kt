@@ -1,36 +1,52 @@
-package com.backend.domain.auth.entity;
+package com.backend.domain.auth.entity
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "refresh_token")
-@AllArgsConstructor
-@Builder
-public class RefreshToken {
-
+class RefreshToken(
+    memberPk: Long,
+    token: String,
+    issuedAt: LocalDateTime,
+    expiry: LocalDateTime
+) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    var id: Long? = null
+        protected set
 
-    private Long memberPk;          // Member의 PK(id)와 연결 not memberId
+    @Column(nullable = false)
+    var memberPk: Long = memberPk
+        protected set
 
     @Column(nullable = false, unique = true, length = 512)
-    private String token;           // 실제 Refresh Token 값
+    var token: String = token
+        protected set
 
     @Column(nullable = false)
-    private LocalDateTime issuedAt; // 발급 시간
+    var issuedAt: LocalDateTime = issuedAt
+        protected set
 
     @Column(nullable = false)
-    private LocalDateTime expiry;   // 만료일시
+    var expiry: LocalDateTime = expiry
+        protected set
 
-    // 토큰 갱신 시 사용
-    public void updateToken(String newToken, LocalDateTime newExpiry) {
-        this.token = newToken;
-        this.expiry = newExpiry;
+    /** RefreshToken 갱신 로직 */
+    fun updateToken(newToken: String, newExpiry: LocalDateTime) {
+        this.token = newToken
+        this.expiry = newExpiry
+        this.issuedAt = LocalDateTime.now()
+    }
+
+    companion object {
+        fun create(memberPk: Long, token: String, expiry: LocalDateTime): RefreshToken {
+            return RefreshToken(
+                memberPk = memberPk,
+                token = token,
+                issuedAt = LocalDateTime.now(),
+                expiry = expiry
+            )
+        }
     }
 }

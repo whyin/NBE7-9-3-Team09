@@ -1,156 +1,153 @@
-package com.backend.domain.auth.service;
+package com.backend.domain.auth.service
 
-import com.backend.domain.auth.dto.reponse.TokenResponse;
-import com.backend.domain.auth.entity.RefreshToken;
-import com.backend.domain.auth.repository.RefreshTokenRepository;
-import com.backend.domain.member.entity.Member;
-import com.backend.domain.member.entity.MemberStatus;
-import com.backend.domain.member.repository.MemberRepository;
-import com.backend.global.exception.BusinessException;
-
-import com.backend.global.response.ErrorCode;
-import com.backend.global.security.jwt.JwtTokenProvider;
-import com.backend.global.security.jwt.TokenStatus;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
+import com.backend.domain.auth.dto.reponse.TokenResponse
+import com.backend.domain.auth.entity.RefreshToken
+import com.backend.domain.auth.repository.RefreshTokenRepository
+import com.backend.domain.member.entity.Member
+import com.backend.domain.member.entity.MemberStatus
+import com.backend.domain.member.repository.MemberRepository
+import com.backend.global.exception.BusinessException
+import com.backend.global.response.ErrorCode
+import com.backend.global.security.jwt.JwtTokenProvider
+import com.backend.global.security.jwt.TokenStatus
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 /**
  * 인증 서비스 (JWT 발급, 재발급, 로그아웃)
  */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 @Transactional(readOnly = true)
-public class AuthService {
+class AuthService(
+    private val memberRepository: MemberRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val refreshTokenRepository: RefreshTokenRepository,
+    private val jwtTokenProvider: JwtTokenProvider
+) {
+    private val log = KotlinLogging.logger {}
 
-    private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-
-    /** 로그인: AccessToken + RefreshToken 발급 */
+    /** 로그인: AccessToken + RefreshToken 발급  */
     @Transactional
-    public TokenResponse login(String loginId, String password) {
+    fun login(loginId: String, password: String): TokenResponse {
+        val member: Member = memberRepository.findByMemberId(loginId)
+            ?: throw BusinessException(ErrorCode.MEMBER_NOT_FOUND)
 
-        Member member = memberRepository.findByMemberId(loginId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-
-        if (member.getStatus() != MemberStatus.ACTIVE) {
-            throw new BusinessException(ErrorCode.INACTIVE_MEMBER); // 새로운 에러 코드 추가
+        if (member.status != MemberStatus.ACTIVE) {
+            throw BusinessException(ErrorCode.INACTIVE_MEMBER) // 새로운 에러 코드 추가
         }
 
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        if (!passwordEncoder.matches(password, member.password)) {
+            throw BusinessException(ErrorCode.INVALID_PASSWORD)
         }
 
-        Long memberPk = member.getId();
+        val memberPk = member.id
+            ?:throw BusinessException(ErrorCode.INVALID_MEMBER)
 
-        String accessToken = jwtTokenProvider.generateAccessToken(memberPk, member.getRole());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(memberPk, member.getRole());
-        long refreshTokenMaxAge = jwtTokenProvider.getRefreshTokenExpireTime();
+        val accessToken = jwtTokenProvider.generateAccessToken(memberPk, member.role)
+        val refreshToken = jwtTokenProvider.generateRefreshToken(memberPk, member.role)
+        val refreshTokenMaxAge = jwtTokenProvider.refreshTokenExpireTime
 
-        saveOrUpdateRefreshToken(memberPk, refreshToken);
+        saveOrUpdateRefreshToken(memberPk, refreshToken)
 
-        log.info("[Auth] 로그인 성공: memberPk={}, issuedAt={}", memberPk, LocalDateTime.now());
+        log.info { "${"[Auth] 로그인 성공: memberPk={}, issuedAt={}"} $memberPk ${LocalDateTime.now()}" }
 
-        return TokenResponse.of(accessToken, refreshToken, refreshTokenMaxAge, member.getRole().name());
+        return TokenResponse.of(accessToken, refreshToken, refreshTokenMaxAge, member.role.name)
     }
 
-    /** AccessToken 재발급 */
+    /** AccessToken 재발급  */
     @Transactional
-    public TokenResponse reissue(String refreshToken) {
-
-        if (refreshToken == null) {
-            throw new BusinessException(ErrorCode.TOKEN_NOT_FOUND);
-        }
+    fun reissue(refreshToken: String?): TokenResponse {
+        val token = refreshToken
+            ?: throw BusinessException(ErrorCode.TOKEN_NOT_FOUND)
 
         // 1. 유효성 검사
-        validateTokenStatus(refreshToken);
+        validateTokenStatus(token)
 
         // 2. 토큰에서 memberPk 추출
-        Long memberPk = jwtTokenProvider.getMemberIdFromToken(refreshToken);
+        val memberPk = jwtTokenProvider.getMemberIdFromToken(token)
 
         // 3. DB 토큰 검증
-        RefreshToken savedToken = getValidatedRefreshToken(refreshToken, memberPk);
+        val savedToken = getValidatedRefreshToken(token, memberPk)
 
         // 4. RefreshToken에는 role 정보가 없기 때문에 MemberService로부터 다시 조회 필요
-        Member member = memberRepository.findById(memberPk)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        val member = memberRepository.findByIdOrNull(memberPk)
+            ?: throw BusinessException(ErrorCode.MEMBER_NOT_FOUND)
 
         // 5. 새 AccessToken 발급
-        String newAccessToken = jwtTokenProvider.generateAccessToken(memberPk, member.getRole());
-        long refreshTokenMaxAge = jwtTokenProvider.getRefreshTokenExpireTime();
+        val newAccessToken = jwtTokenProvider.generateAccessToken(memberPk, member.role)
+        val refreshTokenMaxAge = jwtTokenProvider.refreshTokenExpireTime
 
-        log.info("[Auth] AccessToken 재발급 완료: memberPk={}, reissuedAt={}", memberPk, LocalDateTime.now());
+        log.info { "${"[Auth] AccessToken 재발급 완료: memberPk={}, reissuedAt={}"} $memberPk ${LocalDateTime.now()}" }
 
-        return TokenResponse.of(newAccessToken, savedToken.getToken(), refreshTokenMaxAge, member.getRole().name());
+        return TokenResponse.of(newAccessToken, savedToken.token, refreshTokenMaxAge, member.role.name)
     }
 
     @Transactional
-    public void logout(String accessTokenHeader) {
-        Long memberPk = jwtTokenProvider.getMemberIdFromToken(extractToken(accessTokenHeader));
-        refreshTokenRepository.deleteByMemberPk(memberPk);
-        log.info("[Auth] 로그아웃 완료: memberPk={}, deletedAt={}", memberPk, LocalDateTime.now());
+    fun logout(accessTokenHeader: String) {
+        val memberPk = jwtTokenProvider.getMemberIdFromToken(extractToken(accessTokenHeader))
+        refreshTokenRepository.deleteByMemberPk(memberPk)
+        log.info { "${"[Auth] 로그아웃 완료: memberPk={}, deletedAt={}"} $memberPk ${LocalDateTime.now()}" }
     }
 
     /**
      * RefreshToken 생성 or 갱신
      */
     @Transactional
-    private void saveOrUpdateRefreshToken(Long memberPk, String refreshToken) {
-        LocalDateTime expiryTime = LocalDateTime.now()
-                .plusSeconds(jwtTokenProvider.getRefreshTokenExpireTime());
+    private fun saveOrUpdateRefreshToken(memberPk: Long, refreshToken: String) {
+        val expiryTime = LocalDateTime.now()
+            .plusSeconds(jwtTokenProvider.refreshTokenExpireTime)
 
-        RefreshToken token = refreshTokenRepository.findByMemberPk(memberPk)
-                .orElseGet(() -> RefreshToken.builder()
-                        .memberPk(memberPk)
-                        .issuedAt(LocalDateTime.now())
-                        .build());
+        val token: RefreshToken = refreshTokenRepository.findByMemberPk(memberPk)
+            ?: RefreshToken.create(
+                memberPk = memberPk,
+                token = refreshToken,
+                expiry = expiryTime
+            )
 
-        token.updateToken(refreshToken, expiryTime);
-        refreshTokenRepository.save(token);
+        token.updateToken(refreshToken, expiryTime)
+        refreshTokenRepository.save(token)
     }
 
     // === 공통 유틸 메서드 === //
 
-    /** 토큰에서 memberId 가져오기 */
-    public Long getMemberId(String accessTokenHeader) {
-        String token = extractToken(accessTokenHeader);
-        return jwtTokenProvider.getMemberIdFromToken(token);
+    /** 토큰에서 memberId 가져오기  */
+    fun getMemberId(accessTokenHeader: String): Long {
+        val token = extractToken(accessTokenHeader)
+        return jwtTokenProvider.getMemberIdFromToken(token)
     }
 
-    /** Bearer 접두사 제거 */
-    private String extractToken(String headerValue) {
-        if (headerValue == null || !headerValue.startsWith("Bearer ")) {
-            throw new BusinessException(ErrorCode.TOKEN_NOT_FOUND);
+    /** Bearer 접두사 제거  */
+    private fun extractToken(headerValue: String?): String {
+        val raw = headerValue ?: throw BusinessException(ErrorCode.TOKEN_NOT_FOUND)
+
+        if (!raw.startsWith("Bearer ")) {
+            throw BusinessException(ErrorCode.TOKEN_NOT_FOUND)
         }
-        return headerValue.replace("Bearer ", "").trim();
+
+        return raw.removePrefix("Bearer ").trim()
     }
 
-    /** RefreshToken DB 검증 */
-    private RefreshToken getValidatedRefreshToken(String refreshToken, Long memberPk) {
-        RefreshToken savedToken = refreshTokenRepository.findByMemberPk(memberPk)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN));
+    /** RefreshToken DB 검증  */
+    private fun getValidatedRefreshToken(refreshToken: String, memberPk: Long): RefreshToken {
+        val savedToken = refreshTokenRepository.findByMemberPk(memberPk)
+            ?: throw BusinessException(ErrorCode.INVALID_REFRESH_TOKEN)
 
-        if (!savedToken.getToken().equals(refreshToken)) {
-            throw new BusinessException(ErrorCode.MISMATCH_REFRESH_TOKEN);
+        if (savedToken.token != refreshToken) {
+            throw BusinessException(ErrorCode.MISMATCH_REFRESH_TOKEN)
         }
-        return savedToken;
+        return savedToken
     }
 
-    /** 토큰 상태 검증 (TokenStatus 기반) */
-    private void validateTokenStatus(String token) {
-        TokenStatus status = jwtTokenProvider.validateTokenStatus(token);
-
-        switch (status) {
-            case EXPIRED -> throw new BusinessException(ErrorCode.EXPIRED_REFRESH_TOKEN);
-            case INVALID -> throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
-            case VALID -> log.debug("[Auth] 토큰 유효성 검증 완료");
+    /** 토큰 상태 검증 (TokenStatus 기반)  */
+    private fun validateTokenStatus(token: String) {
+        when (jwtTokenProvider.validateTokenStatus(token)) {
+            TokenStatus.EXPIRED -> throw BusinessException(ErrorCode.EXPIRED_REFRESH_TOKEN)
+            TokenStatus.INVALID -> throw BusinessException(ErrorCode.INVALID_REFRESH_TOKEN)
+            TokenStatus.VALID -> log.debug { "[Auth] 토큰 유효성 검증 완료" }
         }
     }
 }

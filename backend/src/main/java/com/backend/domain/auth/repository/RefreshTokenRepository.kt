@@ -1,19 +1,18 @@
-package com.backend.domain.auth.repository;
+package com.backend.domain.auth.repository
 
-import com.backend.domain.auth.entity.RefreshToken;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
+import com.backend.domain.auth.entity.RefreshToken
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+interface RefreshTokenRepository : JpaRepository<RefreshToken, Long> {
 
-    Optional<RefreshToken> findByMemberPk(Long memberId);
+    fun findByMemberPk(memberPk: Long): RefreshToken?
 
-    Optional<RefreshToken> findByToken(String token);
+    fun findByToken(token: String): RefreshToken?
 
-    void deleteByMemberPk(Long memberId);
+    fun deleteByMemberPk(memberPk: Long)
 
-    boolean existsByMemberPk(Long memberId);
+    fun existsByMemberPk(memberPk: Long): Boolean
 }
+

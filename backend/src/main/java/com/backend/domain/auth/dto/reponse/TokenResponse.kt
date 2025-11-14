@@ -1,12 +1,20 @@
-package com.backend.domain.auth.dto.reponse;
+package com.backend.domain.auth.dto.reponse
 
-public record TokenResponse(
-        String accessToken,
-        String refreshToken,
-        long refreshTokenMaxAge,
-        String role
+@JvmRecord
+data class TokenResponse(
+    val accessToken: String,
+    val refreshToken: String,
+    val refreshTokenMaxAge: Long,
+    val role: String
 ) {
-    public static TokenResponse of(String accessToken, String refreshToken, long refreshTokenMaxAge, String role) {
-        return new TokenResponse(accessToken, refreshToken, refreshTokenMaxAge, role);
+    companion object {
+        fun of(
+            accessToken: String,
+            refreshToken: String,
+            refreshTokenMaxAge:
+            Long, role: String
+        ): TokenResponse {
+            return TokenResponse(accessToken, refreshToken, refreshTokenMaxAge, role)
+        }
     }
 }
