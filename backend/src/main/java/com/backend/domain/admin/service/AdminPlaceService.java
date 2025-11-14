@@ -43,14 +43,14 @@ public class AdminPlaceService {
 
     /** 장소 등록 (관리자 직접 등록) */
     public void createPlace(RequestPlaceDto dto) {
-        Category category = categoryRepository.findById(dto.categoryId())
+        Category category = categoryRepository.findById(dto.categoryId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
 
         Place place = Place.builder()
-                .placeName(dto.placeName())
-                .address(dto.address())
-                .gu(dto.gu())
-                .description(dto.description())
+                .placeName(dto.placeName)
+                .address(dto.address)
+                .gu(dto.gu)
+                .description(dto.description)
                 .category(category)
                 .build();
 
