@@ -117,7 +117,7 @@ class ReviewService (
         reviewRepository.findById(reviewId)
             .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_REVIEW) }
 
-    fun getPlaceEntity(placeId: Long): Place =
+    fun getPlaceEntity(placeId: Long?): Place =
         placeRepository.findById(placeId)
             .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_PLACE) }
 
