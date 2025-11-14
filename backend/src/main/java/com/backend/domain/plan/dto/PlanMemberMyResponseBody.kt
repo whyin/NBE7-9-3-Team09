@@ -5,7 +5,7 @@ import com.backend.domain.plan.entity.PlanMember
 @JvmRecord
 data class PlanMemberMyResponseBody(
     val planMemberId: Long,
-    val memberLoginId: Long,
+    val memberLoginId: Long?,
     val planTitle: String,
     val isAccepted: Int
 
