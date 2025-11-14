@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Table(name = "member")
 class Member(
     @Column(nullable = false, unique = true, length = 30)
-    var memberId: String, // 로그인용 아이디
+    val memberId: String, // 로그인용 아이디
 
     @Column(nullable = false)
     var password: String, // 암호화된 비밀번호
