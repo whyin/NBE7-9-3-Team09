@@ -1,3 +1,4 @@
+/*
 package com.backend.domain.admin.service;
 
 
@@ -21,7 +22,9 @@ public class AdminCategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryService categoryService;
 
-    /** 전체 카테고리 조회 */
+    */
+/** 전체 카테고리 조회 *//*
+
     public List<ResponseCategoryDto> getAllCategories() {
         return categoryService.findAll();
     }
@@ -32,7 +35,9 @@ public class AdminCategoryService {
         return ResponseCategoryDto.from(category);
     }
 
-    /** 카테고리 생성 */
+    */
+/** 카테고리 생성 *//*
+
     public ResponseCategoryDto createCategory(String name) {
         Category category = new Category();
         category.setName(name);
@@ -40,7 +45,9 @@ public class AdminCategoryService {
         return ResponseCategoryDto.from(category);
     }
 
-    /** 카테고리 수정 */
+    */
+/** 카테고리 수정 *//*
+
     public ResponseCategoryDto updateCategory(Long categoryId, String newName) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
@@ -49,7 +56,9 @@ public class AdminCategoryService {
         return ResponseCategoryDto.from(category);
     }
 
-    /** 카테고리 삭제 */
+    */
+/** 카테고리 삭제 *//*
+
     public void deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
@@ -57,3 +66,4 @@ public class AdminCategoryService {
         categoryRepository.delete(category);
     }
 }
+*/

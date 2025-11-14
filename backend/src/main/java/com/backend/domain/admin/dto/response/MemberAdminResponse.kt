@@ -1,30 +1,27 @@
-package com.backend.domain.admin.dto.response;
+package com.backend.domain.admin.dto.response
 
-import com.backend.domain.member.entity.Member;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.backend.domain.member.entity.Member
 
-import java.time.LocalDateTime;
-
-public record MemberAdminResponse(
-
-        Long id,
-        String memberId,
-        String email,
-        String nickname,
-        String role,
-        String status
-        // LocalDateTime createdAt
+@JvmRecord
+data class MemberAdminResponse(
+    val id: Long,
+    val memberId: String,
+    val email: String,
+    val nickname: String,
+    val role: String,
+    val status: String // LocalDateTime createdAt
 ) {
-    public static MemberAdminResponse from(Member member) {
-        return new MemberAdminResponse(
-                member.getId(),
-                member.getMemberId(),
-                member.getEmail(),
-                member.getNickname(),
-                member.getRole().name(),
-                member.getStatus().name()
-                // member.getCreatedAt()
-        );
+    companion object {
+        @JvmStatic
+        fun from(member: Member): MemberAdminResponse {
+            return MemberAdminResponse(
+                id = member.id ?: 0L, // or throw if null
+                memberId = member.memberId,
+                email = member.email,
+                nickname = member.nickname,
+                role = member.role.name,
+                status = member.status.name
+            )
+        }
     }
 }
