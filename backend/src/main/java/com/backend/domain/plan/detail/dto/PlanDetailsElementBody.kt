@@ -17,7 +17,7 @@ data class PlanDetailsElementBody(
 ) {
     constructor(planDetail: PlanDetail) : this(
         planDetail.id,
-        planDetail.place?.id ?:0 ,
+        planDetail.place?.id?:0,
         planDetail.place?.placeName,
         planDetail.startTime,
         planDetail.endTime,

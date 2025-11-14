@@ -7,14 +7,14 @@ import java.time.LocalDateTime
 
 @JvmRecord
 data class PlanDetailResponseBody(
-    val placeId: @NotNull Long,
+    val placeId: @NotNull Long?,
     val startTime: @NotEmpty LocalDateTime?,
     val endTime: @NotEmpty LocalDateTime?,
     val title: @NotEmpty String?,
     val content: @NotEmpty String?
 ) {
     constructor(planDetail: PlanDetail) : this(
-        planDetail.place?.id?:0,
+        planDetail.place?.id,
         planDetail.startTime,
         planDetail.endTime,
         planDetail.title,
