@@ -1,19 +1,16 @@
-package com.backend.domain.category.dto;
+package com.backend.domain.category.dto
 
-import com.backend.domain.category.entity.Category;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.backend.domain.category.entity.Category
 
-@Getter
-@AllArgsConstructor
-public class ResponseCategoryDto {
-    private Long id;
-    private String name;
-
-    public static ResponseCategoryDto from(Category category) {
-        return new ResponseCategoryDto(
-                category.getId(),
-                category.getName()
-        );
+data class ResponseCategoryDto(
+    val id: Long,
+    val name: String,
+) {
+    companion object {
+        fun from(category: Category): ResponseCategoryDto =
+            ResponseCategoryDto(
+                id = category.id ?: 0L,   // Kotlin null-safe
+                name = category.name
+            )
     }
 }
