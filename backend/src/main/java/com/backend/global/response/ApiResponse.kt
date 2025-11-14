@@ -42,8 +42,8 @@ class ApiResponse<T>(
 
         // custom 메세지 추가
         @JvmStatic
-        fun <T> success(data: T, customMessage: String): ApiResponse<T?> {
-            return ApiResponse<T?>(
+        fun <T> success(data: T, customMessage: String): ApiResponse<T> {
+            return ApiResponse<T>(
                 ResponseCode.CREATED.code,
                 customMessage,
                 data
