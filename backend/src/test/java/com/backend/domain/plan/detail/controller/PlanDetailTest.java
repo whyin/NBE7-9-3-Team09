@@ -1,18 +1,6 @@
-package com.backend.domain.plan.detail;
+package com.backend.domain.plan.detail.controller;
 
-import com.backend.domain.category.entity.Category;
-import com.backend.domain.category.repository.CategoryRepository;
 import com.backend.domain.member.dto.request.MemberSignupRequest;
-import com.backend.domain.member.entity.Member;
-import com.backend.domain.member.repository.MemberRepository;
-import com.backend.domain.member.service.MemberService;
-import com.backend.domain.place.entity.Place;
-import com.backend.domain.place.repository.PlaceRepository;
-import com.backend.domain.plan.detail.controller.PlanDetailController;
-import com.backend.domain.plan.detail.service.PlanDetailService;
-import com.backend.domain.plan.entity.Plan;
-import com.backend.domain.plan.repository.PlanRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.management.Query;
-
-import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;

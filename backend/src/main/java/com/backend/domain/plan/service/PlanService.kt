@@ -58,9 +58,9 @@ open class PlanService(
         isSameMember(plan, member)
         hasValidPlan(plan)
 
-        plan.updatePlan(planUpdateRequestBody, member)
-        planRepository.save<Plan?>(plan)
-        return PlanResponseBody(plan)
+        val newPlan : Plan = plan.updatePlan(planUpdateRequestBody, member);
+        planRepository.save<Plan>(newPlan)
+        return PlanResponseBody(newPlan)
     }
 
     @Transactional
