@@ -3,61 +3,57 @@ package com.backend.domain.bookmark.entity
 import com.backend.domain.member.entity.Member
 import com.backend.domain.place.entity.Place
 import jakarta.persistence.*
-import lombok.AccessLevel
-import lombok.AllArgsConstructor
-import lombok.Getter
-import lombok.NoArgsConstructor
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "bookmarks", uniqueConstraints = [UniqueConstraint(columnNames = ["member_id", "place_id"])])
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Getter
-class Bookmark {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bookmark_id", nullable = false)
-    private var bookmarkId: Long? = null
-
+@Table(
+    name = "bookmarks",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["member_id", "place_id"])]
+)
+class Bookmark(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
-    private var member: Member? = null
+    val member: Member,
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "place_id", nullable = false)
-    private var place: Place? = null
+    val place: Place
+) {
 
-    @Column(name = "create_date", nullable = false)
-    private var createdAt: LocalDateTime? = null
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var bookmarkId: Long? = null
+        protected set  // JPA-friendly, 외부에서 직접 수정 금지
 
-    @Column(name = "delete_date")
-    private var deletedAt: LocalDateTime? = null
+    var createdAt: LocalDateTime = LocalDateTime.now()
+        protected set
 
-    @PrePersist
-    protected fun onCreate() {
-        this.createdAt = LocalDateTime.now()
-    }
+    var deletedAt: LocalDateTime? = null
+        protected set
 
+    val isDeleted: Boolean
+        get() = deletedAt != null
+
+    /** 즐겨찾기 삭제 */
     fun delete() {
         this.deletedAt = LocalDateTime.now()
     }
 
+    /** 즐겨찾기 복원 */
     fun reactivate() {
         this.deletedAt = null
         this.createdAt = LocalDateTime.now()
     }
 
-    val isDeleted: Boolean
-        get() = this.deletedAt != null
+    /** 권한 체크: member가 bookmark를 수정/삭제할 수 있는지 확인 */
+    fun checkActor(actor: Member) {
+        if (this.member != actor) {
+            throw IllegalAccessException("권한이 없습니다.")
+        }
+    }
 
     companion object {
-        @JvmStatic
-        fun create(member: Member?, place: Place?): Bookmark {
-            val bookmark = Bookmark()
-            bookmark.member = member
-            bookmark.place = place
-            return bookmark
-        }
+        /** 안전한 Bookmark 생성 */
+        fun create(member: Member, place: Place) = Bookmark(member, place)
     }
 }
