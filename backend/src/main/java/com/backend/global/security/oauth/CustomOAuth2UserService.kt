@@ -63,7 +63,6 @@ class CustomOAuth2UserService(
                 )
             }
         }
-
         throw BusinessException(ErrorCode.UNSUPPORTED_OAUTH_PROVIDER)
     }
 }
