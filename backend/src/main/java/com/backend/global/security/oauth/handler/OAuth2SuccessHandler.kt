@@ -4,7 +4,6 @@ import com.backend.domain.auth.util.CookieManager
 import com.backend.domain.member.entity.Provider
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.security.jwt.JwtTokenProvider
-import com.backend.global.security.oauth.CustomOAuth2UserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication
@@ -45,11 +44,10 @@ class OAuth2SuccessHandler(
                 email = email!!
             )
 
-            val redirectUrl = UriComponentsBuilder
-                .fromUriString("http://localhost:3000/oauth2/signup") // 프론트 신규가입 페이지
-                .queryParam("token", tempToken)
-                .build()
-                .toUriString()
+            val redirectUrl = buildRedirectUrl(
+                baseUrl = "http://localhost:3000/oauth2/signup",
+                params = mapOf("token" to tempToken)
+            )
 
             response.sendRedirect(redirectUrl)
             return
@@ -74,12 +72,17 @@ class OAuth2SuccessHandler(
         )
 
         // Access Token은 URL 파라미터 or 헤더로 전달
-        val redirectUrl = UriComponentsBuilder
-            .fromUriString("http://localhost:3000/login/success")
-            .queryParam("accessToken", accessToken)
-            .build()
-            .toUriString()
+        val redirectUrl = buildRedirectUrl(
+            baseUrl = "http://localhost:3000/login/success",
+            params = mapOf("accessToken" to accessToken)
+        )
 
         response.sendRedirect(redirectUrl)
+    }
+
+    private fun buildRedirectUrl(baseUrl: String, params: Map<String, String>): String {
+        val builder = UriComponentsBuilder.fromUriString(baseUrl)
+        params.forEach { (key, value) -> builder.queryParam(key, value) }
+        return builder.build().toUriString()
     }
 }
