@@ -76,6 +76,9 @@ dependencies {
 
     // Jackson Kotlin module 추가
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2")
+
+    // 카카오 로그인
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 }
 
 allOpen {

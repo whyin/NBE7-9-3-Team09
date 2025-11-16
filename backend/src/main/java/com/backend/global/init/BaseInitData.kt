@@ -107,7 +107,6 @@ class BaseInitData(
                     "초기 일정 데이터 내용2"
                 )
 
-
                 planRepository.saveAll(List.of<Plan>(plan1, plan2, plan3))
 
                 val planMember1 = PlanMember(

@@ -25,7 +25,7 @@ import java.lang.Exception
 open class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
-    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler
+    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
 ) {
     @Bean
     @Throws(Exception::class)
@@ -62,6 +62,12 @@ open class SecurityConfig(
                     .accessDeniedHandler(jwtAccessDeniedHandler)
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .oauth2Login {
+                /*userInfoEndpoint {
+                    userService = customOAuth2UserService
+                }
+                successHandler = oAuth2SuccessHandler*/
+            }
             .headers { it.frameOptions { frame -> frame.disable() } }
 
         return http.build()
