@@ -59,7 +59,7 @@ class JwtAuthenticationFilter(
             when (jwtTokenProvider.validateTokenStatus(token)) {
                 TokenStatus.VALID -> {
                     val tokenType = jwtTokenProvider.getTokenType(token)
-                    if (tokenType != "access") {
+                    if (tokenType != TokenType.ACCESS) {
                         log.warn { "[JWT] Refresh Token으로 접근 시도 차단: $requestURI" }
                         jwtErrorResponseWriter.write(response, ErrorCode.INVALID_ACCESS_TOKEN)
                         return
@@ -91,5 +91,4 @@ class JwtAuthenticationFilter(
             jwtErrorResponseWriter.write(response, ErrorCode.UNAUTHORIZED_REQUEST)
         }
     }
-
 }

@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 class Member(
 
     /* === 소셜 로그인 정보 === */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = true, length = 20)
     var provider: Provider? = null,  // LOCAL, KAKAO, GOOGLE…
 
@@ -108,6 +109,7 @@ class Member(
             )
         }
 
+        @JvmStatic
         fun builder() = Builder()
     }
 

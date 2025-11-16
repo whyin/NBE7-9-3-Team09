@@ -41,29 +41,28 @@ class BaseInitData(
         return ApplicationRunner { args: ApplicationArguments? ->
             if (memberRepository.count() == 0L) {
 
-                val member1 = Member(
+                val member1 = Member.createLocal(
                     memberId = "member1",
                     password = passwordEncoder.encode("1111"),
                     email = "member1@gmail.com",
                     nickname = "사용자1",
-                    role = Role.USER,
                 )
 
-                val member2 = Member(
+                val member2 = Member.createLocal(
                     memberId = "member2",
                     password = passwordEncoder.encode("2222"),
                     email = "member2@gmail.com",
                     nickname = "사용자2",
-                    role = Role.USER
                 )
 
-                val admin = Member(
+                val admin = Member.createLocal(
                     memberId = "admin",
                     password = passwordEncoder.encode("admin1234"),
                     email = "admin@gmail.com",
                     nickname = "관리자",
+                ).apply {
                     role = Role.ADMIN
-                )
+                }
 
                 memberRepository.saveAll(List.of(member1, member2, admin))
                 log.info { "초기 member 데이터 세팅 완료: " }
