@@ -29,8 +29,7 @@ class PlanDetailService(
     private val placeService: PlaceService,
     private val planDetailRepository: PlanDetailRepository,
 ) {
-
-
+    //TODO : 해당 엔티티의존재 여부를 확인...해야하는데, 정상 로직이라면 이전의 조회 로직에서 데이터를 가져왔을 것 -> 이거를 캐시처리하면 좋지 않나?
     @Transactional
     fun addPlanDetail(requestBody: PlanDetailRequestBody, memberPkId: Long): PlanDetail {
         val member = getAvailableMember(requestBody.planId, memberPkId)
@@ -53,7 +52,7 @@ class PlanDetailService(
     }
 
     @Transactional
-    fun getPlanDetailsByPlanId(planId: Long, memberPkId: Long): MutableList<PlanDetailsElementBody?> {
+    fun getPlanDetailsByPlanId(planId: Long, memberPkId: Long): List<PlanDetailsElementBody> {
         getAvailableMember(planId, memberPkId)
 
         val planDetails = planDetailRepository.getPlanDetailsByPlanId(planId)
@@ -62,11 +61,11 @@ class PlanDetailService(
             PlanDetailsElementBody(it)
         }.toList()
 
-        return planDetailList as MutableList<PlanDetailsElementBody?>
+        return planDetailList
     }
 
 
-    fun getTodayPlanDetails(planId: Long, memberPkId: Long): MutableList<PlanDetailsElementBody?> {
+    fun getTodayPlanDetails(planId: Long, memberPkId: Long): List<PlanDetailsElementBody> {
         getAvailableMember(planId, memberPkId)
         val planDetails = planDetailRepository.getPlanDetailsByPlanId(planId)
         return planDetails.stream().filter { planDetail: PlanDetail ->
@@ -75,7 +74,7 @@ class PlanDetailService(
             ) && planDetail.startTime.isBefore(
                 LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX)
             )
-        }.map<PlanDetailsElementBody?> { planDetail: PlanDetail? -> PlanDetailsElementBody(planDetail) }.toList()
+        }.map<PlanDetailsElementBody> { planDetail: PlanDetail? -> PlanDetailsElementBody(planDetail) }.toList()
     }
 
     @Transactional
@@ -90,14 +89,14 @@ class PlanDetailService(
         val planDetail = getPlanDetailById(planDetailId)
         checkValidTime(planDetailRequestBody, planService.getPlanById(planDetailRequestBody.planId), planDetail)
         planDetail.updatePlanDetail(planDetailRequestBody, place)
-        planDetailRepository.save<PlanDetail?>(planDetail)
+        planDetailRepository.save<PlanDetail>(planDetail)
         return PlanDetailResponseBody(planDetail)
     }
 
     @Transactional
     fun deletePlanDetail(planDetailId: Long, memberPkId: Long) {
         val planDetail = getPlanDetailById(planDetailId)
-        getAvailableMember(planDetail?.plan?.id?:throw BusinessException(ErrorCode.INVALID_MEMBER), memberPkId)
+        getAvailableMember(planDetail.plan?.id?:throw BusinessException(ErrorCode.INVALID_MEMBER), memberPkId)
         planDetailRepository.deleteById(planDetailId)
     }
 
@@ -114,6 +113,7 @@ class PlanDetailService(
     private fun getAvailableMember(planId: Long, memberPkId: Long): Member {
         val member = memberService.findById(memberPkId)
         val plan = planService.getPlanById(planId)
+
         if (!planMemberService.isAvailablePlanMember(planId, member)) {
             throw BusinessException(ErrorCode.NOT_ALLOWED_MEMBER)
         }

@@ -5,10 +5,12 @@ import com.backend.domain.plan.entity.PlanMember
 @JvmRecord
 data class PlanMemberResponseBody(
     val memberLoginId: String,
-    val planTitle: String
+    val planTitle: String,
+    val isComfirmed: Boolean,
 ) {
     constructor(planMember: PlanMember) : this(
         planMember.member.memberId,
-        planMember.plan.title
+        planMember.plan.title,
+        planMember.isConfirmed == 1
     )
 }

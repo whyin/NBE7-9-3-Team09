@@ -31,22 +31,23 @@ class PlanMemberService(
         return PlanMemberResponseBody(planMember)
     }
 
-    fun myInvitedPlanList(memberPkId: Long): MutableList<PlanMemberMyResponseBody?> {
+    fun myInvitedPlanList(memberPkId: Long): List<PlanMemberMyResponseBody> {
         // TODO : 이후 ID 값만 있는 멤버 객체를 생성하는 방법 찾기
         val member: Member? = memberService.findById(memberPkId)
 
         val planMemberList = planMemberRepository.getPlanMembersByMember(member)
         val myPlanMemberList =
-            planMemberList
-                .stream()
-                .map<PlanMemberMyResponseBody?> { pm: PlanMember? -> PlanMemberMyResponseBody(pm!!) }
-                .toList()
+            planMemberList.map{
+                PlanMemberMyResponseBody(it)
+            }.toList()
+
         return myPlanMemberList
     }
 
-
     fun DeletePlanMember(requestBody: PlanMemberAddRequestBody, memberPkId: Long): PlanMemberResponseBody {
-        val planMember = isValidInvite(requestBody, memberPkId)
+        val planMember : PlanMember = planMemberRepository
+            .getMyInviteByMemberIdAndPlanId(requestBody.planId,requestBody.memberId,memberPkId)
+            ?: throw BusinessException(ErrorCode.NOT_FOUND_INVITE)
 
         planMemberRepository.delete(planMember)
         return PlanMemberResponseBody(planMember)
@@ -66,6 +67,7 @@ class PlanMemberService(
         return PlanMemberResponseBody(planMember)
     }
 
+    // 초대가 유효한지 검사합니다.
     private fun isValidInvite(requestBody: PlanMemberAddRequestBody, memberId: Long): PlanMember {
         val plan = planService.getPlanById(requestBody.planId)
         if (plan.member.id != memberId) {
@@ -86,11 +88,12 @@ class PlanMemberService(
         return planMember
     }
 
+    // 내 초대가 맞는지 검사합니다.
     private fun isMyInvite(requestBody: PlanMemberAnswerRequestBody, memberPkId: Long): PlanMember {
         // TODO : 이후 ID 값만 있는 멤버 객체를 생성하는 방법 찾기
         val member: Member = memberService.findById(memberPkId)
 
-        val plan = planService!!.getPlanById(requestBody.planId)
+        val plan = planService.getPlanById(requestBody.planId)
 
         if (requestBody.memberId != member.id) {
             throw BusinessException(ErrorCode.NOT_MY_PLAN)
