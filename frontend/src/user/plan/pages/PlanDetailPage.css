@@ -1,0 +1,568 @@
+/* PlanDetailPage 전용 스타일 */
+
+/* 2단 레이아웃 컨테이너 */
+.plan-detail-layout {
+  display: flex;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  margin-top: 20px;
+}
+
+/* 좌측: 여행 계획 기본 정보 카드 */
+.plan-info-sidebar {
+  width: 380px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+}
+
+.plan-info-card {
+  background: #f7f9fc;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.plan-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.plan-info-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.plan-info-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.plan-info-edit-btn,
+.plan-info-delete-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.plan-info-edit-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.plan-info-edit-btn:hover {
+  background: #2563eb;
+}
+
+.plan-info-delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.plan-info-delete-btn:hover {
+  background: #dc2626;
+}
+
+.plan-info-date {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.plan-info-content {
+  font-size: 15px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.plan-info-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.plan-info-edit-form input,
+.plan-info-edit-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.plan-info-edit-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.plan-info-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.plan-info-save-btn,
+.plan-info-cancel-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.plan-info-save-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.plan-info-save-btn:hover {
+  background: #2563eb;
+}
+
+.plan-info-cancel-btn {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.plan-info-cancel-btn:hover {
+  background: #d1d5db;
+}
+
+/* 우측: 상세 일정 영역 */
+.plan-details-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 상세 일정 추가 폼 카드 */
+.detail-add-form-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.detail-add-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.detail-add-form-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.detail-add-form-toggle {
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail-add-form-toggle:hover {
+  background: #2563eb;
+}
+
+.detail-add-form-toggle.cancel {
+  background: #6b7280;
+}
+
+.detail-add-form-toggle.cancel:hover {
+  background: #4b5563;
+}
+
+.detail-add-form-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.detail-add-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-add-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-add-form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.detail-add-form-input,
+.detail-add-form-select,
+.detail-add-form-textarea {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.detail-add-form-input:focus,
+.detail-add-form-select:focus,
+.detail-add-form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.detail-add-form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.detail-add-form-submit {
+  grid-column: 1 / -1;
+  padding: 12px 24px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.detail-add-form-submit:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.detail-add-form-submit:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* 장소 선택 리스트 */
+.place-selection-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+  background: white;
+}
+
+.place-selection-item {
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+  border: 2px solid transparent;
+}
+
+.place-selection-item:hover {
+  background: #f3f4f6;
+}
+
+.place-selection-item.selected {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.place-selection-item-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.place-selection-item-address {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* 상세 일정 리스트 (타임라인) */
+.detail-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-timeline-item {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+}
+
+.detail-timeline-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 카테고리별 색상 */
+.detail-timeline-item.category-hotel {
+  background: #e8f1ff;
+  border-left-color: #3b82f6;
+}
+
+.detail-timeline-item.category-restaurant {
+  background: #fff7e0;
+  border-left-color: #f59e0b;
+}
+
+.detail-timeline-item.category-nightspot {
+  background: #f3e8ff;
+  border-left-color: #a78bfa;
+}
+
+.detail-timeline-item.category-bookmark {
+  background: #f0fdf4;
+  border-left-color: #10b981;
+}
+
+.detail-timeline-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-timeline-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.detail-timeline-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.detail-timeline-time {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.detail-timeline-place {
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+
+.detail-timeline-description {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.detail-timeline-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.detail-timeline-edit-btn,
+.detail-timeline-delete-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail-timeline-edit-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.detail-timeline-edit-btn:hover {
+  background: #2563eb;
+}
+
+.detail-timeline-delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.detail-timeline-delete-btn:hover {
+  background: #dc2626;
+}
+
+/* 빈 상태 */
+.detail-timeline-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #9ca3af;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-timeline-empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.detail-timeline-empty-text {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+/* 수정 모드 */
+.detail-timeline-item.editing {
+  background: #f9fafb;
+  border: 2px solid #3b82f6;
+}
+
+.detail-timeline-edit-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.detail-timeline-edit-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-timeline-edit-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-timeline-edit-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.detail-timeline-edit-form-input,
+.detail-timeline-edit-form-textarea {
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.detail-timeline-edit-form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.detail-timeline-edit-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.detail-timeline-edit-save-btn,
+.detail-timeline-edit-cancel-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail-timeline-edit-save-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.detail-timeline-edit-save-btn:hover {
+  background: #2563eb;
+}
+
+.detail-timeline-edit-cancel-btn {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.detail-timeline-edit-cancel-btn:hover {
+  background: #d1d5db;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 1024px) {
+  .plan-detail-layout {
+    flex-direction: column;
+  }
+
+  .plan-info-sidebar {
+    width: 100%;
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .plan-detail-layout {
+    padding: 0 16px;
+  }
+
+  .detail-add-form-content {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-timeline-edit-form {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { apiRequest } from "../../../utils/api";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function PlanCreateForm() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  // URL 파라미터에서 날짜 가져오기
+  const urlStartDate = searchParams.get("start");
+  const urlEndDate = searchParams.get("end");
+
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     placeId: "",
-    startDate: "",
-    endDate: "",
+    startDate: urlStartDate || "",
+    endDate: urlEndDate || "",
   });
 
   const [errors, setErrors] = useState({});
@@ -21,6 +30,17 @@ export default function PlanCreateForm() {
   const maxDate = new Date();
   maxDate.setFullYear(maxDate.getFullYear() + 10);
   const maxDateStr = maxDate.toISOString().split("T")[0];
+
+  // URL 파라미터가 변경되면 폼 데이터 업데이트
+  useEffect(() => {
+    if (urlStartDate || urlEndDate) {
+      setFormData((prev) => ({
+        ...prev,
+        startDate: urlStartDate || prev.startDate,
+        endDate: urlEndDate || prev.endDate,
+      }));
+    }
+  }, [urlStartDate, urlEndDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,10 +114,25 @@ export default function PlanCreateForm() {
         }
       );
 
-      if (response.status === 200) {
-        alert("작성 성공");
-        window.location.href = "http://localhost:3000/user/plan/list";
+      if (response.status === 200 || response.status === 201) {
+        // API 응답에서 planId 추출
+        const result = await response.json();
+        // 다양한 응답 구조에 대응
+        const planId =
+          result.data?.id || result.data?.planId || result.id || result.planId;
+
+        if (planId) {
+          // 상세 작성 페이지로 이동
+          navigate(`/user/plan/detail/${planId}`);
+        } else {
+          // planId를 찾을 수 없는 경우 목록으로 이동
+          console.error("planId를 찾을 수 없습니다. 응답:", result);
+          alert("계획이 생성되었습니다.");
+          navigate("/user/plan/list");
+        }
       } else {
+        const errorText = await response.text();
+        console.error("계획 생성 실패:", errorText);
         alert("오류가 발생했습니다");
       }
     } catch (error) {
@@ -111,7 +146,8 @@ export default function PlanCreateForm() {
   const styles = {
     container: {
       minHeight: "100vh",
-      background: "linear-gradient(to bottom right, #eff6ff, #e0e7ff)",
+      background: "white",
+      backgroundColor: "white",
       padding: "48px 16px",
     },
     wrapper: {
@@ -219,13 +255,13 @@ export default function PlanCreateForm() {
 
   return (
     <div style={styles.container}>
+      <PageHeader
+        title="여행 계획 작성"
+        subtitle="새로운 여행 계획을 만들어보세요"
+        onBack={() => navigate("/user/plan")}
+      />
       <div style={styles.wrapper}>
         <div style={styles.card}>
-          <div style={styles.header}>
-            <h1 style={styles.title}>여행 계획 작성</h1>
-            <p style={styles.subtitle}>새로운 여행 계획을 만들어보세요</p>
-          </div>
-
           <div>
             {/* 계획 제목 */}
             <div style={styles.formGroup}>
