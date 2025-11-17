@@ -44,18 +44,14 @@ class AuthService(
             throw BusinessException(ErrorCode.INVALID_PASSWORD)
         }
 
-        val memberPk = member.id
-            ?:throw BusinessException(ErrorCode.INVALID_MEMBER)
+        log.info { "[Auth] 로그인 성공: memberPk=${member.id}, issuedAt=${LocalDateTime.now()}" }
 
-        val accessToken = jwtTokenProvider.generateAccessToken(memberPk, member.role)
-        val refreshToken = jwtTokenProvider.generateRefreshToken(memberPk, member.role)
-        val refreshTokenMaxAge = jwtTokenProvider.refreshTokenExpireTime
+        return generateAndStoreTokens(member)
+    }
 
-        saveOrUpdateRefreshToken(memberPk, refreshToken)
-
-        log.info { "${"[Auth] 로그인 성공: memberPk={}, issuedAt={}"} $memberPk ${LocalDateTime.now()}" }
-
-        return TokenResponse.of(accessToken, refreshToken, refreshTokenMaxAge, member.role.name)
+    @Transactional
+    fun generateTokensForOAuth(member: Member): TokenResponse {
+        return generateAndStoreTokens(member)
     }
 
     /** AccessToken 재발급  */
@@ -83,7 +79,7 @@ class AuthService(
 
         log.info { "${"[Auth] AccessToken 재발급 완료: memberPk={}, reissuedAt={}"} $memberPk ${LocalDateTime.now()}" }
 
-        return TokenResponse.of(newAccessToken, savedToken.token, refreshTokenMaxAge, member.role.name)
+        return TokenResponse.fromTokens(newAccessToken, savedToken.token, refreshTokenMaxAge, member.role.name)
     }
 
     @Transactional
@@ -93,11 +89,29 @@ class AuthService(
         log.info { "${"[Auth] 로그아웃 완료: memberPk={}, deletedAt={}"} $memberPk ${LocalDateTime.now()}" }
     }
 
+    @Transactional
+    private fun generateAndStoreTokens(member: Member): TokenResponse {
+        val memberPk = member.id!!
+
+        val accessToken = jwtTokenProvider.generateAccessToken(memberPk, member.role)
+        val refreshToken = jwtTokenProvider.generateRefreshToken(memberPk, member.role)
+        val refreshTokenMaxAge = jwtTokenProvider.refreshTokenExpireTime
+
+        saveOrUpdateRefreshToken(memberPk, refreshToken)
+
+        return TokenResponse.fromTokens(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            refreshTokenMaxAge = refreshTokenMaxAge,
+            role = member.role.name
+        )
+    }
+
     /**
      * RefreshToken 생성 or 갱신
      */
     @Transactional
-    private fun saveOrUpdateRefreshToken(memberPk: Long, refreshToken: String) {
+    fun saveOrUpdateRefreshToken(memberPk: Long, refreshToken: String) {
         val expiryTime = LocalDateTime.now()
             .plusSeconds(jwtTokenProvider.refreshTokenExpireTime)
 

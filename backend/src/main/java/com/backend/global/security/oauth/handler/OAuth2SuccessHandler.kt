@@ -1,9 +1,11 @@
 package com.backend.global.security.oauth.handler
 
+import com.backend.domain.auth.service.AuthService
 import com.backend.domain.auth.util.CookieManager
 import com.backend.domain.member.entity.Provider
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.security.jwt.JwtTokenProvider
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication
@@ -15,8 +17,11 @@ import org.springframework.web.util.UriComponentsBuilder
 class OAuth2SuccessHandler(
     private val memberRepository: MemberRepository,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val cookieManager: CookieManager
+    private val cookieManager: CookieManager,
+    private val authService: AuthService
 ) : AuthenticationSuccessHandler {
+
+    private val log = KotlinLogging.logger {}
 
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
@@ -46,35 +51,26 @@ class OAuth2SuccessHandler(
 
             val redirectUrl = buildRedirectUrl(
                 baseUrl = "http://localhost:3000/oauth2/signup",
-                params = mapOf("token" to tempToken)
+                params = mapOf("token" to tempToken),
             )
 
             response.sendRedirect(redirectUrl)
             return
         }
 
-        // 기존 회원 → 바로 로그인 처리
-        val accessToken = jwtTokenProvider.generateAccessToken(
-            existingMember.id!!,
-            existingMember.role
-        )
-
-        val refreshToken = jwtTokenProvider.generateRefreshToken(
-            existingMember.id!!,
-            existingMember.role
-        )
+        val tokenResponse = authService.generateTokensForOAuth(existingMember)
 
         // Refresh Token → HttpOnly Cookie 저장
         cookieManager.addRefreshTokenCookie(
             response = response,
-            token = refreshToken,
+            token = tokenResponse.refreshToken,
             maxAgeSeconds = jwtTokenProvider.refreshTokenExpireTime
         )
 
         // Access Token은 URL 파라미터 or 헤더로 전달
         val redirectUrl = buildRedirectUrl(
-            baseUrl = "http://localhost:3000/login/success",
-            params = mapOf("accessToken" to accessToken)
+            baseUrl = "http://localhost:3000/user",
+            params = mapOf("accessToken" to tokenResponse.accessToken)
         )
 
         response.sendRedirect(redirectUrl)

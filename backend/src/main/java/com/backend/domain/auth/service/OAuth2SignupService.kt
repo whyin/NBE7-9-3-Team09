@@ -2,12 +2,16 @@ package com.backend.domain.auth.service
 
 import com.backend.domain.auth.dto.reponse.TokenResponse
 import com.backend.domain.auth.dto.request.OAuth2SignupRequest
+import com.backend.domain.auth.entity.RefreshToken
+import com.backend.domain.auth.repository.RefreshTokenRepository
 import com.backend.domain.member.entity.Member
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import com.backend.global.security.jwt.JwtTokenProvider
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class OAuth2SignupService(
@@ -15,7 +19,8 @@ class OAuth2SignupService(
     private val jwtTokenProvider: JwtTokenProvider,
 ) {
 
-    fun signupWithOAuth2(request: OAuth2SignupRequest): TokenResponse {
+    @Transactional
+    fun signupWithOAuth2(request: OAuth2SignupRequest): Member {
 
         // 1) TempToken Claims 파싱
         val claims = runCatching {
@@ -24,7 +29,7 @@ class OAuth2SignupService(
             throw BusinessException(ErrorCode.INVALID_TOKEN)
         }
 
-        // 2) providerId로 중복 검사 TODO: 에러코드 적합하게 수정하기
+        // 2) providerId 중복 검사
         if (memberRepository.existsByProviderAndProviderId(claims.provider, claims.providerId)) {
             throw BusinessException(ErrorCode.DUPLICATE_MEMBER_ID)
         }
@@ -34,25 +39,13 @@ class OAuth2SignupService(
             throw BusinessException(ErrorCode.DUPLICATE_EMAIL)
         }
 
-        // 소셜 회원 생성
+        // 4) 소셜 회원 생성
         val member = Member.createKakao(
             providerId = claims.providerId,
             email = claims.email,
             nickname = request.nickname
         )
 
-        memberRepository.save(member)
-
-        // 5) JWT 발급
-        val accessToken = jwtTokenProvider.generateAccessToken(member.id!!, member.role)
-        val refreshToken = jwtTokenProvider.generateRefreshToken(member.id!!, member.role)
-
-        // 6) TokenResponse 반환
-        return TokenResponse(
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-            refreshTokenMaxAge = jwtTokenProvider.refreshTokenExpireTime,
-            role = member.role.name
-        )
+        return memberRepository.save(member)
     }
 }
