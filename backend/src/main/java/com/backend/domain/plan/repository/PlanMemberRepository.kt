@@ -10,11 +10,32 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PlanMemberRepository : JpaRepository<PlanMember, Long> {
-    fun getPlanMembersByMember(member: Member?): MutableList<PlanMember>
+    fun getPlanMembersByMember(member: Member?): List<PlanMember>
 
     fun getPlanMembersByPlan(plan: Plan): MutableList<PlanMember>
 
     fun existsByPlanIdAndMemberId(planId: Long, memberId: Long): Boolean
+
+    @Query("""
+        SELECT
+        pm
+        FROM
+        PlanMember pm,
+        Plan p
+        WHERE
+        pm.plan.id = :planId
+        AND
+        p.id = :planId
+        AND 
+        p.member.id = :loginMemberId
+        AND
+        pm.member.id = :invitedMemberId
+    """)
+    fun getMyInviteByMemberIdAndPlanId(
+        @Param("planId")planId: Long,
+        @Param("invitedMemberId")InvitedMemberId: Long,
+        @Param("loginMemberId")loginMemberId: Long
+    ): PlanMember?
 
     @Query("""
 SELECT COUNT(pm) > 0
@@ -31,7 +52,9 @@ AND pm.member.id = :memberId
 
     fun deletePlanMembersByPlan(plan: Plan)
 
-    fun getPlanMembersByMemberId(memberId: Long): MutableList<PlanMember>
+    fun getPlanMembersByMemberId(memberId: Long): List<PlanMember>
+    fun findByPlan_IdAndMember_Id(planId: Long, memberId: Long): PlanMember
+    fun getPlanMembersByMemberIdAndPlan_Id(memberId: Long, planId: Long): MutableList<PlanMember>
 
 
 }

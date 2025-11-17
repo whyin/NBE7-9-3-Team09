@@ -70,6 +70,7 @@ class BaseInitData(
             }
             if(placeRepository.count() == 0L) {
                 hotelImportController.importHotels();
+                log.info { "초기 호텔 데이터 세팅 완료 " }
             }
 
             if (planRepository.count() == 0L) {
@@ -137,7 +138,16 @@ class BaseInitData(
                     1
                 )
 
-                planMemberRepository.saveAll(List.of<PlanMember>(planMember1, planMember2, planMember3))
+                val planMember4 = PlanMember(
+                    null,
+                    memberRepository.getReferenceById(2L),
+                    planRepository.getReferenceById(1L)?:throw Exception(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    1
+                )
+
+                planMemberRepository.saveAll(List.of<PlanMember>(planMember1, planMember2, planMember3,planMember4))
                 log.info("초기 plan 데이터 세팅 완료: ")
             }
 

@@ -32,21 +32,31 @@ class PlanController(
     fun create(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String,
         @RequestBody planCreateRequestBody: @Valid PlanCreateRequestBody
-    ): ApiResponse<PlanResponseBody?> {
+    ): ApiResponse<PlanResponseBody> {
         val memberPkId = authService.getMemberId(accessToken)
 
         val plan = planService.createPlan(planCreateRequestBody, memberPkId)
         val planResponseBody = PlanResponseBody(plan)
-        return created<PlanResponseBody?>(planResponseBody)
+        return created<PlanResponseBody>(planResponseBody)
     }
 
     @GetMapping("/list")
     fun getList(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String
-    ): ApiResponse<MutableList<PlanResponseBody?>?> {
+    ): ApiResponse<List<PlanResponseBody>> {
         val memberPkId = authService.getMemberId(accessToken)
-        val plans: MutableList<PlanResponseBody?>? = planService.getPlanList(memberPkId) as MutableList<PlanResponseBody?>?
-        return success<MutableList<PlanResponseBody?>?>(plans)
+        val plans: List<PlanResponseBody> = planService.getPlanList(memberPkId)
+        return success<List<PlanResponseBody>>(plans)
+    }
+
+    //초대가 승낙된 모임만 표시
+    @GetMapping("/myInvitedPlan")
+    fun getMyInvitedPlan(
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String
+    ): ApiResponse<List<PlanResponseBody>> {
+        val memberPkId = authService.getMemberId(accessToken)
+        val plans: List<PlanResponseBody> = planService.getInvitedAcceptedPlan(memberPkId)
+        return success<List<PlanResponseBody>>(plans)
     }
 
     @GetMapping("/todayPlan")
@@ -74,9 +84,9 @@ class PlanController(
     @GetMapping("/{planId}")
     fun getPlan(
         @PathVariable planId: @NotNull Long
-    ): ApiResponse<PlanResponseBody?> {
+    ): ApiResponse<PlanResponseBody> {
         val planResponseBody = planService.getPlanResponseBodyById(planId)
-        return success<PlanResponseBody?>(planResponseBody)
+        return success<PlanResponseBody>(planResponseBody)
     }
 
     @DeleteMapping("/delete/{planId}")
@@ -103,9 +113,9 @@ class PlanController(
     @GetMapping("/member/mylist")
     fun getMyPlanMember(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String
-    ): ApiResponse<MutableList<PlanMemberMyResponseBody?>?> {
+    ): ApiResponse<List<PlanMemberMyResponseBody>> {
         val memberPkId = authService.getMemberId(accessToken)
-        return success<MutableList<PlanMemberMyResponseBody?>?>(planMemberService.myInvitedPlanList(memberPkId))
+        return success<List<PlanMemberMyResponseBody>>(planMemberService.myInvitedPlanList(memberPkId))
     }
 
     @PatchMapping("/member/accept")
