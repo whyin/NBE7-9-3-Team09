@@ -1,14 +1,16 @@
 /* PlanApp 컨테이너 */
 .plan-app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #eef3ff, #f9f6ff);
+  background: white !important;
+  background-color: white !important;
   position: relative;
 }
 
 /* 컨테이너 스타일 */
 .container {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #ebf8ff, #e0e7ff);
+  background: white !important;
+  background-color: white !important;
   padding: 20px;
 }
 
@@ -31,7 +33,8 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background: linear-gradient(to bottom right, #ebf8ff, #e0e7ff);
+  background: white !important;
+  background-color: white !important;
 }
 
 .spinner {

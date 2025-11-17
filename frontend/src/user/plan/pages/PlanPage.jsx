@@ -1,18 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../../utils/api";
+import PageHeader from "../../components/common/PageHeader";
+import { getCategoryIcon, getCategoryInfo } from "../../utils/categoryUtils";
 import "./PlanPage.css";
 
 export default function TravelPlanMain() {
   const navigate = useNavigate();
   const [todayPlan, setTodayPlan] = useState(null);
   const [planDetails, setPlanDetails] = useState([]);
+  const [allTodayDetails, setAllTodayDetails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchTodayPlan();
   }, []);
+
+  // 날짜가 오늘인지 확인
+  const isToday = (dateTimeString) => {
+    if (!dateTimeString) return false;
+    const date = new Date(dateTimeString);
+    const today = new Date();
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    );
+  };
 
   const fetchTodayPlan = async () => {
     try {
@@ -24,6 +39,7 @@ export default function TravelPlanMain() {
         if (planResponse.status === 404) {
           setTodayPlan(null);
           setPlanDetails([]);
+          setAllTodayDetails([]);
           setLoading(false);
           return;
         }
@@ -33,14 +49,36 @@ export default function TravelPlanMain() {
       const planData = await planResponse.json();
       setTodayPlan(planData);
 
-      const detailResponse = await apiRequest(
-        "http://localhost:8080/api/plan/detail/{planData.data.id}/"
-      );
-      if (detailResponse.ok) {
-        const detailData = await detailResponse.json();
-        setPlanDetails(detailData);
+      // 오늘 날짜에 해당하는 모든 세부 일정 가져오기
+      const planId = planData.data?.id;
+      if (planId) {
+        try {
+          const detailResponse = await apiRequest(
+            `http://localhost:8080/api/plan/detail/${planId}/list`
+          );
+          if (detailResponse.ok) {
+            const detailResult = await detailResponse.json();
+            const allDetails = detailResult.data || [];
+
+            // 오늘 날짜에 해당하는 일정만 필터링
+            const todayDetails = allDetails.filter((detail) =>
+              isToday(detail.startTime)
+            );
+
+            setPlanDetails(allDetails);
+            setAllTodayDetails(todayDetails);
+          } else {
+            setPlanDetails([]);
+            setAllTodayDetails([]);
+          }
+        } catch (detailErr) {
+          console.error("세부 일정 조회 실패:", detailErr);
+          setPlanDetails([]);
+          setAllTodayDetails([]);
+        }
       } else {
         setPlanDetails([]);
+        setAllTodayDetails([]);
       }
 
       setLoading(false);
@@ -68,6 +106,66 @@ export default function TravelPlanMain() {
     });
   };
 
+  const formatDate = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // 카테고리 정보는 공통 유틸 함수 사용 (getCategoryInfo from categoryUtils)
+
+  // 세부 일정에서 카테고리 추출
+  const getDetailCategory = (detail) => {
+    // detail 객체에서 category 필드 확인
+    if (detail.category) {
+      return detail.category;
+    }
+    // placeCategory 필드 확인
+    if (detail.placeCategory) {
+      return detail.placeCategory;
+    }
+    // place의 categoryName 필드 확인
+    if (detail.place && detail.place.categoryName) {
+      return detail.place.categoryName;
+    }
+    // placeName에서 추정 (예: 호텔, 맛집 등이 이름에 포함된 경우)
+    if (detail.placeName) {
+      const placeName = detail.placeName.toLowerCase();
+      if (placeName.includes("호텔") || placeName.includes("hotel")) {
+        return "HOTEL";
+      }
+      if (
+        placeName.includes("맛집") ||
+        placeName.includes("식당") ||
+        placeName.includes("restaurant") ||
+        placeName.includes("food")
+      ) {
+        return "맛집";
+      }
+      if (
+        placeName.includes("야경") ||
+        placeName.includes("night") ||
+        placeName.includes("view")
+      ) {
+        return "NIGHTSPOT";
+      }
+    }
+    // 기본값
+    return null;
+  };
+
+  // 오늘의 세부 일정을 시간순으로 정렬
+  const sortedTodayDetails = useMemo(() => {
+    return [...allTodayDetails].sort((a, b) => {
+      const timeA = new Date(a.startTime).getTime();
+      const timeB = new Date(b.startTime).getTime();
+      return timeA - timeB;
+    });
+  }, [allTodayDetails]);
+
   const handleCreatePlan = () => {
     console.log("handleCreatePlan called");
     navigate("/user/plan/create");
@@ -80,12 +178,11 @@ export default function TravelPlanMain() {
 
   return (
     <div className="main">
+      <PageHeader
+        title="나의 여행 계획"
+        subtitle="즐거운 여행을 계획하고 관리하세요"
+      />
       <div className="main-container">
-        <div className="header">
-          <h1>나의 여행 계획</h1>
-          <p>즐거운 여행을 계획하고 관리하세요</p>
-        </div>
-
         <div className="button-group">
           <button className="primary" onClick={handleCreatePlan}>
             여행계획 작성하기
@@ -121,35 +218,60 @@ export default function TravelPlanMain() {
               <div className="today-card">
                 <h3>{todayPlan.data.title}</h3>
                 {todayPlan.data.content && (
-                  <p className="content">{todayPlan.content}</p>
+                  <p className="content">{todayPlan.data.content}</p>
                 )}
                 <div className="date">
-                  <span>🕐 {formatDateTime(todayPlan.data.startDate)}</span>
-                  <span>~</span>
-                  <span>{formatDateTime(todayPlan.data.endDate)}</span>
+                  <span>📅 {formatDate(todayPlan.data.startDate)}</span>
+                  <span> ~ </span>
+                  <span>{formatDate(todayPlan.data.endDate)}</span>
                 </div>
               </div>
 
-              {planDetails.length > 0 && (
+              {/* 오늘의 세부 일정 */}
+              {sortedTodayDetails.length > 0 ? (
                 <div className="details">
-                  <h4>세부 일정</h4>
-                  {planDetails.map((detail) => (
-                    <div key={detail.id} className="detail-card">
-                      <div className="detail-header">
-                        <h5>{detail.title}</h5>
-                        <span className="time">
-                          🕐 {formatTime(detail.startTime)} -{" "}
-                          {formatTime(detail.endTime)}
-                        </span>
-                      </div>
-                      <div className="place">
-                        📍 <span>{detail.placeName}</span>
-                      </div>
-                      {detail.content && (
-                        <p className="detail-content">{detail.content}</p>
-                      )}
-                    </div>
-                  ))}
+                  <h4>📋 오늘의 일정 ({sortedTodayDetails.length}개)</h4>
+                  <div className="today-details-list">
+                    {sortedTodayDetails.map((detail) => {
+                      const category = getDetailCategory(detail);
+                      const categoryInfo = getCategoryInfo(category);
+                      return (
+                        <div
+                          key={detail.id}
+                          className="detail-card today-detail-item"
+                          onClick={() =>
+                            navigate(`/user/plan/detail/${todayPlan.data.id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div className="detail-header">
+                            <div className="detail-title-row">
+                              <span className="category-icon">
+                                {categoryInfo.icon}
+                              </span>
+                              <h5>{detail.title}</h5>
+                            </div>
+                            <span className="time">
+                              🕐 {formatTime(detail.startTime)} -{" "}
+                              {formatTime(detail.endTime)}
+                            </span>
+                          </div>
+                          {detail.placeName && (
+                            <div className="place">
+                              📍 <span>{detail.placeName}</span>
+                            </div>
+                          )}
+                          {detail.content && (
+                            <p className="detail-content">{detail.content}</p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="no-details">
+                  <p>오늘 예정된 세부 일정이 없습니다.</p>
                 </div>
               )}
             </div>

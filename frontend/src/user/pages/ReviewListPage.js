@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ReviewList from "../components/organisms/ReviewList";
 import Button from "../components/atoms/Button";
+import PageHeader from "../components/common/PageHeader";
 import { getAllReviews, deleteReview } from "../services/reviewService";
 import "./ReviewListPage.css";
 
@@ -60,12 +61,20 @@ const ReviewListPage = () => {
 
   return (
     <div className="review-list-page">
-      {/* ✅ 상단 헤더 */}
-      <div className="page-header">
-        <div className="page-title-area">
-          <h1 className="page-title">리뷰 목록</h1>
-          <span className="review-count">총 {reviews.length}개의 리뷰</span>
-        </div>
+      <PageHeader
+        title="리뷰 목록"
+        subtitle={`총 ${reviews.length}개의 리뷰`}
+      />
+      <div
+        style={{
+          maxWidth: "1280px",
+          margin: "0 auto",
+          padding: "0 16px",
+          marginBottom: "24px",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
         <Button variant="primary" onClick={handleWriteReview}>
           리뷰 작성하기
         </Button>

@@ -1,7 +1,8 @@
 /* 북마크 앱 전체 컨테이너 */
 .p-4 {
   min-height: 100vh;
-  background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 50%, #fbc7d4 100%);
+  background: white !important;
+  background-color: white !important;
   padding: 2rem !important;
 }
 
@@ -21,25 +22,7 @@
   margin-bottom: 1.5rem !important;
 }
 
-/* 뒤로가기 버튼 */
-.back-button {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-  border: none;
-  padding: 12px 20px;
-  border-radius: 25px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-}
-
-.back-button:hover {
-  background: linear-gradient(135deg, #ee5a6f 0%, #ff6b6b 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-}
+/* 뒤로가기 버튼 스타일은 BackButton.css에서 통일 관리 */
 
 .bookmark-header {
   display: flex;

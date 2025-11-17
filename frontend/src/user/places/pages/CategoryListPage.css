@@ -1,6 +1,7 @@
 .category-list-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #87ceeb 0%, #b0e0e6 50%, #e0f6ff 100%);
+  background: white !important;
+  background-color: white !important;
   padding: 40px 20px;
   position: relative;
   z-index: 1;
