@@ -30,7 +30,7 @@ class OAuth2SignupController(
         val member = oAuth2SignupService.signupWithOAuth2(request)
 
         // 2) 소셜 로그인 처리 (토큰 발급)
-        val tokenResponse = authService.generateTokensForOAuth(member)
+        val tokenResponse = authService.loginOAuth2(member)
 
         // 3) Refresh Token → HttpOnly Cookie 저장
         cookieManager.addRefreshTokenCookie(

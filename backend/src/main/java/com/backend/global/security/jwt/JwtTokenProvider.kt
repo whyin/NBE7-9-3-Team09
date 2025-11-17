@@ -3,6 +3,7 @@ package com.backend.global.security.jwt
 import com.backend.domain.member.entity.Provider
 import com.backend.domain.member.entity.Role
 import com.backend.global.security.oauth.dto.OAuth2TempClaims
+import com.backend.global.security.oauth.util.OAuth2TempTokenParser
 import com.backend.global.security.user.CustomUserDetails
 import com.backend.global.security.user.CustomUserDetailsService
 import io.jsonwebtoken.Claims
@@ -32,7 +33,10 @@ class JwtTokenProvider(
     private val accessTokenExpireTimeMs: Long,
 
     @Value("\${custom.jwt.refresh-token.expire-time}")
-    private val refreshTokenExpireTimeMs: Long
+    private val refreshTokenExpireTimeMs: Long,
+
+    @Value("\${custom.jwt.temp-token.expire-time}")
+    private val tempTokenExpireMs: Long
 ) {
 
     private lateinit var key: SecretKey
@@ -80,7 +84,7 @@ class JwtTokenProvider(
                 "email" to email,
                 "type" to TokenType.OAUTH2_TEMP.name
             ),
-            expireTime = 1000L * 60 * 10      // 10 minutes
+            expireTime = tempTokenExpireMs
         )
     }
 
@@ -161,13 +165,6 @@ class JwtTokenProvider(
         private val log = LoggerFactory.getLogger(JwtTokenProvider::class.java)
     }
 
-    fun parseOAuth2TempToken(token: String): OAuth2TempClaims {
-        val claims = parseClaims(token)
-
-        return OAuth2TempClaims(
-            provider = Provider.valueOf(claims["provider"].toString()),
-            providerId = claims["providerId"].toString(),
-            email = claims["email"].toString()
-        )
-    }
+    fun parseOAuthClaims(token: String): Claims =
+        parseClaims(token)
 }

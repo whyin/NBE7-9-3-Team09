@@ -1,22 +1,20 @@
 package com.backend.domain.auth.service
 
-import com.backend.domain.auth.dto.reponse.TokenResponse
 import com.backend.domain.auth.dto.request.OAuth2SignupRequest
-import com.backend.domain.auth.entity.RefreshToken
-import com.backend.domain.auth.repository.RefreshTokenRepository
 import com.backend.domain.member.entity.Member
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import com.backend.global.security.jwt.JwtTokenProvider
+import com.backend.global.security.oauth.util.OAuth2TempTokenParser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Service
 class OAuth2SignupService(
     private val memberRepository: MemberRepository,
     private val jwtTokenProvider: JwtTokenProvider,
+    private val oAuth2TempTokenParser: OAuth2TempTokenParser,
 ) {
 
     @Transactional
@@ -24,7 +22,8 @@ class OAuth2SignupService(
 
         // 1) TempToken Claims 파싱
         val claims = runCatching {
-            jwtTokenProvider.parseOAuth2TempToken(request.tempToken)
+            val jwtClaims = jwtTokenProvider.parseOAuthClaims(request.tempToken)   // ★ 1단계
+            oAuth2TempTokenParser.toTempClaims(jwtClaims)
         }.getOrElse {
             throw BusinessException(ErrorCode.INVALID_TOKEN)
         }

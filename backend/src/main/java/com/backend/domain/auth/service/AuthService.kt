@@ -1,10 +1,12 @@
 package com.backend.domain.auth.service
 
 import com.backend.domain.auth.dto.reponse.TokenResponse
+import com.backend.domain.auth.dto.request.OAuthLoginResult
 import com.backend.domain.auth.entity.RefreshToken
 import com.backend.domain.auth.repository.RefreshTokenRepository
 import com.backend.domain.member.entity.Member
 import com.backend.domain.member.entity.MemberStatus
+import com.backend.domain.member.entity.Provider
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
@@ -30,7 +32,51 @@ class AuthService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    /** 로그인: AccessToken + RefreshToken 발급  */
+    /** OAuth 통합 처리 */
+    @Transactional
+    fun handleOAuth2Login(
+        provider: Provider,
+        providerId: String,
+        email: String?
+    ): OAuthLoginResult {
+
+        val existingMember = memberRepository.findByProviderAndProviderId(provider, providerId)
+
+        return if (existingMember == null) {
+            // ★ 신규 회원 → TempToken 발급
+            val tempToken = issueOAuth2TempToken(provider, providerId, email!!)
+            OAuthLoginResult.newUser(tempToken)
+        } else {
+            // ★ 기존 회원 → 로그인 처리
+            val tokens = loginOAuth2(existingMember)
+            OAuthLoginResult.existingUser(
+                access = tokens.accessToken,
+                refresh = tokens.refreshToken
+            )
+        }
+    }
+
+    /** OAuth 신규 회원 TempToken 발급 */
+    @Transactional
+    fun issueOAuth2TempToken(
+        provider: Provider,
+        providerId: String,
+        email: String
+    ): String {
+        return jwtTokenProvider.generateOAuth2TempToken(
+            provider = provider,
+            providerId = providerId,
+            email = email
+        )
+    }
+
+    /** OAuth2 로그인 (기존 회원) */
+    @Transactional
+    fun loginOAuth2(member: Member): TokenResponse {
+        return generateAndStoreTokens(member)
+    }
+
+    /** 일반 로그인: AccessToken + RefreshToken 발급  */
     @Transactional
     fun login(loginId: String, password: String): TokenResponse {
         val member: Member = memberRepository.findByMemberId(loginId)
@@ -49,12 +95,7 @@ class AuthService(
         return generateAndStoreTokens(member)
     }
 
-    @Transactional
-    fun generateTokensForOAuth(member: Member): TokenResponse {
-        return generateAndStoreTokens(member)
-    }
-
-    /** AccessToken 재발급  */
+    /** AccessToken 재발급 */
     @Transactional
     fun reissue(refreshToken: String?): TokenResponse {
         val token = refreshToken
@@ -75,11 +116,14 @@ class AuthService(
 
         // 5. 새 AccessToken 발급
         val newAccessToken = jwtTokenProvider.generateAccessToken(memberPk, member.role)
-        val refreshTokenMaxAge = jwtTokenProvider.refreshTokenExpireTime
 
         log.info { "${"[Auth] AccessToken 재발급 완료: memberPk={}, reissuedAt={}"} $memberPk ${LocalDateTime.now()}" }
 
-        return TokenResponse.fromTokens(newAccessToken, savedToken.token, refreshTokenMaxAge, member.role.name)
+        return TokenResponse.fromTokens(
+            newAccessToken,
+            savedToken.token,
+            jwtTokenProvider.refreshTokenExpireTime,
+            member.role.name)
     }
 
     @Transactional
@@ -89,6 +133,24 @@ class AuthService(
         log.info { "${"[Auth] 로그아웃 완료: memberPk={}, deletedAt={}"} $memberPk ${LocalDateTime.now()}" }
     }
 
+    /** RefreshToken 저장/갱신 */
+    @Transactional
+    fun saveOrUpdateRefreshToken(memberPk: Long, refreshToken: String) {
+        val expiryTime = LocalDateTime.now()
+            .plusSeconds(jwtTokenProvider.refreshTokenExpireTime)
+
+        val token: RefreshToken = refreshTokenRepository.findByMemberPk(memberPk)
+            ?: RefreshToken.create(
+                memberPk = memberPk,
+                token = refreshToken,
+                expiry = expiryTime
+            )
+
+        token.updateToken(refreshToken, expiryTime)
+        refreshTokenRepository.save(token)
+    }
+
+    /** Access/Refresh 발급 후 저장 */
     @Transactional
     private fun generateAndStoreTokens(member: Member): TokenResponse {
         val memberPk = member.id!!
@@ -108,25 +170,10 @@ class AuthService(
     }
 
     /**
-     * RefreshToken 생성 or 갱신
+     * ====== ======  ======
+     * === 공통 유틸 메서드 ===
+     * ====== ====== ======
      */
-    @Transactional
-    fun saveOrUpdateRefreshToken(memberPk: Long, refreshToken: String) {
-        val expiryTime = LocalDateTime.now()
-            .plusSeconds(jwtTokenProvider.refreshTokenExpireTime)
-
-        val token: RefreshToken = refreshTokenRepository.findByMemberPk(memberPk)
-            ?: RefreshToken.create(
-                memberPk = memberPk,
-                token = refreshToken,
-                expiry = expiryTime
-            )
-
-        token.updateToken(refreshToken, expiryTime)
-        refreshTokenRepository.save(token)
-    }
-
-    // === 공통 유틸 메서드 === //
 
     /** 토큰에서 memberId 가져오기  */
     fun getMemberId(accessTokenHeader: String): Long {
@@ -165,4 +212,3 @@ class AuthService(
         }
     }
 }
-
