@@ -3,10 +3,10 @@ package com.backend.domain.auth.util
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
-import org.springframework.stereotype.Component
 
-@Component
-class CookieManager {
+object CookieManager {
+
+    private const val COOKIE_NAME = "refreshToken"
 
     /** RefreshToken 쿠키 생성 */
     fun addRefreshTokenCookie(response: HttpServletResponse, token: String, maxAgeSeconds: Long) {
@@ -29,9 +29,5 @@ class CookieManager {
             .build()
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-    }
-
-    companion object {
-        private const val COOKIE_NAME = "refreshToken"
     }
 }

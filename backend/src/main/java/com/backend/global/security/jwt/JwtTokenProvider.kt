@@ -2,6 +2,7 @@ package com.backend.global.security.jwt
 
 import com.backend.domain.member.entity.Provider
 import com.backend.domain.member.entity.Role
+import com.backend.global.security.oauth.dto.OAuth2TempClaims
 import com.backend.global.security.user.CustomUserDetails
 import com.backend.global.security.user.CustomUserDetailsService
 import io.jsonwebtoken.Claims
@@ -160,4 +161,13 @@ class JwtTokenProvider(
         private val log = LoggerFactory.getLogger(JwtTokenProvider::class.java)
     }
 
+    fun parseOAuth2TempToken(token: String): OAuth2TempClaims {
+        val claims = parseClaims(token)
+
+        return OAuth2TempClaims(
+            provider = Provider.valueOf(claims["provider"].toString()),
+            providerId = claims["providerId"].toString(),
+            email = claims["email"].toString()
+        )
+    }
 }

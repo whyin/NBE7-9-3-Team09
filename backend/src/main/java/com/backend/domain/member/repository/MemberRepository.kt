@@ -14,5 +14,6 @@ interface MemberRepository : JpaRepository<Member, Long> {
     fun existsByNickname(nickname: String): Boolean
 
     // provider + providerId 로 회원 조회
-    fun findByProviderAndProviderId(kakao: Provider, providerId: String): Member?
+    fun findByProviderAndProviderId(provider: Provider, providerId: String): Member?
+    fun existsByProviderAndProviderId(provider: Provider, providerId: String): Boolean
 }

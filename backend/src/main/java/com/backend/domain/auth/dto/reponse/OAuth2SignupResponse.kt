@@ -1,4 +1,8 @@
 package com.backend.domain.auth.dto.reponse
 
-class OAuth2SignupResponse {
-}
+data class OAuth2SignupResponse(
+    val memberId: Long,
+    val accessToken: String,
+    val refreshToken: String,
+    val refreshTokenMaxAge: Long
+)
