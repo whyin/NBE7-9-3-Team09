@@ -42,13 +42,13 @@ class Place(
     var updatedDate: LocalDateTime? = null,
 ) {
 
-    // JPA 프록시용 protected no-arg 생성자
     protected constructor() : this(
         placeName = "",
         address = null,
         gu = null,
-        category = Category(),   // 임시값 — JPA가 실제로는 프록시로 교체함
-        description = null
+        category = Category(),
+        description = null,
+        // 새 필드는 기본값 그대로 사용 (null / null / null)
     )
 
     fun update(
@@ -62,4 +62,5 @@ class Place(
         this.gu = gu
         this.description = description
     }
+
 }
