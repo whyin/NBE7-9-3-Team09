@@ -4,6 +4,7 @@ import com.backend.domain.bookmark.entity.Bookmark
 import com.backend.domain.member.entity.Member
 import com.backend.domain.place.entity.Place
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
 import java.util.*
 
 interface BookmarkRepository : JpaRepository<Bookmark, Long> {
@@ -15,4 +16,6 @@ interface BookmarkRepository : JpaRepository<Bookmark, Long> {
 
     // 회원의 활성 북마크 목록 (최근 저장 순)
     fun findAllByMemberAndDeletedAtIsNullOrderByCreatedAtDesc(member: Member): List<Bookmark>
+
+    fun findAllByDeletedAtBefore(before: LocalDateTime): List<Bookmark>
 }
