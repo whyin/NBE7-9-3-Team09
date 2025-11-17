@@ -6,7 +6,6 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import lombok.RequiredArgsConstructor
 import org.springframework.http.HttpHeaders
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -15,7 +14,6 @@ import java.io.IOException
 import java.lang.Exception
 
 @Component
-@RequiredArgsConstructor
 class JwtAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
     private val jwtErrorResponseWriter: JwtErrorResponseWriter

@@ -7,17 +7,13 @@ import com.backend.domain.member.entity.Member
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
-import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.function.Supplier
 
 @Service
-@RequiredArgsConstructor
 @Transactional
-@Slf4j
 class MemberService(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder
