@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import Login from "./login/Login";
 import Signup from "./signup/Signup";
 import Member from "./login/member/Member";
@@ -33,13 +33,8 @@ const MemberHome = () => (
 );
 
 const MemberApp = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="member-app">
-      <button className="back-button" onClick={() => navigate("/user")}>
-        ← 뒤로가기
-      </button>
       <Routes>
         {/* ✅ 기본 진입 시 */}
         <Route index element={<MemberHome />} />

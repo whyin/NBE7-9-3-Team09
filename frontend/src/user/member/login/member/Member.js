@@ -10,10 +10,6 @@ const Member = () => {
     navigate("/user/member/login/member/mypage");
   };
 
-  const goToLogout = () => {
-    navigate("/user/member/login/member/logout"); // ✅ 로그아웃 페이지로 이동
-  };
-
   return (
     <div className="member-container">
       <h2>회원 메인 페이지 🎉</h2>
@@ -30,11 +26,6 @@ const Member = () => {
       >
         <button onClick={goToMyPage} className="member-button">
           마이페이지로 이동
-        </button>
-
-        {/* ✅ 로그아웃 페이지로 이동 */}
-        <button onClick={goToLogout} className="member-button danger">
-          로그아웃
         </button>
       </div>
     </div>

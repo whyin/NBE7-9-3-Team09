@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { apiRequest, showErrorToast } from "../../utils/api.js";
 import PlanDetailModal from "./PlanDetailModal.jsx";
+import PageHeader from "../components/common/PageHeader";
 import "./BookmarkApp.css";
 
 const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8080";
@@ -63,11 +64,8 @@ export default function BookmarkApp() {
       className="p-4 max-w-4xl mx-auto"
       style={{ position: "relative", zIndex: 2 }}
     >
-      <button className="back-button" onClick={() => navigate("/user")}>
-        ← 뒤로가기
-      </button>
+      <PageHeader title="내 북마크" />
       <ToastContainer position="top-right" autoClose={2500} />
-      <h2 className="text-lg font-semibold mb-4">내 북마크</h2>
 
       {loading ? (
         <div>로딩 중...</div>

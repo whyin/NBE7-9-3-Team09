@@ -1,6 +1,7 @@
 .admin-dashboard-page {
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: white !important;
+  background: white !important;
   padding: 40px 20px;
 }
 

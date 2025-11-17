@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../../../../utils/api"; // ✅ 경로 수정됨 (5단계)
+import PageHeader from "../../../../components/common/PageHeader";
 import "../../../Member.css"; // ✅ 경로 수정됨 (3단계)
 
 const MyPage = () => {
@@ -73,21 +74,22 @@ const MyPage = () => {
     }
   };
 
-  // ✅ 로그아웃 페이지로 이동
-  const handleLogout = () => {
-    navigate("/user/member/login/member/logout"); // ✅ 로그아웃 페이지 이동
-  };
-
   return (
     <div className="member-container">
-      <h2>마이페이지</h2>
+      <PageHeader title="마이페이지" />
 
       {userInfo ? (
         <div className="member-form">
           <div className="profile-info">
-            <p><strong>아이디:</strong> {userInfo.memberId}</p>
-            <p><strong>이메일:</strong> {userInfo.email}</p>
-            <p><strong>닉네임:</strong> {userInfo.nickname}</p>
+            <p>
+              <strong>아이디:</strong> {userInfo.memberId}
+            </p>
+            <p>
+              <strong>이메일:</strong> {userInfo.email}
+            </p>
+            <p>
+              <strong>닉네임:</strong> {userInfo.nickname}
+            </p>
           </div>
 
           <div className="divider"></div>
@@ -130,15 +132,6 @@ const MyPage = () => {
           )}
 
           <div className="divider"></div>
-
-          {/* ✅ 로그아웃 버튼 추가 */}
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="member-button danger"
-          >
-            로그아웃
-          </button>
 
           {/* ✅ 회원 탈퇴 버튼 */}
           <button onClick={handleDelete} className="member-button danger">
