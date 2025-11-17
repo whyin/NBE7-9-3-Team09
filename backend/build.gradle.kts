@@ -76,6 +76,8 @@ dependencies {
 
     // Jackson Kotlin module 추가
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2")
+
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
 }
 
 allOpen {

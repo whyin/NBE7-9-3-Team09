@@ -26,6 +26,15 @@ class Place(
     @Column(columnDefinition = "TEXT")
     var description: String? = null,
 
+    @Column
+    var latitude: Double? = null,   // y
+
+    @Column
+    var longitude: Double? = null,  // x
+
+    @Column(length = 100)
+    var kakaoPlaceId: String? = null,
+
     @Column(nullable = false)
     var ratingSum: Long = 0L,
 
@@ -61,6 +70,14 @@ class Place(
         this.address = address
         this.gu = gu
         this.description = description
+    }
+
+    fun updateCoordinate(lat: Double, lng: Double, kakaoPlaceId: String? = null) {
+        this.latitude = lat
+        this.longitude = lng
+        if (kakaoPlaceId != null) {
+            this.kakaoPlaceId = kakaoPlaceId
+        }
     }
 
 }
