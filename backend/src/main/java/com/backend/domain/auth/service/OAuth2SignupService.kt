@@ -7,7 +7,9 @@ import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import com.backend.global.security.jwt.JwtTokenProvider
+import org.springframework.stereotype.Service
 
+@Service
 class OAuth2SignupService(
     private val memberRepository: MemberRepository,
     private val jwtTokenProvider: JwtTokenProvider,
@@ -40,7 +42,6 @@ class OAuth2SignupService(
         )
 
         memberRepository.save(member)
-
 
         // 5) JWT 발급
         val accessToken = jwtTokenProvider.generateAccessToken(member.id!!, member.role)
