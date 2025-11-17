@@ -1,4 +1,4 @@
-package com.backend.global.security.oauth.kakao
+package com.backend.global.security.oauth.provider.kakao
 
 class KakaoOAuthAttributes(
     val providerId: String,   // 카카오 고유 회원 번호(id)

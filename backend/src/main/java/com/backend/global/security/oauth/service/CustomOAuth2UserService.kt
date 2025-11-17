@@ -1,10 +1,10 @@
-package com.backend.global.security.oauth
+package com.backend.global.security.oauth.service
 
 import com.backend.domain.member.entity.Provider
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
-import com.backend.global.security.oauth.kakao.KakaoOAuthAttributes
+import com.backend.global.security.oauth.provider.kakao.KakaoOAuthAttributes
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -29,7 +29,7 @@ class CustomOAuth2UserService(
 
         // 3) 카카오 전용 attributes 파싱
         if (registrationId == "kakao") {
-            val kakaoAttributes = KakaoOAuthAttributes.of(oAuth2User.attributes)
+            val kakaoAttributes = KakaoOAuthAttributes.Companion.of(oAuth2User.attributes)
             val providerId = kakaoAttributes.providerId
 
             // 4) 기존 회원 조회

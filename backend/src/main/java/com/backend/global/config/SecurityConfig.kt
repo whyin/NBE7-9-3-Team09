@@ -3,7 +3,7 @@ package com.backend.global.config
 import com.backend.global.security.jwt.JwtAuthenticationFilter
 import com.backend.global.security.jwt.handler.JwtAccessDeniedHandler
 import com.backend.global.security.jwt.handler.JwtAuthenticationEntryPoint
-import com.backend.global.security.oauth.CustomOAuth2UserService
+import com.backend.global.security.oauth.service.CustomOAuth2UserService
 import com.backend.global.security.oauth.handler.OAuth2SuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

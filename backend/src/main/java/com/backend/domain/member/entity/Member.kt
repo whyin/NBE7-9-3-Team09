@@ -4,6 +4,7 @@ import com.backend.global.entity.BaseEntity
 import jakarta.persistence.*
 import lombok.*
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Entity
 @Table(name = "member")
@@ -100,7 +101,7 @@ class Member(
             return Member(
                 provider = Provider.KAKAO,
                 providerId = providerId,
-                memberId = "kakao_$providerId",      // 자동 생성
+                memberId = "social_" + java.util.UUID.randomUUID().toString().replace("-", "").take(16),      // 자동 생성
                 password = "{SOCIAL_LOGIN}",         // 소셜 회원 dummy PW
                 email = email,
                 nickname = nickname,
