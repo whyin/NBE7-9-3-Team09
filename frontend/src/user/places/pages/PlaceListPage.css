@@ -153,6 +153,7 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
+  line-height: 1.5;
 }
 
 .place-card::before {
@@ -262,34 +263,57 @@
 .place-rating {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 15px;
+  flex-wrap: wrap;
 }
 
 .stars {
   display: flex;
-  gap: 2px;
+  gap: 4px;
 }
 
 .star {
-  font-size: 16px;
+  font-size: 18px;
+  color: #d1d5db;
+  line-height: 1;
+  position: relative;
 }
 
-.star.filled,
+.star.filled {
+  color: #f59e0b;
+}
+
 .star.half {
-  color: #fbbf24;
-}
-
-.star.empty {
   color: #d1d5db;
 }
 
-.rating-text {
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
+.star.half::before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  color: #f59e0b;
 }
 
+.rating-text {
+  font-size: 15px;
+  color: #374151;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.rating-text strong {
+  color: #111827;
+  font-size: 16px;
+}
+
+.rating-count {
+  font-size: 14px;
+  color: #6b7280;
+}
 .place-description {
   margin-top: 15px;
   padding-top: 15px;

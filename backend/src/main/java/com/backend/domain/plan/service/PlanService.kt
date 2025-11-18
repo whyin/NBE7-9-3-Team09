@@ -27,11 +27,9 @@ open class PlanService(
 
     @Transactional
     open fun createPlan(planCreateRequestBody: PlanCreateRequestBody, memberPkId: Long): Plan {
-
-//        val member = Member.builder().id(memberPkId).build()
-        val member = memberService.findById(memberPkId) // todo 이후 member 코틀린으로 전환되면 위의 생성 코드 사용하기.
+        val member = memberService.findById(memberPkId)
         val plan = planCreateRequestBody.toEntity(member)
-        hasValidPlan(plan)
+        hasValidPlan(plan,memberPkId)
         val savedPlan = planRepository.save<Plan>(plan)
         planMemberRepository.save<PlanMember?>(
             PlanMember(null, member, plan, null, null, 0)
@@ -56,11 +54,10 @@ open class PlanService(
         planUpdateRequestBody: PlanUpdateRequestBody,
         memberPkId: Long
     ): PlanResponseBody {
-        //        val member = Member.builder().id(memberPkId).build()
-        val member = memberService.findById(memberPkId) // todo 이후 member 코틀린으로 전환되면 위의 생성 코드 사용하기.
+        val member = memberService.findById(memberPkId)
         val plan = getPlanById(planId)
         isSameMember(plan, member)
-        hasValidPlan(plan)
+        hasValidPlan(plan,memberPkId)
 
         val newPlan: Plan = plan.updatePlan(planUpdateRequestBody, member);
         planRepository.save<Plan>(newPlan)
@@ -70,8 +67,7 @@ open class PlanService(
     @Transactional
     open fun deletePlanById(planId: Long, memberPkId: Long) {
         val plan = getPlanById(planId)
-        //        val member = Member.builder().id(memberPkId).build()
-        val member = memberService.findById(memberPkId) // todo 이후 member 코틀린으로 전환되면 위의 생성 코드 사용하기.
+        val member = memberService.findById(memberPkId)
         isSameMember(plan, member)
         planMemberRepository.deletePlanMembersByPlan(plan)
         planDetailRepository.deletePlanDetailsByPlan(plan)
@@ -94,20 +90,16 @@ open class PlanService(
         return PlanResponseBody(plan)
     }
 
-    private fun hasValidPlan(plan: Plan) {
-        if (plan.startDate.isAfter(plan.endDate)) {
-            throw BusinessException(ErrorCode.NOT_VALID_DATE)
-        }
-        if (plan.startDate.isBefore(LocalDateTime.now().toLocalDate().atStartOfDay().minusSeconds(1))) {
-            throw BusinessException(ErrorCode.NOT_VALID_DATE)
-        }
-        if (plan.endDate.isAfter(LocalDateTime.now().plusYears(10))) {
-            throw BusinessException(ErrorCode.NOT_VALID_DATE)
-        }
+    private fun hasValidPlan(plan: Plan,memberPkId: Long) {
+        if (plan.startDate.isAfter(plan.endDate))throw BusinessException(ErrorCode.NOT_VALID_DATE)
+        if (plan.startDate.isBefore(LocalDateTime.now().toLocalDate().atStartOfDay().minusSeconds(1))) throw BusinessException(ErrorCode.NOT_VALID_DATE)
+        if (plan.endDate.isAfter(LocalDateTime.now().plusYears(10))) throw BusinessException(ErrorCode.NOT_VALID_DATE)
+        if (planRepository.existsOverlappingPlan(plan.id, memberPkId,plan.startDate,plan.endDate)) throw BusinessException(ErrorCode.NOT_VALID_DATE)
+
     }
 
     private fun isSameMember(plan: Plan, member: Member) {
-        if (member.id !== plan.member.id) {
+        if (member.id != plan.member.id) {
             throw BusinessException(ErrorCode.NOT_SAME_MEMBER)
         }
     }

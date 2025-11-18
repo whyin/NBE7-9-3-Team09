@@ -84,6 +84,11 @@ dependencies {
     // QueryDSL
     implementation("io.github.openfeign.querydsl:querydsl-jpa:7.1")
     kapt("io.github.openfeign.querydsl:querydsl-apt:7.1:jpa")
+
+    //Spring 캐시 관련
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
 }
 
 allOpen {

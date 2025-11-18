@@ -14,4 +14,12 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun findByMember_IdAndPlace_Id(memberId: Long, placeId: Long): Review?
     @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Review r WHERE r.place.id = :placeId")
     fun findAverageRatingByPlaceId(@Param("placeId") placeId: Long?): Double
+
+    @Query("SELECT AVG(r.rating) FROM Review r")
+    fun findGlobalAverageRating(): Double
+    fun findByMemberIdAndId(memberId: Long?, reviewId: Long?): Review?
+
+
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.place.id = :placeId")
+    fun findAverageRating(@Param("placeId") placeId: Long?): Double
 }

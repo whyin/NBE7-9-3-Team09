@@ -6,112 +6,143 @@ import com.backend.domain.member.entity.Member
 import com.backend.domain.member.repository.MemberRepository
 import com.backend.domain.place.entity.Place
 import com.backend.domain.place.repository.PlaceRepository
+import com.backend.domain.recommend.entity.Recommend
+import com.backend.domain.recommend.repository.RecommendRepository
 import com.backend.domain.review.dto.RecommendResponse
-import com.backend.domain.review.dto.RecommendResponse.Companion.from
 import com.backend.domain.review.dto.ReviewRequestDto
 import com.backend.domain.review.dto.ReviewResponseDto
 import com.backend.domain.review.entity.Review
 import com.backend.domain.review.repository.ReviewRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
-import java.util.Map
-import java.util.function.Supplier
 
 @Service
-class ReviewService (
+class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val memberRepository: MemberRepository,
     private val placeRepository: PlaceRepository,
     private val categoryRepository: CategoryRepository,
-    ){
-    //리뷰 생성 메서드
-    @Transactional
-    fun createReview(dto: ReviewRequestDto, memberId: Long): ReviewResponseDto {
-//        val placeId: Long = reviewRequestDto.placeId!!
+    private val recommendRepository: RecommendRepository,
+) {
 
+    /**
+     * 리뷰 생성
+     */
+    @Transactional
+    @CacheEvict(cacheNames = ["recommendTop5", "sortedPlaces"], allEntries = true)
+    fun createReview(dto: ReviewRequestDto, memberId: Long): ReviewResponseDto {
         val member = getMemberEntity(memberId)
         val place = getPlaceEntity(dto.placeId)
 
-        val mid = requireNotNull(member.id) {"Member must be persisted" }
-        val pid = requireNotNull(place.id) {"Place must be persisted" }
+        val mid = requireNotNull(member.id) { "Member must be persisted" }
+        val pid = requireNotNull(place.id) { "Place must be persisted" }
 
+        // 중복 리뷰 체크
         reviewRepository.findByMember_IdAndPlace_Id(mid, pid)?.let {
             throw BusinessException(ErrorCode.GIVEN_REVIEW)
         }
-        val review = Review(place = place, member = member, rating = dto.rating).apply { onCreate() }
+
+        // 리뷰 생성/저장
+        val review = Review(
+            place = place,
+            member = member,
+            rating = dto.rating,
+            content = dto.content
+        ).apply { onCreate() }
+
         val saved = reviewRepository.save(review)
+
+        // place 통계 갱신
+        place.ratingCount = place.ratingCount + 1
+        place.ratingSum = place.ratingSum + dto.rating
+        placeRepository.save(place)
+
+        // Recommend 갱신
+        updateRecommend(place)
+
+        // DTO 변환 (기존 from(..) 패턴 사용한다고 가정)
         return ReviewResponseDto.from(saved)
-
     }
 
-    //리뷰 수정 메서드
+    /**
+     * 리뷰 수정
+     */
     @Transactional
-    fun modifyReview(memberId: Long, modifyRating: Int) {
-        val review = getReviewWithAuth(memberId)
+    @CacheEvict(cacheNames = ["recommendTop5", "sortedPlaces"], allEntries = true)
+    fun modifyReview(memberId: Long, reviewId: Long, modifyRating: Int, content: String) {
+        val review = reviewRepository.findByMemberIdAndId(memberId, reviewId)
+            ?: throw BusinessException(ErrorCode.NOT_FOUND_REVIEW)
+
+        val oldRating = review.rating
+
         review.rating = modifyRating
+        review.content = content
         review.onUpdate()
+        reviewRepository.save(review)
+
+        // place 통계 갱신
+        val place = getPlaceEntity(requireNotNull(review.place.id))
+        place.ratingSum = place.ratingSum - oldRating + modifyRating
+        placeRepository.save(place)
+
+        // Recommend 갱신
+        updateRecommend(place)
     }
 
-    //리뷰 삭제 메서드
+    /**
+     * 리뷰 삭제
+     */
     @Transactional
+    @CacheEvict(cacheNames = ["recommendTop5", "sortedPlaces"], allEntries = true)
     fun deleteReview(memberId: Long, reviewId: Long) {
         if (!validWithReviewId(memberId, reviewId)) {
             throw BusinessException(ErrorCode.ACCESS_DENIED)
         }
+
         val review = getReviewEntity(reviewId)
+        val place = getPlaceEntity(requireNotNull(review.place.id))
+
+        // place 통계 갱신
+        place.ratingCount = place.ratingCount - 1
+        place.ratingSum = place.ratingSum - review.rating
+        placeRepository.save(place)
+
         reviewRepository.delete(review)
+
+        // Recommend 갱신
+        updateRecommend(place)
     }
 
-    //내가 작성한 리뷰 조회
-    fun getMyReviews(memberId: Long): List<ReviewResponseDto?> {
-        val myReviews: List<Review> = reviewRepository.findAllByMemberId(memberId)
+    /**
+     * 내가 작성한 리뷰 조회
+     */
+    fun getMyReviews(memberId: Long): List<ReviewResponseDto> {
+        val myReviews = reviewRepository.findAllByMemberId(memberId)
         if (myReviews.isEmpty()) {
             throw BusinessException(ErrorCode.NOT_FOUND_REVIEW)
         }
-        return myReviews.map{ ReviewResponseDto.from(it)  }
+        return myReviews.map { ReviewResponseDto.from(it) }
     }
 
-    val allReviews: List<ReviewResponseDto>
-        //전체 리뷰 조회
-        get() = reviewRepository.findAll()
-            .map{ ReviewResponseDto.from(it)  }
+    /**
+     * 전체 리뷰 조회
+     */
+    fun getAllReviews(): List<ReviewResponseDto> =
+        reviewRepository.findAll()
+            .map { ReviewResponseDto.from(it) }
 
-    //여행지의 전체 리뷰 조회
-    fun getReviewList(placeId: Long): List<ReviewResponseDto?> {
-        return reviewRepository.findByPlaceId(placeId)
-            .map{ ReviewResponseDto.from(it)  }
-    }
+    /**
+     * 특정 여행지의 리뷰 리스트
+     */
+    fun getReviewList(placeId: Long): List<ReviewResponseDto> =
+        reviewRepository.findByPlaceId(placeId)
+            .map { ReviewResponseDto.from(it) }
 
-    //"RESTAURANT", "LODGING", "NIGHTSPOT"
-    @Transactional(readOnly = true)
-    fun recommendHotel(topN: Int = 5): List<RecommendResponse> {
-        val category = categoryRepository.findByName("HOTEL")
-            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_CATEGORY) }
-
-        // getAllPlacesAndCalculate(category): List<Pair<Long, Double>> 를 사용한다고 가정
-        return getAllPlacesAndCalculate(category)
-            .take(topN)
-            .map { (placeId, avg) ->
-                val place = getPlaceEntity(placeId)
-                RecommendResponse.from(place, avg)
-            }
-    }
-
-    fun recommendByPlace(placeId: Long, topN: Int = 5): List<RecommendResponse> {
-        val base = getPlaceEntity(placeId)
-        val categoryName = base.category.name
-
-        return placeRepository.findByCategory_Name(categoryName)
-            .filter { it.id != placeId } // 자기 자신 제외
-            .map { it.id to (reviewRepository.findAverageRatingByPlaceId(it.id) ?: 0.0) }
-            .sortedByDescending { it.second }
-            .take(topN)
-            .map { (pid, avg) -> RecommendResponse.from(getPlaceEntity(pid), avg) }
-    }
-
+    // ───────────────── 헬퍼 메서드들 ─────────────────
 
     fun getReviewEntity(reviewId: Long): Review =
         reviewRepository.findById(reviewId)
@@ -125,97 +156,98 @@ class ReviewService (
         memberRepository.findById(memberId)
             .orElseThrow { BusinessException(ErrorCode.MEMBER_NOT_FOUND) }
 
-    fun getReviewWithAuth(memberId: Long): Review {
-        val member = getMemberEntity(memberId)
-        val reviews: List<Review> = reviewRepository.findAllByMemberId(member.id)
-        if (reviews.isEmpty()) {
-            throw BusinessException(ErrorCode.NOT_FOUND_REVIEW)
-        }
-
-        return reviews.get(0)
-    }
-
     fun validWithReviewId(memberId: Long, reviewId: Long): Boolean {
         val review = getReviewEntity(reviewId)
         val member = getMemberEntity(memberId)
         return review.member.id == member.id
     }
 
-
-    @Transactional(readOnly = true)
-    fun recommendRestaurant(topN: Int = 5): List<RecommendResponse> {
-        val category = categoryRepository.findByName("맛집")
-            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_CATEGORY) }
-
-        return getAllPlacesAndCalculate(category)       // List<Pair<Long, Double>>
-            .take(topN)
-            .map { (placeId, avg) ->
-                val place = getPlaceEntity(placeId)
-                RecommendResponse.from(place, avg)
-            }
-    }
-
-    fun getAllPlacesAndCalculate(category: Category): List<Pair<Long, Double>> {
-        return placeRepository.findByCategory_Name(category.name)
+    /**
+     * (옛 로직용) 카테고리 내 place들의 평균 별점 계산
+     * 필요하면 계속 사용, 아니면 지워도 됨
+     */
+    fun getAllPlacesAndCalculate(category: Category): List<Pair<Long, Double>> =
+        placeRepository.findByCategory_Name(category.name)
             .map { place ->
                 val pid = requireNotNull(place.id) { "Place must be persisted" }
                 val avg = reviewRepository.findAverageRatingByPlaceId(pid) ?: 0.0
                 pid to avg
             }
             .sortedByDescending { it.second }
+
+    /**
+     * 베이지안 가중치 계산
+     */
+    fun getWeightByBayesian(
+        averageRating: Double,
+        reviewCount: Double,
+        globalAverageRating: Double
+    ): Double {
+        val threshold = 10.0 // 신뢰도 임계값
+        return (reviewCount / (reviewCount + threshold)) * averageRating +
+                (threshold / (reviewCount + threshold)) * globalAverageRating
     }
 
-    @Transactional(readOnly = true)
-    fun sortAllHotelReviews(): List<RecommendResponse> {
-        val category = categoryRepository.findByName("HOTEL")
-            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_CATEGORY) }
+    // ───────────────── Recommend / 캐시 영역 ─────────────────
 
-        // getAllPlacesAndCalculate(category): List<Pair<Long, Double>> 를 사용한다고 가정
-        return getAllPlacesAndCalculate(category)
-            .map { (placeId, avg) ->
-                val place = placeRepository.findById(placeId)
-                    .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_PLACE) }
-                RecommendResponse.from(place, avg)
-            }
-    }
+    @Cacheable(cacheNames = ["recommendTop5"], key = "#categoryName")
+    fun recommendPlace(categoryName: String): List<RecommendResponse> {
+        val recommends = recommendRepository
+            .findTop5ByPlaceCategoryNameOrderByBayesianRatingDesc(categoryName)
 
-    @Transactional(readOnly = true)
-    fun sortAllNightSpotReviews(): List<RecommendResponse> {
-        val category = categoryRepository.findByName("NIGHTSPOT")
-            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_CATEGORY) }
-
-        // getAllPlacesAndCalculate(category): List<Pair<Long, Double>> 가정
-        return getAllPlacesAndCalculate(category)
-            .map { (placeId, avg) ->
-                val place = placeRepository.findById(placeId)
-                    .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_PLACE) }
-                RecommendResponse.from(place, avg)
-            }
-    }
-
-    fun sortAllRestaurantReviews(): List<RecommendResponse> {
-        val category = categoryRepository.findByName("맛집").orElseThrow{
-            BusinessException(ErrorCode.NOT_FOUND_CATEGORY)
+        return recommends.map {
+            val place = it?.place ?: throw IllegalStateException("Recommend.place is null")
+            RecommendResponse.from(place, it.bayesianRating)
         }
-
-        return getAllPlacesAndCalculate(category)
-            .map { (placeId, avg) ->
-                val place = placeRepository.findById(placeId)
-                    .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_PLACE) }
-                RecommendResponse.from(place, avg)
-            }
     }
 
-    @Transactional(readOnly = true)
-    fun recommendNightSpot(topN: Int = 5): List<RecommendResponse> {
-        val category = categoryRepository.findByName("NIGHTSPOT")
-            .orElseThrow { BusinessException(ErrorCode.NOT_FOUND_CATEGORY) }
+    @Cacheable(cacheNames = ["sortedPlaces"], key = "#categoryName")
+    fun sortPlaces(categoryName: String): List<RecommendResponse> {
+        val recommends = recommendRepository
+            .findByPlaceCategoryNameOrderByBayesianRatingDesc(categoryName)
 
-        return getAllPlacesAndCalculate(category)          // List<Pair<Long, Double>>
-            .take(topN)                                   // 상위 N개
-            .map { (placeId, avg) ->
-                val place = getPlaceEntity(placeId)
-                RecommendResponse.from(place, avg)
-            }
+        return recommends.map {
+            val place = it?.place ?: throw IllegalStateException("Recommend.place is null")
+            RecommendResponse.from(place, it.bayesianRating)
+        }
+    }
+
+    /**
+     * 전체 리뷰의 글로벌 평균 평점
+     */
+    fun getGlobalAverageRating(): Double =
+        reviewRepository.findGlobalAverageRating()
+
+    /**
+     * 특정 장소의 평균 평점
+     */
+    fun getAverageRating(placeId: Long): Double =
+        reviewRepository.findAverageRating(placeId)
+
+    /**
+     * place/Review 통계를 기반으로 Recommend 엔티티 갱신
+     */
+    fun updateRecommend(place: Place) {
+        val pid = requireNotNull(place.id) { "Place must be persisted" }
+
+        val averageRating = getAverageRating(pid)
+        val reviewCount = place.ratingCount.toLong()
+        val globalAverageRating = getGlobalAverageRating()
+        val weight = getWeightByBayesian(
+            averageRating = averageRating,
+            reviewCount = reviewCount.toDouble(),
+            globalAverageRating = globalAverageRating
+        )
+
+        val recommend = recommendRepository.findByPlaceId(pid)
+            ?.orElseGet { Recommend.create(place, averageRating, reviewCount, weight) }
+
+        recommend?.updateRecommend(averageRating, reviewCount, weight)
+        recommendRepository.save(recommend)
+
+        // place에도 캐시용 통계 저장
+        place.ratingAvg = averageRating
+        place.ratingCount = reviewCount.toInt()
+        placeRepository.save(place)
     }
 }

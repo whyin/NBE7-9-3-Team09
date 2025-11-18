@@ -8,6 +8,7 @@ data class ResponsePlaceDto(
     val address: String?,
     val gu: String?,
     val category: String,
+    val ratingAvg: Double?,
     val description: String?,
     val latitude: Double?,
     val longitude: Double?
@@ -20,6 +21,7 @@ data class ResponsePlaceDto(
                 address = place.address,
                 gu = place.gu,
                 category = place.category.name,
+                ratingAvg = place.ratingAvg,
                 description = place.description,
                 latitude = place.latitude,
                 longitude = place.longitude
