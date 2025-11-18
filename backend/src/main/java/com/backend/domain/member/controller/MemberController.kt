@@ -2,6 +2,7 @@ package com.backend.domain.member.controller
 
 import com.backend.domain.member.dto.request.MemberSignupRequest
 import com.backend.domain.member.dto.request.MemberUpdateRequest
+import com.backend.domain.member.dto.response.MemberIdResponse
 import com.backend.domain.member.dto.response.MemberResponse
 import com.backend.domain.member.service.MemberService
 import com.backend.global.response.ApiResponse
@@ -21,6 +22,14 @@ class MemberController(
     ): ApiResponse<MemberResponse> {
         val response = memberService.signup(request)
         return ApiResponse.created(response)
+    }
+
+    @GetMapping("/search/email")
+    fun findMemberByEmail(
+        @RequestParam email: String
+    ): ApiResponse<MemberIdResponse> {
+        val member = memberService.getMemberIdByEmail(email)
+        return ApiResponse.success(MemberIdResponse(id = member), "member id 반환 성공")
     }
 
     @GetMapping("/me")
