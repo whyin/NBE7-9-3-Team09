@@ -1,3 +1,5 @@
+import Oauth2Signup from "./signup/Oauth2Signup";
+
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import Login from "./login/Login";
@@ -42,6 +44,9 @@ const MemberApp = () => {
         {/* ✅ 로그인 & 회원가입 */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
+        {/* ⭐ 신규 카카오 회원가입 페이지 */}
+        <Route path="/oauth2/signup" element={<Oauth2Signup />} /> 
 
         {/* ✅ 로그인 성공 후 회원 전용 페이지 */}
         <Route path="/login/member" element={<Member />} />

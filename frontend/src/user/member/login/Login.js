@@ -10,6 +10,13 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const REST_API_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;  // 추가 rk rk rk rk
+  const REDIRECT_URI = process.env.REACT_APP_KAKAO_REDIRECT_URI; // 추가
+
+  const handleKakaoLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
+  };
+
   // ✅ 로그인 요청 (AccessToken, Role 저장)
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -72,9 +79,21 @@ const Login = () => {
         <button type="submit" className="member-button">
           로그인
         </button>
+        
+
+        {/* 카카오 로그인 버튼 */}
+        <button
+          type="button"
+          onClick={handleKakaoLogin}
+          className="member-button"
+          style={{ backgroundColor: "#FEE500", color: "#3C1E1E" }} // 최소 스타일
+        >
+          카카오 로그인
+        </button>
 
         {error && <p className="error-text">{error}</p>}
       </form>
+
 
       {/* 회원가입 버튼 */}
       <button

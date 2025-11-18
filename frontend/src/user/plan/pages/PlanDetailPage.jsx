@@ -4,6 +4,9 @@ import "./planListPage.css";
 import "./PlanDetailPage.css";
 import { apiRequest } from "../../../utils/api";
 import { getCategoryIcon, getCategoryInfo } from "../../utils/categoryUtils";
+import PlanMemberPanel from "../components/PlanMemberPanel";
+import PlanSummaryCard from "../components/PlanSummaryCard";
+import PlanScheduleSection from "../components/PlanScheduleSection";
 
 // 여행 계획 상세 컴포넌트
 export default function PlanDetailPage({ planId, onBack }) {
@@ -104,6 +107,7 @@ export default function PlanDetailPage({ planId, onBack }) {
         `http://localhost:8080/api/plan/update/${planId}`,
         {
           method: "PUT",
+          body: JSON.stringify(editData),
         }
       );
 
@@ -115,6 +119,7 @@ export default function PlanDetailPage({ planId, onBack }) {
       setPlan(result.data);
       setIsEditing(false);
       alert("수정이 완료되었습니다.");
+      fetchPlanDetail();
     } catch (err) {
       alert(err.message);
     }
@@ -465,7 +470,7 @@ export default function PlanDetailPage({ planId, onBack }) {
   };
 
   return (
-    <div className="container">
+    <div className="plan-detail-page">
       <PageHeader
         title={plan ? plan.title : "여행 계획 상세"}
         subtitle={
@@ -478,491 +483,70 @@ export default function PlanDetailPage({ planId, onBack }) {
         onBack={onBack}
         backText="← 목록으로"
       />
-      <div className="plan-detail-layout">
-        {/* 좌측: 여행 계획 기본 정보 */}
-        <div className="plan-info-sidebar">
-          <div className="plan-info-card">
-            <div className="plan-info-header">
-              {!isEditing ? (
-                <>
-                  <h2 className="plan-info-title">{plan.title}</h2>
-                  <div className="plan-info-actions">
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="plan-info-edit-btn"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => setShowDeleteConfirm(true)}
-                      className="plan-info-delete-btn"
-                    >
-                      삭제
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h2 className="plan-info-title">계획 수정</h2>
-                  <div className="plan-info-actions">
-                    <button
-                      onClick={handleUpdate}
-                      className="plan-info-save-btn"
-                    >
-                      저장
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsEditing(false);
-                        setEditData({
-                          title: plan.title,
-                          content: plan.content,
-                          startDate: plan.startDate,
-                          endDate: plan.endDate,
-                        });
-                      }}
-                      className="plan-info-cancel-btn"
-                    >
-                      취소
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {!isEditing ? (
-              <>
-                <div className="plan-info-date">
-                  {formatDateTime(plan.startDate)} ~{" "}
-                  {formatDateTime(plan.endDate)}
-                </div>
-                {plan.content && (
-                  <p className="plan-info-content">{plan.content}</p>
-                )}
-              </>
-            ) : (
-              <div className="plan-info-edit-form">
-                <input
-                  type="text"
-                  value={editData.title}
-                  onChange={(e) =>
-                    setEditData({ ...editData, title: e.target.value })
-                  }
-                  placeholder="계획 제목"
-                />
-                <textarea
-                  value={editData.content}
-                  onChange={(e) =>
-                    setEditData({ ...editData, content: e.target.value })
-                  }
-                  placeholder="계획 설명"
-                />
-                <input
-                  type="datetime-local"
-                  value={editData.startDate}
-                  onChange={(e) =>
-                    setEditData({ ...editData, startDate: e.target.value })
-                  }
-                />
-                <input
-                  type="datetime-local"
-                  value={editData.endDate}
-                  onChange={(e) =>
-                    setEditData({ ...editData, endDate: e.target.value })
-                  }
-                />
-              </div>
-            )}
-          </div>
+      <div className="plan-detail-three-column">
+        {/* 왼쪽 컬럼: 요약 카드 */}
+        <div className="plan-detail-column plan-detail-column-left">
+          <PlanSummaryCard
+            plan={plan}
+            isEditing={isEditing}
+            editData={editData}
+            onEditChange={setEditData}
+            onEdit={() => setIsEditing(true)}
+            onSave={handleUpdate}
+            onCancel={() => {
+              setIsEditing(false);
+              setEditData({
+                title: plan.title,
+                content: plan.content,
+                startDate: plan.startDate,
+                endDate: plan.endDate,
+              });
+            }}
+            onDelete={() => setShowDeleteConfirm(true)}
+          />
         </div>
 
-        {/* 우측: 상세 일정 영역 */}
-        <div className="plan-details-main">
-          {/* 상세 일정 추가 폼 */}
-          <div className="detail-add-form-card">
-            <div className="detail-add-form-header">
-              <h2 className="detail-add-form-title">여행 상세 일정</h2>
-              <button
-                onClick={() => setShowAddForm(!showAddForm)}
-                className={`detail-add-form-toggle ${
-                  showAddForm ? "cancel" : ""
-                }`}
-              >
-                {showAddForm ? "취소" : "+ 새 일정 추가"}
-              </button>
-            </div>
+        {/* 가운데 컬럼: 여행 상세 일정 */}
+        <div className="plan-detail-column plan-detail-column-center">
+          <PlanScheduleSection
+            planDetails={sortedPlanDetails}
+            plan={plan}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+            recommendedPlaces={recommendedPlaces}
+            showPlaceList={showPlaceList}
+            loadingPlaces={loadingPlaces}
+            newDetail={newDetail}
+            onNewDetailChange={setNewDetail}
+            onPlaceSelect={handlePlaceSelect}
+            showAddForm={showAddForm}
+            onToggleAddForm={() => setShowAddForm(!showAddForm)}
+            onAddDetail={handleAddDetail}
+            isAddFormValid={isAddFormValid}
+            editingDetailId={editingDetailId}
+            editingDetailData={editingDetailData}
+            onEditingDetailChange={setEditingDetailData}
+            editSelectedCategory={editSelectedCategory}
+            onEditCategorySelect={handleEditCategorySelect}
+            editRecommendedPlaces={editRecommendedPlaces}
+            editShowPlaceList={editShowPlaceList}
+            editLoadingPlaces={editLoadingPlaces}
+            onEditPlaceSelect={handleEditPlaceSelect}
+            onEditDetail={handleEditDetail}
+            onUpdateDetail={handleUpdateDetail}
+            onCancelEditDetail={handleCancelEditDetail}
+            onDeleteDetail={handleDeleteDetail}
+            getDetailCategory={getDetailCategory}
+          />
+        </div>
 
-            {showAddForm && (
-              <div className="detail-add-form-content">
-                <div className="detail-add-form-group">
-                  <label className="detail-add-form-label">카테고리</label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => handleCategorySelect(e.target.value)}
-                    className="detail-add-form-select"
-                  >
-                    <option value="">카테고리 선택</option>
-                    {categories.map((cat) => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {loadingPlaces && (
-                  <div className="detail-add-form-group full-width">
-                    <p>추천 여행지를 불러오는 중...</p>
-                  </div>
-                )}
-
-                {showPlaceList && recommendedPlaces.length > 0 && (
-                  <div className="detail-add-form-group full-width">
-                    <label className="detail-add-form-label">추천 여행지</label>
-                    <div className="place-selection-list">
-                      {recommendedPlaces.map((place) => (
-                        <div
-                          key={place.id}
-                          onClick={() => handlePlaceSelect(place)}
-                          className={`place-selection-item ${
-                            newDetail.placeId === place.id ? "selected" : ""
-                          }`}
-                        >
-                          <div className="place-selection-item-name">
-                            ⭐ {place.averageRating.toFixed(1)}{" "}
-                            {place.placeName}
-                          </div>
-                          <div className="place-selection-item-address">
-                            {place.address}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {newDetail.placeName && (
-                  <div className="detail-add-form-group full-width">
-                    <label className="detail-add-form-label">선택된 장소</label>
-                    <div
-                      style={{
-                        padding: "8px",
-                        background: "#f3f4f6",
-                        borderRadius: "8px",
-                      }}
-                    >
-                      <strong>{newDetail.placeName}</strong>
-                    </div>
-                  </div>
-                )}
-
-                <div className="detail-add-form-group">
-                  <label className="detail-add-form-label">시작 시간</label>
-                  <input
-                    type="datetime-local"
-                    value={newDetail.startTime}
-                    onChange={(e) =>
-                      setNewDetail({ ...newDetail, startTime: e.target.value })
-                    }
-                    className="detail-add-form-input"
-                  />
-                  {newDetail.startTime &&
-                    !isTimeInRange(newDetail.startTime) && (
-                      <p
-                        style={{
-                          color: "#ef4444",
-                          fontSize: "12px",
-                          marginTop: "4px",
-                        }}
-                      >
-                        시작 시간은 계획 기간 내에 있어야 합니다.
-                      </p>
-                    )}
-                </div>
-
-                <div className="detail-add-form-group">
-                  <label className="detail-add-form-label">종료 시간</label>
-                  <input
-                    type="datetime-local"
-                    value={newDetail.endTime}
-                    onChange={(e) =>
-                      setNewDetail({ ...newDetail, endTime: e.target.value })
-                    }
-                    className="detail-add-form-input"
-                  />
-                  {newDetail.endTime && !isTimeInRange(newDetail.endTime) && (
-                    <p
-                      style={{
-                        color: "#ef4444",
-                        fontSize: "12px",
-                        marginTop: "4px",
-                      }}
-                    >
-                      종료 시간은 계획 기간 내에 있어야 합니다.
-                    </p>
-                  )}
-                </div>
-
-                <div className="detail-add-form-group">
-                  <label className="detail-add-form-label">제목</label>
-                  <input
-                    type="text"
-                    value={newDetail.title}
-                    onChange={(e) =>
-                      setNewDetail({ ...newDetail, title: e.target.value })
-                    }
-                    className="detail-add-form-input"
-                    placeholder="일정 제목"
-                  />
-                </div>
-
-                <div className="detail-add-form-group full-width">
-                  <label className="detail-add-form-label">내용</label>
-                  <textarea
-                    value={newDetail.content}
-                    onChange={(e) =>
-                      setNewDetail({ ...newDetail, content: e.target.value })
-                    }
-                    className="detail-add-form-textarea"
-                    placeholder="일정 설명"
-                  />
-                </div>
-
-                <button
-                  onClick={handleAddDetail}
-                  disabled={!isAddFormValid()}
-                  className="detail-add-form-submit"
-                >
-                  저장
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* 상세 일정 타임라인 */}
-          {sortedPlanDetails.length === 0 ? (
-            <div className="detail-timeline-empty">
-              <div className="detail-timeline-empty-icon">📅</div>
-              <p className="detail-timeline-empty-text">
-                아직 등록된 상세 일정이 없습니다.
-              </p>
-            </div>
-          ) : (
-            <div className="detail-timeline">
-              {sortedPlanDetails.map((detail) => {
-                const category = getDetailCategory(detail);
-                const categoryInfo = getCategoryInfo(category);
-                return (
-                  <div
-                    key={detail.id}
-                    className={`detail-timeline-item ${categoryInfo.class} ${
-                      editingDetailId === detail.id ? "editing" : ""
-                    }`}
-                  >
-                    {editingDetailId === detail.id ? (
-                      <div className="detail-timeline-edit-form">
-                        <div className="detail-timeline-edit-form-group">
-                          <label className="detail-timeline-edit-form-label">
-                            카테고리
-                          </label>
-                          <select
-                            value={editSelectedCategory}
-                            onChange={(e) =>
-                              handleEditCategorySelect(e.target.value)
-                            }
-                            className="detail-timeline-edit-form-input"
-                          >
-                            <option value="">카테고리 선택</option>
-                            {categories.map((cat) => (
-                              <option key={cat.value} value={cat.value}>
-                                {cat.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {editLoadingPlaces && (
-                          <div className="detail-timeline-edit-form-group full-width">
-                            <p>추천 여행지를 불러오는 중...</p>
-                          </div>
-                        )}
-
-                        {editShowPlaceList &&
-                          editRecommendedPlaces.length > 0 && (
-                            <div className="detail-timeline-edit-form-group full-width">
-                              <label className="detail-timeline-edit-form-label">
-                                추천 여행지
-                              </label>
-                              <div className="place-selection-list">
-                                {editRecommendedPlaces.map((place) => (
-                                  <div
-                                    key={place.id}
-                                    onClick={() => handleEditPlaceSelect(place)}
-                                    className={`place-selection-item ${
-                                      editingDetailData.placeId === place.id
-                                        ? "selected"
-                                        : ""
-                                    }`}
-                                  >
-                                    <div className="place-selection-item-name">
-                                      ⭐ {place.averageRating.toFixed(1)}{" "}
-                                      {place.placeName}
-                                    </div>
-                                    <div className="place-selection-item-address">
-                                      {place.address}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                        {editingDetailData.placeName && (
-                          <div className="detail-timeline-edit-form-group full-width">
-                            <label className="detail-timeline-edit-form-label">
-                              선택된 장소
-                            </label>
-                            <div
-                              style={{
-                                padding: "8px",
-                                background: "#f3f4f6",
-                                borderRadius: "8px",
-                              }}
-                            >
-                              <strong>{editingDetailData.placeName}</strong>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="detail-timeline-edit-form-group">
-                          <label className="detail-timeline-edit-form-label">
-                            시작 시간
-                          </label>
-                          <input
-                            type="datetime-local"
-                            value={editingDetailData.startTime}
-                            onChange={(e) =>
-                              setEditingDetailData({
-                                ...editingDetailData,
-                                startTime: e.target.value,
-                              })
-                            }
-                            className="detail-timeline-edit-form-input"
-                          />
-                        </div>
-
-                        <div className="detail-timeline-edit-form-group">
-                          <label className="detail-timeline-edit-form-label">
-                            종료 시간
-                          </label>
-                          <input
-                            type="datetime-local"
-                            value={editingDetailData.endTime}
-                            onChange={(e) =>
-                              setEditingDetailData({
-                                ...editingDetailData,
-                                endTime: e.target.value,
-                              })
-                            }
-                            className="detail-timeline-edit-form-input"
-                          />
-                        </div>
-
-                        <div className="detail-timeline-edit-form-group">
-                          <label className="detail-timeline-edit-form-label">
-                            제목
-                          </label>
-                          <input
-                            type="text"
-                            value={editingDetailData.title}
-                            onChange={(e) =>
-                              setEditingDetailData({
-                                ...editingDetailData,
-                                title: e.target.value,
-                              })
-                            }
-                            className="detail-timeline-edit-form-input"
-                          />
-                        </div>
-
-                        <div className="detail-timeline-edit-form-group full-width">
-                          <label className="detail-timeline-edit-form-label">
-                            내용
-                          </label>
-                          <textarea
-                            value={editingDetailData.content}
-                            onChange={(e) =>
-                              setEditingDetailData({
-                                ...editingDetailData,
-                                content: e.target.value,
-                              })
-                            }
-                            className="detail-timeline-edit-form-textarea"
-                          />
-                        </div>
-
-                        <div className="detail-timeline-edit-actions">
-                          <button
-                            onClick={() => handleUpdateDetail(detail.id)}
-                            className="detail-timeline-edit-save-btn"
-                          >
-                            저장
-                          </button>
-                          <button
-                            onClick={handleCancelEditDetail}
-                            className="detail-timeline-edit-cancel-btn"
-                          >
-                            취소
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="detail-timeline-icon">
-                          {getCategoryIcon(category)}
-                        </div>
-                        <div className="detail-timeline-content">
-                          <div className="detail-timeline-header">
-                            <div>
-                              <h3 className="detail-timeline-title">
-                                {detail.title}
-                              </h3>
-                              <div className="detail-timeline-time">
-                                🕐 {formatDetailDateTime(detail.startTime)} ~{" "}
-                                {formatDetailDateTime(detail.endTime)}
-                              </div>
-                              <div className="detail-timeline-place">
-                                📍 {detail.placeName}
-                              </div>
-                            </div>
-                            <div className="detail-timeline-actions">
-                              <button
-                                onClick={() => handleEditDetail(detail)}
-                                className="detail-timeline-edit-btn"
-                              >
-                                수정
-                              </button>
-                              <button
-                                onClick={() => handleDeleteDetail(detail.id)}
-                                className="detail-timeline-delete-btn"
-                              >
-                                삭제
-                              </button>
-                            </div>
-                          </div>
-                          {detail.content && (
-                            <p className="detail-timeline-description">
-                              {detail.content}
-                            </p>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+        {/* 오른쪽 컬럼: 함께하는 친구 */}
+        <div className="plan-detail-column plan-detail-column-right">
+          <PlanMemberPanel
+            planId={planId}
+            onMemberChange={fetchPlanDetailsList}
+          />
         </div>
       </div>
 
