@@ -39,8 +39,10 @@ class PlaceController(
         return ApiResponse.success(data)
     }
 
-    @GetMapping("/paged/{categoryId}")
-    fun pagedList(
+    // GET /api/place/category/1/paged?page=0&size=10
+
+    @GetMapping("/category/{categoryId}/paged")
+    fun getPagedPlace(
         @PathVariable @Min(1) categoryId: Long,
         pageable: Pageable
     ): ApiResponse<Page<ResponsePlaceDto>> {
