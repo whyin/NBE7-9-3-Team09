@@ -1,0 +1,55 @@
+.plan-create-container {
+  min-height: 100vh;
+  background: white;
+  padding: 48px 16px;
+}
+
+.plan-create-layout {
+  display: flex;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+.plan-create-form-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-create-card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 32px;
+}
+
+.plan-create-date-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.plan-create-panel-section {
+  width: 360px;
+  flex-shrink: 0;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 1024px) {
+  .plan-create-layout {
+    flex-direction: column;
+  }
+
+  .plan-create-panel-section {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .plan-create-date-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+

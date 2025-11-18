@@ -1,0 +1,123 @@
+.plan-summary-card {
+  background: #f7f9fc;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.plan-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.plan-summary-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.plan-summary-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.plan-summary-edit-btn,
+.plan-summary-delete-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.plan-summary-edit-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.plan-summary-edit-btn:hover {
+  background: #2563eb;
+}
+
+.plan-summary-delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.plan-summary-delete-btn:hover {
+  background: #dc2626;
+}
+
+.plan-summary-save-btn,
+.plan-summary-cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.plan-summary-save-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.plan-summary-save-btn:hover {
+  background: #2563eb;
+}
+
+.plan-summary-cancel-btn {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.plan-summary-cancel-btn:hover {
+  background: #d1d5db;
+}
+
+.plan-summary-date {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.plan-summary-content {
+  font-size: 15px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.plan-summary-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.plan-summary-edit-input,
+.plan-summary-edit-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.plan-summary-edit-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+

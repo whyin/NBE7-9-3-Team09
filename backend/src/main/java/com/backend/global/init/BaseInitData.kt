@@ -15,6 +15,8 @@ import com.backend.domain.plan.repository.PlanRepository
 import com.backend.external.seoul.hotel.controller.HotelImportController
 import com.backend.external.seoul.modelrestaurant.controller.ModelRestaurantImportController
 import com.backend.external.seoul.nightspot.controller.controller.NightSpotImportController
+import com.backend.domain.bookmark.entity.Bookmark
+import com.backend.domain.bookmark.repository.BookmarkRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -39,6 +41,7 @@ class BaseInitData(
     private val placeRepository: PlaceRepository,
     private val planDetailRepository: PlanDetailRepository,
     private val placeGeoService: PlaceGeoService,
+    private val bookmarkRepository: BookmarkRepository,
 
     ) {
     private val log = KotlinLogging.logger {}
@@ -185,6 +188,29 @@ class BaseInitData(
                 planDetailRepository.save<PlanDetail>(planDetail1)
             }
 
+            if (bookmarkRepository.count() == 0L) {
+                val members = memberRepository.findAll()
+                val places = placeRepository.findAll()
+
+                if (members.isNotEmpty() && places.isNotEmpty()) {
+                    val bookmarks = mutableListOf<Bookmark>()
+
+                    // 각 멤버마다 3~4개 정도 북마크 생성
+                    members.forEach { member ->
+                        // 그냥 앞에서 몇 개만 잘라서 사용 (랜덤/의미 필요 없다고 해서 단순하게)
+                        val pickedPlaces = places.shuffled().take(4)  // 최대 4개
+
+                        pickedPlaces.forEach { place ->
+                            bookmarks += Bookmark.create(member, place)
+                        }
+                    }
+
+                    bookmarkRepository.saveAll(bookmarks)
+                    log.info { "초기 bookmark 데이터 세팅 완료: ${bookmarks.size}개" }
+                } else {
+                    log.warn { "북마크 초기화 스킵: member 혹은 place 데이터가 없습니다." }
+                }
+            }
 
         }
     }

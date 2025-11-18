@@ -1,0 +1,194 @@
+.plan-member-panel {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.plan-member-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.plan-member-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.plan-member-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.plan-member-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.plan-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.plan-member-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.plan-member-item:hover {
+  background: #f3f4f6;
+}
+
+.plan-member-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.plan-member-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plan-member-avatar-initial {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.plan-member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-member-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.plan-member-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.plan-member-role {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.plan-member-role.owner {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.plan-member-role.member {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.plan-member-email {
+  font-size: 12px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-member-actions {
+  flex-shrink: 0;
+}
+
+.plan-member-remove-btn,
+.plan-member-leave-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.plan-member-remove-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.plan-member-remove-btn:hover {
+  background: #dc2626;
+}
+
+.plan-member-leave-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.plan-member-leave-btn:hover {
+  background: #4b5563;
+}
+
+.plan-member-invite-btn {
+  width: 100%;
+  padding: 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+
+.plan-member-invite-btn:hover {
+  background: #2563eb;
+}
+
+.plan-member-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 1024px) {
+  .plan-member-panel {
+    position: static;
+    margin-top: 24px;
+  }
+}
+
