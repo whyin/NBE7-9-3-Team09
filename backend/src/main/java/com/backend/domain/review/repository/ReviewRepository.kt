@@ -4,6 +4,7 @@ import com.backend.domain.review.entity.Review
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import java.util.*
 
 interface ReviewRepository : JpaRepository<Review, Long> {
     // 특정 회원이 특정 장소에 남긴 리뷰가 있는지 확인하는 메서드
@@ -16,6 +17,7 @@ interface ReviewRepository : JpaRepository<Review, Long> {
 
     @Query("SELECT AVG(r.rating) FROM Review r")
     fun findGlobalAverageRating(): Double
+    fun findByMemberIdAndId(memberId: Long?, reviewId: Long?): Review?
 
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.place.id = :placeId")

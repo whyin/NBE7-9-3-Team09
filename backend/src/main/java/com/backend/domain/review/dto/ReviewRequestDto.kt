@@ -5,6 +5,7 @@ data class ReviewRequestDto(
     val memberId: Long,
     val placeId: Long,
     val rating: Int,
+    val content: String,
     val Category: String,
     val placeName: String,
     val address: String,
