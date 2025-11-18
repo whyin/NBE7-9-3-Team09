@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";  // 🔸 useEffect import 수정
-import { Routes, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import "./UserApp.css";
 
 import PlanApp from "./plan/PlanApp";
@@ -8,34 +8,42 @@ import MemberApp from "./member/MemberApp";
 import BookmarkApp from "./bookmark/BookmarkApp";
 import ReviewApp from "./pages/ReviewApp";
 import HomePage from "./pages/HomePage";
+import MenuCards from "./components/home/MenuCards";
 
 function UserApp() {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // 🔸 [추가된 코드] 기존 카카오 로그인 회원 처리
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("accessToken");
+    const params = new URLSearchParams(location.search);
+    const accessToken = params.get("accessToken");
 
-    if (token) {
-      localStorage.setItem("accessToken", token); // 토큰 저장
-      
-      window.history.replaceState({}, "", "/user"); // URL 정리
+    if (accessToken) {
+      localStorage.setItem(
+        "accessToken",
+        accessToken
+      ); /* 쿼리에서 전달된 토큰 저장 */
+      navigate("/user", {
+        replace: true,
+      }); /* 토큰 저장 후 /user 경로만 남기기 */
     }
-  }, []); // 최초 1회만 실행
+  }, [location.search, navigate]);
 
   return (
     <div className="user-app">
-      <Routes>
-        {/* ⭐ /user → UserApp 진입 후 HomePage 표시 */}
-        <Route path="/" element={<HomePage />} />
+      <MenuCards />
+      <div className="user-app__content">
+        <Routes>
+          {/* ⭐ /user → UserApp 진입 후 HomePage 표시 */}
+          <Route path="/" element={<HomePage />} />
 
-        
-        <Route path="plan/*" element={<PlanApp />} />
-        <Route path="places/*" element={<PlacesApp />} />
-        <Route path="review/*" element={<ReviewApp />} />
-        <Route path="bookmark/*" element={<BookmarkApp />} />
-        <Route path="member/*" element={<MemberApp />} />
-      </Routes>
+          <Route path="plan/*" element={<PlanApp />} />
+          <Route path="places/*" element={<PlacesApp />} />
+          <Route path="review/*" element={<ReviewApp />} />
+          <Route path="bookmark/*" element={<BookmarkApp />} />
+          <Route path="member/*" element={<MemberApp />} />
+        </Routes>
+      </div>
     </div>
   );
 }
