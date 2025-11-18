@@ -12,9 +12,16 @@ export default function TravelPlanMain() {
   const [allTodayDetails, setAllTodayDetails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showInvitedPlans, setShowInvitedPlans] = useState(false);
+  const [rawInvitedPlans, setRawInvitedPlans] = useState([]);
+  const [invitedLoading, setInvitedLoading] = useState(false);
+  const [invitedError, setInvitedError] = useState(null);
+  const [activeInvitationId, setActiveInvitationId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     fetchTodayPlan();
+    fetchCurrentUser();
   }, []);
 
   // 날짜가 오늘인지 확인
@@ -176,6 +183,118 @@ export default function TravelPlanMain() {
     navigate("/user/plan/list");
   };
 
+  const handleToggleInvitedPlans = () => {
+    const nextState = !showInvitedPlans;
+    setShowInvitedPlans(nextState);
+    if (nextState) {
+      fetchInvitedPlans();
+    } else {
+      setActiveInvitationId(null);
+    }
+  };
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await apiRequest("http://localhost:8080/api/members/me", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("사용자 정보를 불러오지 못했습니다.");
+      }
+      const result = await response.json();
+      const memberId =
+        result.data?.id ||
+        result.data?.memberId ||
+        result.data?.memberLoginId ||
+        result.data?.loginId;
+      setCurrentUserId(memberId || null);
+    } catch (err) {
+      console.error("Failed to load current user:", err);
+      setCurrentUserId(null);
+    }
+  };
+
+  const fetchInvitedPlans = async () => {
+    try {
+      setInvitedLoading(true);
+      setInvitedError(null);
+      const response = await apiRequest(
+        "http://localhost:8080/api/plan/member/mylist"
+      );
+
+      if (!response.ok) {
+        throw new Error("초대받은 계획을 불러오지 못했습니다.");
+      }
+
+      const result = await response.json();
+      setRawInvitedPlans(result.data || []);
+    } catch (err) {
+      console.error("Failed to load invited plans:", err);
+      setInvitedError(err.message || "초대받은 계획 조회 중 오류가 발생했습니다.");
+      setRawInvitedPlans([]);
+    } finally {
+      setInvitedLoading(false);
+    }
+  };
+
+  const invitedPlans = useMemo(() => {
+    if (!currentUserId) return rawInvitedPlans;
+    return rawInvitedPlans.filter(
+      (plan) => plan.planMemberId !== currentUserId
+    );
+  }, [rawInvitedPlans, currentUserId]);
+
+  const getInvitationStatus = (statusValue) => {
+    if (statusValue === 1) return { label: "승낙 완료", className: "accepted" };
+    if (statusValue === -1) return { label: "거절됨", className: "denied" };
+    return { label: "대기 중", className: "pending" };
+  };
+
+  const handleSelectInvitation = (planMemberId) => {
+    setActiveInvitationId((prev) =>
+      prev === planMemberId ? null : planMemberId
+    );
+  };
+
+  const handleInvitationResponse = async (invitation, action) => {
+    const endpoint =
+      action === "accept"
+        ? "http://localhost:8080/api/plan/member/accept"
+        : "http://localhost:8080/api/plan/member/deny";
+
+    const memberId =
+      invitation.memberLoginId ?? invitation.memberId ?? invitation.memberID;
+
+    if (!memberId) {
+      alert("초대 응답을 처리할 회원 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    const payload = {
+      planMemberId: invitation.planMemberId,
+      memberId,
+      planId: invitation.planId,
+    };
+
+    try {
+      const response = await apiRequest(endpoint, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("초대 응답 처리에 실패했습니다.");
+      }
+
+      const actionText = action === "accept" ? "승낙" : "거절";
+      alert(`초대를 ${actionText}했습니다.`);
+      await fetchInvitedPlans();
+    } catch (err) {
+      console.error("Failed to handle invitation:", err);
+      alert(err.message || "초대 응답 처리 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div className="main">
       <PageHeader
@@ -190,7 +309,107 @@ export default function TravelPlanMain() {
           <button className="secondary" onClick={handleViewPlans}>
             여행계획 목록보기
           </button>
+          <button className="secondary" onClick={handleToggleInvitedPlans}>
+            초대받은 계획 조회
+          </button>
         </div>
+
+        {showInvitedPlans && (
+          <div className="invited-plans-panel">
+            <div className="invited-plans-header">
+              <h3>📨 초대받은 계획</h3>
+              <div className="invited-actions">
+                <button className="refresh-btn" onClick={fetchInvitedPlans}>
+                  새로고침
+                </button>
+                <button
+                  className="close-panel-btn"
+                  onClick={() => {
+                    setShowInvitedPlans(false);
+                    setActiveInvitationId(null);
+                  }}
+                >
+                  닫기
+                </button>
+              </div>
+            </div>
+            {invitedLoading ? (
+              <div className="invited-plans-loading">불러오는 중...</div>
+            ) : invitedError ? (
+              <div className="invited-plans-error">{invitedError}</div>
+            ) : invitedPlans.length === 0 ? (
+              <div className="invited-plans-empty">
+                아직 초대받은 계획이 없습니다.
+              </div>
+            ) : (
+              <div className="invited-plan-list">
+                {invitedPlans.map((plan) => {
+                  const status = getInvitationStatus(plan.isAccepted);
+                  const isActive = activeInvitationId === plan.planMemberId;
+                  return (
+                    <div
+                      key={plan.planMemberId}
+                      className={`invited-plan-item ${
+                        isActive ? "active" : ""
+                      }`}
+                      onClick={() => handleSelectInvitation(plan.planMemberId)}
+                    >
+                      <div className="invited-plan-info">
+                        <div>
+                          <p className="invited-plan-title">{plan.planTitle}</p>
+                          {plan.isAccepted === 0 && (
+                            <p className="invited-plan-meta">
+                              초대 응답을 기다리고 있습니다.
+                            </p>
+                          )}
+                        </div>
+                        <span
+                          className={`invited-plan-status ${status.className}`}
+                        >
+                          {status.label}
+                        </span>
+                      </div>
+                      {isActive && (
+                        <div className="invited-plan-actions">
+                          <button
+                            className="accept-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleInvitationResponse(plan, "accept");
+                            }}
+                            disabled={plan.isAccepted === 1}
+                          >
+                            승낙
+                          </button>
+                          <button
+                            className="deny-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleInvitationResponse(plan, "deny");
+                            }}
+                            disabled={plan.isAccepted === -1}
+                          >
+                            거절
+                          </button>
+                          <button
+                            className="view-plan-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/user/plan/detail/${plan.planId}`);
+                            }}
+                            disabled={plan.isAccepted !== 1}
+                          >
+                            계획 보기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="plan-card">
           <h2>📅 오늘의 여행 계획</h2>

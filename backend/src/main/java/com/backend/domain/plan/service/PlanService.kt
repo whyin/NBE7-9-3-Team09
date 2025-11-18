@@ -32,11 +32,23 @@ open class PlanService(
         hasValidPlan(plan,memberPkId)
         val savedPlan = planRepository.save<Plan>(plan)
         planMemberRepository.save<PlanMember?>(
-            PlanMember(null, member, plan, null, null, 0)
+            PlanMember(null, member, plan, null, null, 1)
         ) // 단순 저장이므로 레포지토리 사용.
+
+        if(planCreateRequestBody.inviteMembers.isNotEmpty()){ // 리스트에 있는 모든 회원 초대
+            for(invitedMemberPkId in planCreateRequestBody.inviteMembers) {
+                val planMember = PlanMember(
+                    null,
+                    memberService.findById(invitedMemberPkId),
+                    savedPlan,
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    0)
+                planMemberRepository.save<PlanMember?>(planMember)
+            }
+        }
         return savedPlan
     }
-
 
     fun getPlanList(memberPkId: Long): List<PlanResponseBody> {
         val plans = planRepository.getAllMyAcceptedPlansByMemberId(memberPkId)

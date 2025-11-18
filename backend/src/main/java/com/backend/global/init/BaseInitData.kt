@@ -199,39 +199,41 @@ class BaseInitData(
             val writer2 = memberRepository.findByMemberId("member2")
                 ?: throw IllegalStateException("member2이 존재하지 않습니다.")
 
-            val hotelPlaces = placeRepository.findByCategory_Name("HOTEL")
+            if(reviewRepository.count() == 0L) {
+                val hotelPlaces = placeRepository.findByCategory_Name("HOTEL")
 
+                for (place in hotelPlaces) {
+                    // member1 리뷰
 
-            for (place in hotelPlaces) {
-                // member1 리뷰
+                    val rating1 = (((place.id!! - 1) % 5) + 1).toInt()
+                    val review1 = Review(
+                        place,
+                        writer1,
+                        rating1,
+                        "이곳은 정말 멋진 장소입니다! 별점: " + rating1
+                    )
+                    review1.onCreate()
+                    reviewRepository.save<Review?>(review1)
 
-                val rating1 = (((place.id!! - 1) % 5) + 1).toInt()
-                val review1 = Review(
-                    place,
-                    writer1,
-                    rating1,
-                    "이곳은 정말 멋진 장소입니다! 별점: " + rating1
-                )
-                review1.onCreate()
-                reviewRepository.save<Review?>(review1)
+                    // member2 리뷰
+                    val rating2 = (((place.id)!! % 5) + 1).toInt()
+                    val review2 = Review(
+                        place,
+                        writer2,
+                        rating2,
+                        "여기도 꽤 괜찮네요! 별점: " + rating2
+                    )
+                    review2.onCreate()
+                    reviewRepository.save<Review?>(review2)
 
-                // member2 리뷰
-                val rating2 = (((place.id)!! % 5) + 1).toInt()
-                val review2 = Review(
-                    place,
-                    writer2,
-                    rating2,
-                    "여기도 꽤 괜찮네요! 별점: " + rating2
-                )
-                review2.onCreate()
-                reviewRepository.save<Review?>(review2)
+                    //                    place.setRatingCount(2);
+                    placeRepository.save<Place?>(place)
 
-                //                    place.setRatingCount(2);
-                placeRepository.save<Place?>(place)
-
-                // ⭐ 추천 테이블 업데이트 (베이지안 평균 계산)
-                reviewService.updateRecommend(place)
+                    // ⭐ 추천 테이블 업데이트 (베이지안 평균 계산)
+                    reviewService.updateRecommend(place)
+                }
             }
+
 
 
 
