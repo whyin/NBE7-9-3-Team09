@@ -9,8 +9,10 @@ import com.backend.domain.member.service.MemberService
 import com.backend.domain.place.service.PlaceService
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class BookmarkService(
@@ -70,6 +72,19 @@ class BookmarkService(
         if (!bookmark.isDeleted) {
             bookmark.delete()
             bookmarkRepository.save(bookmark)
+        }
+    }
+
+    // 30일 지난 데이터 하드 삭제
+    @Scheduled(cron = "0 0 3 1 * *")  // 매월 1일 새벽 3시 실행
+    @Transactional
+    fun cleanupDeletedBookmarks() {
+        val threshold = LocalDateTime.now().minusDays(30)
+
+        val toDelete = bookmarkRepository.findAllByDeletedAtBefore(threshold)
+
+        if (toDelete.isNotEmpty()) {
+            bookmarkRepository.deleteAll(toDelete)
         }
     }
 }
