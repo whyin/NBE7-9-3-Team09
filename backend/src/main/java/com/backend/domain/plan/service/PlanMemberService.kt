@@ -114,4 +114,9 @@ class PlanMemberService(
     //        return planMemberRepository.existsByMemberInPlanId(member.id?: throw BusinessException(ErrorCode.INVALID_MEMBER)
 //        , planId)
     }
+
+    fun getPlanMembers(planId: Long, memberPkId: Long): List<PlanMemberResponseBody> {
+        val members : List<PlanMemberResponseBody> =planMemberRepository.myQueryGetPlanMembers(planId)
+        return members.filter { it.isComfirmed }
+    }
 }

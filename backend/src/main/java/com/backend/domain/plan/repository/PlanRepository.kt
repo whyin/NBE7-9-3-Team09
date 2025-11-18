@@ -23,7 +23,7 @@ interface PlanRepository : JpaRepository<Plan?, Long?> {
 
     @Query("""
         SELECT 
-        Plan
+        p
         FROM
             Plan p,
             PlanMember pm
@@ -34,7 +34,7 @@ interface PlanRepository : JpaRepository<Plan?, Long?> {
             AND
             pm.isConfirmed = 1
     """)
-    fun getMyInvitedAcceptedPlansByMemberId(@Param("memberId") memberPkId: Long): List<Plan>
+    fun getAllMyAcceptedPlansByMemberId(@Param("memberId") memberPkId: Long): List<Plan>
 
     @Query("""
         SELECT

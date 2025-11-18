@@ -39,13 +39,13 @@ open class PlanService(
 
 
     fun getPlanList(memberPkId: Long): List<PlanResponseBody> {
-        val plans = planRepository.getPlansByMember_Id(memberPkId)
-        return plansMapToPlanResponseBodies(plans)
+        val plans = planRepository.getAllMyAcceptedPlansByMemberId(memberPkId)
+        return plansMapToPlanResponseBodies(plans,memberPkId)
     }
 
     fun getInvitedAcceptedPlan(memberPkId: Long): List<PlanResponseBody>{
-        val plans = planRepository.getMyInvitedAcceptedPlansByMemberId(memberPkId)
-        return plansMapToPlanResponseBodies(plans)
+        val plans = planRepository.getAllMyAcceptedPlansByMemberId(memberPkId)
+        return plansMapToPlanResponseBodies(plans,memberPkId)
     }
 
     @Transactional
@@ -104,7 +104,10 @@ open class PlanService(
         }
     }
 
-    private fun plansMapToPlanResponseBodies(plans: List<Plan>): List<PlanResponseBody> {
-        return plans.map { PlanResponseBody(it) }
+    private fun plansMapToPlanResponseBodies(plans: List<Plan>,memberPkId: Long): List<PlanResponseBody> {
+        return plans.map {
+            if(memberPkId == it.member.id) PlanResponseBody(it)
+            else PlanResponseBody( it.invitedPlan())
+        }
     }
 }

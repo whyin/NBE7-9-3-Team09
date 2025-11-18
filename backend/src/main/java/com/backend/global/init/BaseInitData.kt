@@ -164,6 +164,7 @@ class BaseInitData(
                     1
                 )
 
+
                 planMemberRepository.saveAll(List.of<PlanMember>(planMember1, planMember2, planMember3,planMember4))
                 log.info("초기 plan 데이터 세팅 완료: ")
             }

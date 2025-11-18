@@ -13,4 +13,10 @@ data class PlanMemberResponseBody(
         planMember.plan.title,
         planMember.isConfirmed == 1
     )
+
+    constructor(memberLoginId: String,planTitle: String,isComfirmed: Int): this(
+        memberLoginId,
+        planTitle,
+        isComfirmed == 1
+    )
 }

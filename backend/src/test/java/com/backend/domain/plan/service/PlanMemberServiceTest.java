@@ -74,7 +74,7 @@ public class PlanMemberServiceTest {
     }
 
     @Test
-    @DisplayName("내가 초대된 일정 목록 조회")
+    @DisplayName("내가 초대된 목록 조회")
     void myInvitedPlanList_success() {
         // given: 초기데이터에서 member1은 plan1, plan3에 있음
 
@@ -146,5 +146,13 @@ public class PlanMemberServiceTest {
         boolean exists = planMemberService.isAvailablePlanMember(1L, member3);
 
         Assertions.assertFalse(exists);
+    }
+
+    @Test
+    @DisplayName("어떤 계획에 초대된 사용자 목록")
+    void isMyPlanMember_success() {
+        List<PlanMemberResponseBody> results = planMemberService.getPlanMembers(1L,1L);
+        Assertions.assertFalse(results.isEmpty());
+        Assertions.assertTrue(results.size() == 2);
     }
 }

@@ -61,6 +61,19 @@ class Plan(
         )
     }
 
+    fun invitedPlan(): Plan {
+        return Plan(
+            this.id,
+            this.member,
+            createDate,
+            LocalDateTime.now(),
+            startDate,
+            endDate,
+            "(초대됨) "+title,
+            content
+        )
+    }
+
 
     fun startOfDay(date: LocalDateTime): LocalDateTime {
         return date.toLocalDate().atStartOfDay()
