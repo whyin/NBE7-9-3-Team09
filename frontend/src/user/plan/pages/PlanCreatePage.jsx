@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { apiRequest } from "../../../utils/api";
 import PageHeader from "../../components/common/PageHeader";
+import FriendInvitePanel from "../components/FriendInvitePanel";
+import "./PlanCreatePage.css";
 
 export default function PlanCreateForm() {
   const [searchParams] = useSearchParams();
@@ -21,6 +23,7 @@ export default function PlanCreateForm() {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFriends, setSelectedFriends] = useState([]);
 
   // 오늘 날짜와 10년 후 날짜 계산
   const today = new Date();
@@ -103,6 +106,7 @@ export default function PlanCreateForm() {
         content: formData.content,
         startDate: startDateTime,
         endDate: endDateTime,
+        friendIds: selectedFriends.map((f) => f.id),
       };
 
       const response = await apiRequest(
@@ -254,15 +258,16 @@ export default function PlanCreateForm() {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="plan-create-container">
       <PageHeader
         title="여행 계획 작성"
         subtitle="새로운 여행 계획을 만들어보세요"
         onBack={() => navigate("/user/plan")}
       />
-      <div style={styles.wrapper}>
-        <div style={styles.card}>
-          <div>
+      <div className="plan-create-layout">
+        {/* 좌측: 폼 영역 */}
+        <div className="plan-create-form-section">
+          <div className="plan-create-card">
             {/* 계획 제목 */}
             <div style={styles.formGroup}>
               <label style={styles.label}>📝 계획 제목</label>
@@ -285,7 +290,7 @@ export default function PlanCreateForm() {
             </div>
 
             {/* 날짜 선택 */}
-            <div style={styles.dateGrid}>
+            <div className="plan-create-date-grid">
               <div style={styles.formGroup}>
                 <label style={styles.label}>📅 시작 날짜</label>
                 <input
@@ -389,15 +394,15 @@ export default function PlanCreateForm() {
             </div>
           </div>
         </div>
-      </div>
 
-      <style>{`
-        @media (min-width: 768px) {
-          .date-grid {
-            grid-template-columns: 1fr 1fr;
-          }
-        }
-      `}</style>
+        {/* 우측: 친구 초대 패널 */}
+        <div className="plan-create-panel-section">
+          <FriendInvitePanel
+            selectedFriends={selectedFriends}
+            onFriendsChange={setSelectedFriends}
+          />
+        </div>
+      </div>
     </div>
   );
 }
