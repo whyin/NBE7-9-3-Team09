@@ -13,10 +13,10 @@ class Member(
     /* === 소셜 로그인 정보 === */
     @Enumerated(EnumType.STRING)
     @Column(nullable = true, length = 20)
-    var provider: Provider? = null,  // LOCAL, KAKAO, GOOGLE…
+    val provider: Provider? = null,  // LOCAL, KAKAO, GOOGLE…
 
     @Column(nullable = true, unique = true)
-    var providerId: String? = null, // 소셜 로그인 고유 ID (카카오: kakao id)
+    val providerId: String? = null, // 소셜 로그인 고유 ID (카카오: kakao id)
 
     /* === 일반/소셜 공통 정보 === */
     @Column(nullable = false, unique = true, length = 30)
@@ -26,7 +26,7 @@ class Member(
     var password: String, // 암호화된 비밀번호 / 카카오: "{SOCIAL_LOGIN}"
 
     @Column(nullable = false, unique = true, length = 200)
-    var email: String, // 중복 가입 방지
+    val email: String, // 중복 가입 방지
 
     @Column(nullable = false, unique = true, length = 20)
     var nickname: String,
@@ -60,16 +60,13 @@ class Member(
         this.deletedAt = LocalDateTime.now()
     }
 
+    // TODO: 일단 사용 안 함 
     fun updatePassword(newPassword: String) {
         this.password = newPassword
     }
 
     fun updateNickname(newNickname: String) {
         this.nickname = newNickname
-    }
-
-    fun updateEmail(newEmail: String) {
-        this.email = newEmail
     }
 
     /* === 정적 팩토리: 일반 회원 생성 === */

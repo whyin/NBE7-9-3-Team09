@@ -37,12 +37,11 @@ class MemberService(
         return MemberResponse.from(member)
     }
 
-    //TODO: 수정 시 비밀번호 입력하기
+    //TODO: 수정 시 비밀번호 입력하기 -> 소셜 로그인은 비밀번호가 없어 ,,
     @Transactional
     fun updateMember(id: Long, request: MemberUpdateRequest): MemberResponse {
         val member = findById(id)
 
-        if (request.email != null) member.updateEmail(request.email)
         if (request.nickname != null) member.updateNickname(request.nickname)
 
         return MemberResponse.from(member)
@@ -67,6 +66,13 @@ class MemberService(
         return MemberResponse.from(member)
     }
 
+    /** 이메일로 회원 검색 */
+    @Transactional(readOnly = true)
+    fun getMemberIdByEmail(email: String): Long {
+        return findByEmail(email).id!!
+    }
+
+
     // TODO: Member, MemberResponse 각각 반환 메서드가 필요?
     @Transactional(readOnly = true)
     fun findByMemberId(memberId: String): Member =
@@ -85,6 +91,11 @@ class MemberService(
             .orElseThrow<BusinessException?>(Supplier { BusinessException(ErrorCode.MEMBER_NOT_FOUND) })
     }
 
+    @Transactional(readOnly = true)
+    fun findByEmail(email: String): Member =
+        memberRepository.findByEmail(email)
+            ?: throw BusinessException(ErrorCode.MEMBER_NOT_FOUND)
+
     private fun validateDuplicate(request: MemberSignupRequest) {
         if (memberRepository.existsByMemberId(request.memberId)) {
             throw BusinessException(ErrorCode.DUPLICATE_MEMBER_ID)
@@ -92,10 +103,6 @@ class MemberService(
 
         if (memberRepository.existsByEmail(request.email)) {
             throw BusinessException(ErrorCode.DUPLICATE_EMAIL)
-        }
-
-        if (memberRepository.existsByNickname(request.nickname)) {
-            throw BusinessException(ErrorCode.DUPLICATE_NICKNAME)
         }
     }
 
