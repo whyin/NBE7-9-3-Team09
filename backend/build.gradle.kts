@@ -80,6 +80,11 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     // 카카오 로그인
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
+    //Spring 캐시 관련
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
 }
 
 allOpen {
