@@ -36,4 +36,22 @@ interface PlanRepository : JpaRepository<Plan?, Long?> {
     """)
     fun getMyInvitedAcceptedPlansByMemberId(@Param("memberId") memberPkId: Long): List<Plan>
 
+    @Query("""
+        SELECT
+            COUNT(p) > 0
+        FROM Plan p
+        WHERE 
+            p.member.id=:memberId
+        AND NOT
+            (:endTime <= p.startDate OR :startTime >= p.endDate)
+        AND
+            (:planId is null OR :planId != p.id)
+    """)
+    fun existsOverlappingPlan(
+        @Param("planId") planId: Long?,
+        @Param("memberId") memberId: Long,
+        @Param("startTime") startTime: LocalDateTime,
+        @Param("endTime") endTime: LocalDateTime
+    ) : Boolean
+
 }

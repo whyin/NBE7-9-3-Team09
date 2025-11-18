@@ -73,7 +73,7 @@ class PlanDetailController(
     }
 
 
-    @PatchMapping("/update/{planDetailId}")
+    @PutMapping("/update/{planDetailId}")
     fun updatePlanDetail(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String,
         @PathVariable planDetailId: @NotNull Long,

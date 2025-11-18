@@ -106,7 +106,7 @@ export default function PlanDetailPage({ planId, onBack }) {
       const response = await apiRequest(
         `http://localhost:8080/api/plan/update/${planId}`,
         {
-          method: "PUT",
+          method: "PATCH",
           body: JSON.stringify(editData),
         }
       );
@@ -202,6 +202,7 @@ export default function PlanDetailPage({ planId, onBack }) {
   const handleUpdateDetail = async (detailId) => {
     try {
       const requestBody = {
+        planId: planId,
         placeId: parseInt(editingDetailData.placeId),
         startTime: editingDetailData.startTime,
         endTime: editingDetailData.endTime,
@@ -210,9 +211,9 @@ export default function PlanDetailPage({ planId, onBack }) {
       };
 
       const response = await apiRequest(
-        `http://localhost:8080/api/plan/detail/${detailId}/update`,
+        `http://localhost:8080/api/plan/detail/update/${detailId}`,
         {
-          method: "PATCH",
+          method: "PUT",
           body: JSON.stringify(requestBody),
         }
       );
