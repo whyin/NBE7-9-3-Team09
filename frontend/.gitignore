@@ -24,3 +24,6 @@ yarn-error.log*
 
 ../backend/db_dev.trace.db
 ../backend/.gitignore
+
+# env
+.env

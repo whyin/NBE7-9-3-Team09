@@ -1,14 +1,12 @@
+// 📁 src/user/member/mypage/MyPage.js
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { apiRequest } from "../../../../../utils/api"; // ✅ 경로 수정됨 (5단계)
-import PageHeader from "../../../../components/common/PageHeader";
-import "../../../Member.css"; // ✅ 경로 수정됨 (3단계)
+import { apiRequest } from "../../../../../utils/api";
+import "../../../Member.css";
 
 const MyPage = () => {
   const [userInfo, setUserInfo] = useState(null);
-  const [editData, setEditData] = useState({ email: "", nickname: "" });
+  const [editData, setEditData] = useState({nickname: "" });
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
 
   // ✅ 내 정보 불러오기
   useEffect(() => {
@@ -21,18 +19,18 @@ const MyPage = () => {
         if (!res.ok) throw new Error("조회 실패");
 
         setUserInfo(data.data);
+
         setEditData({
-          email: data.data.email || "",
           nickname: data.data.nickname || "",
         });
       } catch (err) {
         console.error(err);
         alert("로그인이 필요합니다.");
-        navigate("/user/member/login");
+        window.location.href = "/user/member/login";
       }
     };
     fetchMyInfo();
-  }, [navigate]);
+  }, []);
 
   // ✅ 회원정보 수정
   const handleUpdate = async (e) => {
@@ -41,7 +39,9 @@ const MyPage = () => {
     try {
       const res = await apiRequest("http://localhost:8080/api/members/me", {
         method: "PATCH",
-        body: JSON.stringify(editData),
+        body: JSON.stringify({
+          nickname: editData.nickname, // ⭐ email 제거
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || "수정 실패");
@@ -67,7 +67,7 @@ const MyPage = () => {
 
       alert("회원 탈퇴가 완료되었습니다.");
       localStorage.removeItem("accessToken");
-      navigate("/user/member/signup");
+      window.location.href = "/user/member/signup";
     } catch (err) {
       console.error(err);
       alert("❌ 탈퇴 중 오류가 발생했습니다.");
@@ -76,20 +76,14 @@ const MyPage = () => {
 
   return (
     <div className="member-container">
-      <PageHeader title="마이페이지" />
+      <h2>마이페이지</h2>
 
       {userInfo ? (
         <div className="member-form">
           <div className="profile-info">
-            <p>
-              <strong>아이디:</strong> {userInfo.memberId}
-            </p>
-            <p>
-              <strong>이메일:</strong> {userInfo.email}
-            </p>
-            <p>
-              <strong>닉네임:</strong> {userInfo.nickname}
-            </p>
+            <p><strong>아이디:</strong> {userInfo.memberId}</p>
+            <p><strong>이메일:</strong> {userInfo.email}</p>
+            <p><strong>닉네임:</strong> {userInfo.nickname}</p>
           </div>
 
           <div className="divider"></div>
@@ -97,23 +91,11 @@ const MyPage = () => {
           <h3>회원정보 수정</h3>
           <form onSubmit={handleUpdate} className="edit-form">
             <input
-              type="email"
-              name="email"
-              placeholder="이메일 수정"
-              value={editData.email}
-              onChange={(e) =>
-                setEditData({ ...editData, email: e.target.value })
-              }
-              required
-            />
-            <input
               type="text"
               name="nickname"
               placeholder="닉네임 수정"
               value={editData.nickname}
-              onChange={(e) =>
-                setEditData({ ...editData, nickname: e.target.value })
-              }
+              onChange={(e) => setEditData({ ...editData, nickname: e.target.value })}
               required
             />
             <button type="submit" className="member-button">
@@ -122,30 +104,15 @@ const MyPage = () => {
           </form>
 
           {message && (
-            <p
-              className={
-                message.startsWith("✅") ? "success-text" : "error-text"
-              }
-            >
+            <p className={message.startsWith("✅") ? "success-text" : "error-text"}>
               {message}
             </p>
           )}
 
           <div className="divider"></div>
 
-          {/* ✅ 회원 탈퇴 버튼 */}
           <button onClick={handleDelete} className="member-button danger">
             회원 탈퇴하기
-          </button>
-
-          {/* ✅ 회원 홈으로 돌아가기 버튼 */}
-          <button
-            type="button"
-            onClick={() => navigate("/user/member")}
-            className="member-button secondary"
-            style={{ marginTop: "1rem" }}
-          >
-            ← 회원 홈으로 돌아가기
           </button>
         </div>
       ) : (
