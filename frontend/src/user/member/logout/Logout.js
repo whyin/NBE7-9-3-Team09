@@ -34,7 +34,11 @@ const Logout = () => {
         </button>
       </div>
 
-      <a href="/user/member/mypage" className="member-link">
+      <a
+        href="/user/member/login/member/mypage"
+        className="member-link"
+        /* 마이페이지 실제 경로로 수정 */
+      >
         마이페이지로 돌아가기
       </a>
     </div>

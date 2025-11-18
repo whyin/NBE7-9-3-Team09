@@ -42,19 +42,22 @@ const MemberApp = () => {
         <Route index element={<MemberHome />} />
 
         {/* ✅ 로그인 & 회원가입 */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="login"
+          element={<Login />}
+        />{/* /user/member/* 아래에 마운트되므로 상대 경로 사용 */}
+        <Route path="signup" element={<Signup />} />
 
         {/* ⭐ 신규 카카오 회원가입 페이지 */}
-        <Route path="/oauth2/signup" element={<Oauth2Signup />} /> 
+        <Route path="oauth2/signup" element={<Oauth2Signup />} /> 
 
         {/* ✅ 로그인 성공 후 회원 전용 페이지 */}
-        <Route path="/login/member" element={<Member />} />
-        <Route path="/login/member/mypage" element={<MyPage />} />
-        <Route path="/login/member/logout" element={<Logout />} />
+        <Route path="login/member" element={<Member />} />
+        <Route path="login/member/mypage" element={<MyPage />} />
+        <Route path="login/member/logout" element={<Logout />} />
 
         {/* ✅ 관리자 페이지 (ADMIN role 전용) */}
-        <Route path="/login/admin/*" element={<AdminApp />} />
+        <Route path="login/admin/*" element={<AdminApp />} />
       </Routes>
     </div>
   );

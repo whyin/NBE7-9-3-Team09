@@ -39,7 +39,7 @@
     grid-template-columns: 1fr;
     gap: 24px;
     padding: 24px 16px;
-  }
+}
 
   .plan-detail-column {
     width: 100%;
@@ -73,7 +73,7 @@
 @keyframes spin {
   0% {
     transform: rotate(0deg);
-  }
+}
   100% {
     transform: rotate(360deg);
   }
