@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
-@JvmRecord
+
 data class PlanDetailsElementBody(
     val id: Long?,
     val placeId: @NotNull Long,
