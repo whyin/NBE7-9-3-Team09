@@ -3,7 +3,7 @@ package com.backend.domain.place.repository
 import com.backend.domain.place.entity.Place
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface PlaceRepository : JpaRepository<Place, Long> {
+interface PlaceRepository : JpaRepository<Place, Long>, PlaceRepositoryCustom {
 
     fun existsByPlaceNameAndAddress(placeName: String, address: String): Boolean
 

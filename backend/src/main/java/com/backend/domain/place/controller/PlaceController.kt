@@ -1,11 +1,16 @@
 package com.backend.domain.place.controller
 
+import com.backend.domain.bookmark.dto.BookmarkResponseDto
 import com.backend.domain.place.dto.RequestPlaceDto
 import com.backend.domain.place.dto.ResponsePlaceDto
 import com.backend.domain.place.service.PlaceService
 import com.backend.global.response.ApiResponse
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
+import org.hibernate.query.Page.page
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpHeaders
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
@@ -32,6 +37,15 @@ class PlaceController(
         val data = placeService.findOnePlace(id)
         // success(data: T?) -> ApiResponse<T?>
         return ApiResponse.success(data)
+    }
+
+    @GetMapping("/paged/{categoryId}")
+    fun pagedList(
+        @PathVariable @Min(1) categoryId: Long,
+        pageable: Pageable
+    ): ApiResponse<Page<ResponsePlaceDto>> {
+        val page = placeService.getPagedPlaces(categoryId,pageable)
+        return ApiResponse.success(page)
     }
 
     @PostMapping

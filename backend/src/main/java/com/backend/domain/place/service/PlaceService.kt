@@ -1,5 +1,6 @@
 package com.backend.domain.place.service
 
+import com.backend.domain.bookmark.dto.BookmarkResponseDto
 import com.backend.domain.category.repository.CategoryRepository
 import com.backend.domain.place.dto.RequestPlaceDto
 import com.backend.domain.place.dto.ResponsePlaceDto
@@ -7,6 +8,8 @@ import com.backend.domain.place.entity.Place
 import com.backend.domain.place.repository.PlaceRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -53,5 +56,11 @@ class PlaceService(
     @Transactional
     fun delete(id: Long) {
         placeRepository.delete(findPlaceById(id))
+    }
+
+    // 페이징 가져오기
+    fun getPagedPlaces(categoryId: Long, pageable: Pageable): Page<ResponsePlaceDto> {
+        return placeRepository.findPagedByCategoryId(categoryId, pageable)
+            .map (ResponsePlaceDto::from)
     }
 }
