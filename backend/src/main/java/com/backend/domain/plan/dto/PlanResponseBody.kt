@@ -3,7 +3,7 @@ package com.backend.domain.plan.dto
 import com.backend.domain.plan.entity.Plan
 import java.time.LocalDateTime
 
-@JvmRecord
+
 data class PlanResponseBody(
     val id: Long,
     @JvmField val title: String,

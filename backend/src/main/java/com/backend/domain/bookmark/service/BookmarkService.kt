@@ -9,6 +9,8 @@ import com.backend.domain.member.service.MemberService
 import com.backend.domain.place.service.PlaceService
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -86,5 +88,11 @@ class BookmarkService(
         if (toDelete.isNotEmpty()) {
             bookmarkRepository.deleteAll(toDelete)
         }
+    }
+
+    // 페이징 가져오기
+    fun getPagedBookmarks(memberId: Long, pageable: Pageable): Page<BookmarkResponseDto> {
+        return bookmarkRepository.findPagedByMember(memberId, pageable)
+            .map { BookmarkResponseDto(it) }
     }
 }

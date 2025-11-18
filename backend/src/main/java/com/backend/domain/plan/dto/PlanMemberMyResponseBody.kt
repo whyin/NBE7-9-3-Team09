@@ -2,7 +2,7 @@ package com.backend.domain.plan.dto
 
 import com.backend.domain.plan.entity.PlanMember
 
-@JvmRecord
+
 data class PlanMemberMyResponseBody(
     val planMemberId: Long,
     val memberLoginId: Long?,
