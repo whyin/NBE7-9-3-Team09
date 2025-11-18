@@ -27,9 +27,9 @@ class MemberController(
     @GetMapping("/search/email")
     fun findMemberByEmail(
         @RequestParam email: String
-    ): MemberIdResponse {
-        val memberId = memberService.getMemberIdByEmail(email)
-        return MemberIdResponse(id = memberId)
+    ): ApiResponse<MemberIdResponse> {
+        val member = memberService.getMemberIdByEmail(email)
+        return ApiResponse.success(MemberIdResponse(id = member), "member id 반환 성공")
     }
 
     @GetMapping("/me")
