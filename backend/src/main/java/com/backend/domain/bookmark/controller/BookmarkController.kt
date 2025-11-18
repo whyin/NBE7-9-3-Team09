@@ -8,6 +8,8 @@ import com.backend.global.response.ApiResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.*
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 
 @RestController
 @RequestMapping("/api/bookmarks")
@@ -42,7 +44,18 @@ class BookmarkController(
         val list = bookmarkService.getList(memberId)
         return ApiResponse.success(list)
     }
-
+    /**
+     * GET /api/bookmarks/paged?page=0&size=10
+     */
+    @GetMapping("/paged")
+    fun pagedList(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) accessToken: String,
+        pageable: Pageable
+    ): ApiResponse<Page<BookmarkResponseDto>> {
+        val memberId = authService.getMemberId(accessToken)
+        val page = bookmarkService.getPagedBookmarks(memberId, pageable)
+        return ApiResponse.success(page)
+    }
     /**
      * DELETE /api/bookmarks/{bookmarkId}
      */

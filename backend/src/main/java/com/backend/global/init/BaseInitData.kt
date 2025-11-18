@@ -1,8 +1,11 @@
 package com.backend.global.init
 
+import com.backend.domain.bookmark.entity.Bookmark
+import com.backend.domain.bookmark.repository.BookmarkRepository
 import com.backend.domain.member.entity.Member
 import com.backend.domain.member.entity.Role
 import com.backend.domain.member.repository.MemberRepository
+import com.backend.domain.place.entity.Place
 import com.backend.domain.place.repository.PlaceRepository
 import com.backend.domain.place.service.PlaceGeoService
 import com.backend.domain.plan.detail.dto.PlanDetailRequestBody
@@ -12,11 +15,12 @@ import com.backend.domain.plan.entity.Plan
 import com.backend.domain.plan.entity.PlanMember
 import com.backend.domain.plan.repository.PlanMemberRepository
 import com.backend.domain.plan.repository.PlanRepository
+import com.backend.domain.review.entity.Review
+import com.backend.domain.review.repository.ReviewRepository
+import com.backend.domain.review.service.ReviewService
 import com.backend.external.seoul.hotel.controller.HotelImportController
 import com.backend.external.seoul.modelrestaurant.controller.ModelRestaurantImportController
 import com.backend.external.seoul.nightspot.controller.controller.NightSpotImportController
-import com.backend.domain.bookmark.entity.Bookmark
-import com.backend.domain.bookmark.repository.BookmarkRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -42,7 +46,8 @@ class BaseInitData(
     private val planDetailRepository: PlanDetailRepository,
     private val placeGeoService: PlaceGeoService,
     private val bookmarkRepository: BookmarkRepository,
-
+    private val reviewRepository: ReviewRepository,
+    private val reviewService: ReviewService
     ) {
     private val log = KotlinLogging.logger {}
 
@@ -188,6 +193,47 @@ class BaseInitData(
 
                 planDetailRepository.save<PlanDetail>(planDetail1)
             }
+            val writer1 = memberRepository.findByMemberId("member1")
+                ?: throw IllegalStateException("member1이 존재하지 않습니다.")
+
+            val writer2 = memberRepository.findByMemberId("member2")
+                ?: throw IllegalStateException("member2이 존재하지 않습니다.")
+
+            val hotelPlaces = placeRepository.findByCategory_Name("HOTEL")
+
+
+            for (place in hotelPlaces) {
+                // member1 리뷰
+
+                val rating1 = (((place.id!! - 1) % 5) + 1).toInt()
+                val review1 = Review(
+                    place,
+                    writer1,
+                    rating1,
+                    "이곳은 정말 멋진 장소입니다! 별점: " + rating1
+                )
+                review1.onCreate()
+                reviewRepository.save<Review?>(review1)
+
+                // member2 리뷰
+                val rating2 = (((place.id)!! % 5) + 1).toInt()
+                val review2 = Review(
+                    place,
+                    writer2,
+                    rating2,
+                    "여기도 꽤 괜찮네요! 별점: " + rating2
+                )
+                review2.onCreate()
+                reviewRepository.save<Review?>(review2)
+
+                //                    place.setRatingCount(2);
+                placeRepository.save<Place?>(place)
+
+                // ⭐ 추천 테이블 업데이트 (베이지안 평균 계산)
+                reviewService.updateRecommend(place)
+            }
+
+
 
             if (bookmarkRepository.count() == 0L) {
                 val members = memberRepository.findAll()

@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "2.2.0"
     id("org.jetbrains.kotlin.plugin.jpa") version "2.2.0"
     kotlin("jvm")
+    kotlin("kapt") version "1.9.25"
 }
 
 group = "com"
@@ -80,6 +81,14 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     // 카카오 로그인
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    // QueryDSL
+    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.1")
+    kapt("io.github.openfeign.querydsl:querydsl-apt:7.1:jpa")
+
+    //Spring 캐시 관련
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
 }
 
 allOpen {

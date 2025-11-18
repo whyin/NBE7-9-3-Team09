@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 import java.util.*
 
-interface BookmarkRepository : JpaRepository<Bookmark, Long> {
+interface BookmarkRepository : JpaRepository<Bookmark, Long>,BookmarkRepositoryCustom {
     // 소프트 삭제 미포함 상태의 북마크가 존재하는지
     fun findByMemberAndPlaceAndDeletedAtIsNull(member: Member, place: Place): Optional<Bookmark>
 

@@ -305,38 +305,25 @@ const PlaceListPage = () => {
     return categoryMap[categoryId] || "여행지";
   };
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const safeRating = rating || 0;
-    const fullStars = Math.floor(safeRating);
-    const hasHalfStar = safeRating % 1 !== 0;
+  const renderStars = (rating = 0) => {
+    const normalized = Math.max(0, Math.min(5, Number(rating) || 0));
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <span key={i} className="star filled">
-          ⭐
+    return Array.from({ length: 5 }).map((_, index) => {
+      const value = index + 1;
+      let className = "star empty";
+
+      if (normalized >= value) {
+        className = "star filled";
+      } else if (normalized >= value - 0.5) {
+        className = "star half";
+      }
+
+      return (
+        <span key={value} className={className} aria-hidden="true">
+          ★
         </span>
       );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <span key="half" className="star half">
-          ⭐
-        </span>
-      );
-    }
-
-    const emptyStars = 5 - Math.ceil(safeRating);
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <span key={`empty-${i}`} className="star empty">
-          ☆
-        </span>
-      );
-    }
-
-    return stars;
+    });
   };
 
   return (
@@ -424,10 +411,14 @@ const PlaceListPage = () => {
                   </div>
 
                   <div className="place-rating">
-                    <div className="stars">{renderStars(place.ratingAvg)}</div>
+                    <div className="stars">
+                      {renderStars(place.ratingAvg)}
+                    </div>
                     <span className="rating-text">
-                      {(place.ratingAvg || 0).toFixed(1)} (
-                      {place.ratingCount || 0}개 리뷰)
+                      <strong>{(Number(place.ratingAvg) || 0).toFixed(1)}</strong>
+                      <span className="rating-count">
+                        &nbsp;· {place.ratingCount || 0}개 리뷰
+                      </span>
                     </span>
                   </div>
 
