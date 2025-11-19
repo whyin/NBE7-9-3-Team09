@@ -3,7 +3,12 @@ import api from "./api";
 // 리뷰 등록
 export const createReview = async (reviewData) => {
   try {
-    const response = await api.post("/api/review/add", reviewData);
+    const token = localStorage.getItem("accessToken");
+    const response = await api.post("/api/review/add", reviewData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     console.error("리뷰 등록 실패:", error);
@@ -11,17 +16,26 @@ export const createReview = async (reviewData) => {
   }
 };
 
-// 리뷰 수정
-export const modifyReview = async (memberId, rating) => {
+export const modifyReview = async (reviewId, rating, content) => {
   try {
     const token = localStorage.getItem("accessToken");
+
+    // 쿼리 파라미터 구성 (백엔드 @RequestParam 이름과 동일하게)
+    const params = new URLSearchParams({
+      modifyRating: rating,
+      modifyContent: content ?? "",
+    }).toString();
+
     const response = await api.patch(
-      `/api/review/modify/${memberId}?modifyRating=${rating}`,
-      {},
+      `/api/review/modify/${reviewId}?${params}`,
+      null, // body는 필요 없으니 null/{} 아무거나
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
+
     return response;
   } catch (error) {
     console.error("리뷰 수정 실패:", error);

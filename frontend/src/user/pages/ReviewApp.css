@@ -14,7 +14,6 @@
   text-shadow: 2px 2px 4px rgba(106, 27, 154, 0.2);
 }
 
-/* 네비게이션 영역 */
 .review-nav {
   display: flex;
   justify-content: center;
@@ -40,7 +39,7 @@
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-/* 리뷰 카드 공통 스타일 */
+
 .review-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -73,7 +72,6 @@
   font-size: 1.1rem;
 }
 
-/* 리뷰 작성 폼 */
 .review-form {
   max-width: 500px;
   margin: 0 auto;

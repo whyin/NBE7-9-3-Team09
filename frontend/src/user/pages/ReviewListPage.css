@@ -1,32 +1,15 @@
+/* 상단 헤더 전체 래퍼 */
+.page-header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto 24px;
+}
+
+/* 기존 스타일이 있다면 그대로 두고, 없는 것만 참고해서 추가 */
 .review-list-page {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-title-area {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.page-title {
-  font-size: 1.6rem;
-  font-weight: bold;
-}
-
-.review-count {
-  font-size: 1rem;
-  color: #666;
-}
-
-button {
-  cursor: pointer;
 }
