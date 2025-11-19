@@ -13,6 +13,7 @@ import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.stereotype.Service
 import java.util.function.Supplier
 
@@ -36,12 +37,12 @@ class PlanMemberService(
     fun myInvitedPlanList(memberPkId: Long): List<PlanMemberMyResponseBody> {
         // TODO : 이후 ID 값만 있는 멤버 객체를 생성하는 방법 찾기
         val member: Member? = memberService.findById(memberPkId)
-
         val planMemberList = planMemberRepository.getPlanMembersByMember(member)
         val myPlanMemberList =
-            planMemberList.map{
-                PlanMemberMyResponseBody(it)
-            }.toList()
+            planMemberList
+                .filter { it.plan.member.id != memberPkId }
+                .map{ PlanMemberMyResponseBody(it) }
+                .toList()
 
         return myPlanMemberList
     }
@@ -101,7 +102,7 @@ class PlanMemberService(
             throw BusinessException(ErrorCode.NOT_MY_PLAN)
         }
 
-        val planMember = planMemberRepository!!.findById(requestBody.planMemberId).orElseThrow<BusinessException?>(
+        val planMember = planMemberRepository.findById(requestBody.planMemberId).orElseThrow<BusinessException?>(
             Supplier { BusinessException(ErrorCode.NOT_FOUND_INVITE) }
         )
 

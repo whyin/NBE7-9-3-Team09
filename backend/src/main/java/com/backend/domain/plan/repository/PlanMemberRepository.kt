@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository
 interface PlanMemberRepository : JpaRepository<PlanMember, Long> {
     fun getPlanMembersByMember(member: Member?): List<PlanMember>
 
-    fun getPlanMembersByPlan(plan: Plan): MutableList<PlanMember>
+    fun getPlanMembersByPlan(plan: Plan): List<PlanMember>
 
     fun existsByPlanIdAndMemberId(planId: Long, memberId: Long): Boolean
 
