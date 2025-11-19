@@ -2,8 +2,6 @@ package com.backend.global.security.jwt
 
 import com.backend.domain.member.entity.Provider
 import com.backend.domain.member.entity.Role
-import com.backend.global.security.oauth.dto.OAuth2TempClaims
-import com.backend.global.security.oauth.util.OAuth2TempTokenParser
 import com.backend.global.security.user.CustomUserDetails
 import com.backend.global.security.user.CustomUserDetailsService
 import io.jsonwebtoken.Claims
