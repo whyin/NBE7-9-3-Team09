@@ -62,7 +62,8 @@ public class PlanServiceTest {
                 "test1",
                 "테스트",
                 LocalDateTime.now().plusDays(1),
-                LocalDateTime.now().plusDays(2)
+                LocalDateTime.now().plusDays(2),
+                null
         );
 
         planService.createPlan(planCreateRequestBody,1L);

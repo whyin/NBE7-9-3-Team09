@@ -48,7 +48,7 @@ export default function PlanDetailPage({ planId, onBack }) {
 
   const categories = [
     { value: "HOTEL", label: "숙박" },
-    { value: "RESTAURANT", label: "음식점" },
+    { value: "맛집", label: "음식점" },
     { value: "NIGHTSPOT", label: "나이트스팟" },
   ];
 
