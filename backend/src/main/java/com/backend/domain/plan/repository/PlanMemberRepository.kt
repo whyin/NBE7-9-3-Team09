@@ -17,6 +17,8 @@ interface PlanMemberRepository : JpaRepository<PlanMember, Long> {
 
     fun existsByPlanIdAndMemberId(planId: Long, memberId: Long): Boolean
 
+    fun existsByPlanIdAndMemberIdAndIsConfirmed(planId: Long, memberId: Long, isConfirmed: Int): Boolean
+
     @Query("""
         SELECT
         pm

@@ -45,7 +45,7 @@ class PlanController(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String
     ): ApiResponse<List<PlanResponseBody>> {
         val memberPkId = authService.getMemberId(accessToken)
-        val plans: List<PlanResponseBody> = planService.getPlanList(memberPkId)
+        val plans: List<PlanResponseBody> = planService.getInvitedAcceptedPlan(memberPkId)
         return success<List<PlanResponseBody>>(plans)
     }
 
