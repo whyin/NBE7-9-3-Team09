@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration
     )
 )
 open class SpringDoc {
+
     @Bean
     open fun groupApiV1(): GroupedOpenApi? {
         return GroupedOpenApi.builder()
