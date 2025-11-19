@@ -188,18 +188,12 @@ class ReviewService(
                 (threshold / (reviewCount + threshold)) * globalAverageRating
     }
 
-    // ───────────────── Recommend / 캐시 영역 ─────────────────
-
-    @Cacheable(cacheNames = ["recommendTop5"], key = "#categoryName")
-    fun recommendPlace(categoryName: String): List<RecommendResponse> {
-        val recommends = recommendRepository
-            .findTop5ByPlaceCategoryNameOrderByBayesianRatingDesc(categoryName)
-
-        return recommends.map {
-            val place = it?.place ?: throw IllegalStateException("Recommend.place is null")
-            RecommendResponse.from(place, it.bayesianRating)
-        }
+    fun recommendPlace(categoryName: String): List<RecommendResponse?> {
+        val sorted: List<RecommendResponse?> = sortPlaces(categoryName) // 캐시됨
+        return sorted.stream().limit(5).toList()
     }
+
+    // ───────────────── Recommend / 캐시 영역 ─────────────────
 
     @Cacheable(cacheNames = ["sortedPlaces"], key = "#categoryName")
     fun sortPlaces(categoryName: String): List<RecommendResponse> {
@@ -211,6 +205,9 @@ class ReviewService(
             RecommendResponse.from(place, it.bayesianRating)
         }
     }
+
+
+
 
     /**
      * 전체 리뷰의 글로벌 평균 평점
