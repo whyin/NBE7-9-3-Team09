@@ -98,7 +98,7 @@ open class PlanService(
 
     fun getTodayPlan(memberPkId: Long): PlanResponseBody {
         val todayStart = LocalDateTime.now().toLocalDate().atStartOfDay()
-        val plan = planRepository.getPlanByStartDateAndMemberId(todayStart, memberPkId)?:throw BusinessException(ErrorCode.NOT_FOUND_PLAN)
+        val plan = planRepository.myQueryGetPlanContainingThisTime(memberPkId,LocalDateTime.now())?:throw BusinessException(ErrorCode.NOT_FOUND_PLAN)
         return PlanResponseBody(plan)
     }
 

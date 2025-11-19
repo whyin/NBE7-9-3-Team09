@@ -8,11 +8,13 @@ import com.backend.domain.plan.dto.PlanMemberAnswerRequestBody
 import com.backend.domain.plan.dto.PlanMemberMyResponseBody
 import com.backend.domain.plan.dto.PlanMemberResponseBody
 import com.backend.domain.plan.entity.PlanMember
+import com.backend.domain.plan.entity.QPlan.plan
 import com.backend.domain.plan.repository.PlanMemberRepository
 import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.stereotype.Service
 import java.util.function.Supplier
 
@@ -26,8 +28,8 @@ class PlanMemberService(
 ) {
 
 
-    fun invitePlanMember(requestBody: PlanMemberAddRequestBody, memberId: Long): PlanMemberResponseBody {
-        val planMember = isValidInvite(requestBody, memberId)
+    fun invitePlanMember(requestBody: PlanMemberAddRequestBody, memberPkId: Long): PlanMemberResponseBody {
+        val planMember = isValidInvite(requestBody, memberPkId)
         planMemberRepository.save<PlanMember?>(planMember)
         return PlanMemberResponseBody(planMember)
     }
@@ -35,13 +37,13 @@ class PlanMemberService(
 
     fun myInvitedPlanList(memberPkId: Long): List<PlanMemberMyResponseBody> {
         // TODO : 이후 ID 값만 있는 멤버 객체를 생성하는 방법 찾기
-        val member: Member? = memberService.findById(memberPkId)
-
+        val member: Member = memberService.findById(memberPkId)
         val planMemberList = planMemberRepository.getPlanMembersByMember(member)
         val myPlanMemberList =
-            planMemberList.map{
-                PlanMemberMyResponseBody(it)
-            }.toList()
+            planMemberList
+                .filter { it.plan.member.id != memberPkId }
+                .map{ PlanMemberMyResponseBody(it) }
+                .toList()
 
         return myPlanMemberList
     }
@@ -72,19 +74,15 @@ class PlanMemberService(
     // 초대가 유효한지 검사합니다.
     private fun isValidInvite(requestBody: PlanMemberAddRequestBody, memberId: Long): PlanMember {
         val plan = planService.getPlanById(requestBody.planId)
-        if (plan.member.id != memberId) {
-            throw BusinessException(ErrorCode.NOT_MY_PLAN)
-        }
+        if (plan.member.id != memberId) throw BusinessException(ErrorCode.NOT_MY_PLAN) // 현재 로그인 한 사용자의 계획이 맞는지 확인합니다.
 
-        val invitedMember = memberService.findById(requestBody.memberId)
-
-        // 데이터 베이스 오류 처리를 서비스 로직 처리로 변경
+        val invitedMember = memberService.findById(requestBody.memberId) // 초대 할 사용자의 계정이 존재하는지 확인하고 해당 객체를 가져옵니다.
+        // DB에 해당 초대가 이미 존재하는지 확인합니다.
         if (planMemberRepository.existsByMemberInPlanId(
                 invitedMember.id?:throw BusinessException(ErrorCode.INVALID_MEMBER),
                 plan.id?:throw BusinessException(ErrorCode.NOT_FOUND_PLAN))) {
             throw BusinessException(ErrorCode.DUPLICATE_MEMBER_INVITE)
         }
-
 
         val planMember = PlanMember(null, invitedMember, plan, null, null, 0)
         return planMember
@@ -101,7 +99,7 @@ class PlanMemberService(
             throw BusinessException(ErrorCode.NOT_MY_PLAN)
         }
 
-        val planMember = planMemberRepository!!.findById(requestBody.planMemberId).orElseThrow<BusinessException?>(
+        val planMember = planMemberRepository.findById(requestBody.planMemberId).orElseThrow<BusinessException?>(
             Supplier { BusinessException(ErrorCode.NOT_FOUND_INVITE) }
         )
 

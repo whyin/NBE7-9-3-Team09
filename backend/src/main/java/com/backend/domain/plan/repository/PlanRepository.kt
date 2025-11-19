@@ -22,6 +22,18 @@ interface PlanRepository : JpaRepository<Plan?, Long?> {
     fun getPlanByStartDateBeforeAndEndDateAfter(startDateBefore: LocalDateTime, endDateAfter: LocalDateTime): Plan?
 
     @Query("""
+        SELECT
+        p
+        FROM 
+        Plan p
+        WHERE 
+        p.member.id= :memberId
+        AND 
+        (p.startDate <= :nowTime AND p.endDate >= :nowTime)
+    """)
+    fun myQueryGetPlanContainingThisTime(memberId: Long, nowTime: LocalDateTime): Plan?
+
+    @Query("""
         SELECT 
         p
         FROM

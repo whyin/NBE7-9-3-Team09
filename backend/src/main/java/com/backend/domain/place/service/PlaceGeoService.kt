@@ -36,15 +36,14 @@ class PlaceGeoService(
      */
     @Transactional
     fun fillMissingCoordinates(batchSize: Int = 100): Int {
-        // 여기서 어차피 100개만 가져옴
         val places = placeRepository.findTop100ByLatitudeIsNullOrderByIdAsc()
 
         if (places.isEmpty()) {
-            log.info { "✅ 좌표가 비어 있는 Place가 더 이상 없습니다." }
+            log.info { "좌표가 비어 있는 Place가 더 이상 없습니다." }
             return 0
         }
 
-        log.info { "🔍 좌표 미설정 Place ${places.size}개 처리 시작" }
+        log.info { "좌표 미설정 Place ${places.size}개 처리 시작" }
 
         var successCount = 0
 
@@ -147,10 +146,9 @@ class PlaceGeoService(
 
             log.info { "✅ 이번 배치 성공: $successCount 개, 누적: $totalSuccess 개" }
 
-            // 🔥 여기 추가 – 더 이상 새로 채운 게 없으면 루프 종료
             if (successCount == 0) {
                 log.warn {
-                    "⚠️ 이번 배치에서 새로 좌표를 채운 Place가 없습니다. " +
+                    "이번 배치에서 새로 좌표를 채운 Place가 없습니다. " +
                             "남은 애들은 카카오에서 매칭이 잘 안 되는 주소일 가능성이 큽니다. 루프를 종료합니다."
                 }
                 break

@@ -9,6 +9,7 @@ data class ResponsePlaceDto(
     val gu: String?,
     val category: String,
     val ratingAvg: Double?,
+    val ratingCount: Int?,
     val description: String?,
     val latitude: Double?,
     val longitude: Double?
@@ -22,6 +23,7 @@ data class ResponsePlaceDto(
                 gu = place.gu,
                 category = place.category.name,
                 ratingAvg = place.ratingAvg,
+                ratingCount = place.ratingCount,
                 description = place.description,
                 latitude = place.latitude,
                 longitude = place.longitude

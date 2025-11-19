@@ -438,7 +438,7 @@ useEffect(()=>{
                       {renderStars(place.ratingAvg)}
                     </div>
                     <span className="rating-text">
-                      <strong>{(Number(place.ratingAvg) || 0).toFixed(1)}</strong>
+                      <strong>{(Number(place.ratingAvg) || 0).toFixed(2)}</strong>
                       <span className="rating-count">
                         &nbsp;· {place.ratingCount || 0}개 리뷰
                       </span>

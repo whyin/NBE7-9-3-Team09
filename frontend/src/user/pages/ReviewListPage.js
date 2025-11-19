@@ -69,9 +69,6 @@ const ReviewListPage = () => {
 
           {/* 🔥 여기 항상 보이는 버튼 영역 */}
           <div className="page-header-actions">
-            <Button variant="outline" onClick={() => navigate(-1)}>
-              ← 뒤로가기
-            </Button>
             <Button variant="primary" onClick={handleCreate}>
               리뷰 작성
             </Button>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import "./UserApp.css";
 
@@ -13,6 +13,9 @@ import MenuCards from "./components/home/MenuCards";
 function UserApp() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () => !!localStorage.getItem("accessToken")
+  );
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -23,16 +26,27 @@ function UserApp() {
         "accessToken",
         accessToken
       ); /* 쿼리에서 전달된 토큰 저장 */
+      setIsLoggedIn(true);
       navigate("/user", {
         replace: true,
       }); /* 토큰 저장 후 /user 경로만 남기기 */
     }
   }, [location.search, navigate]);
 
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("accessToken"));
+  }, [location.pathname, location.search]);
+
   return (
     <div className="user-app">
-      <MenuCards />
-      <div className="user-app__content">
+      {isLoggedIn && <MenuCards />}
+      <div
+        className={
+          isLoggedIn
+            ? "user-app__content user-app__content--with-nav"
+            : "user-app__content"
+        }
+      >
         <Routes>
           {/* ⭐ /user → UserApp 진입 후 HomePage 표시 */}
           <Route path="/" element={<HomePage />} />

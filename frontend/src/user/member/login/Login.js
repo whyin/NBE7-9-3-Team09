@@ -10,9 +10,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const REST_API_KEY = process.env.REACT_APP_KAKAO_CLIENT_ID;  // 추가 rk rk rk rk
-  const REDIRECT_URI = process.env.REACT_APP_KAKAO_REDIRECT_URI; // 추가
-
   const handleKakaoLogin = () => {
     window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
   };
@@ -54,14 +51,14 @@ const Login = () => {
   };
 
   return (
-    <div className="member-container">
+    <div className="member-container login-page">
       <div className="login-header">
         <h1 className="main-title">갈래? 말래? 가자 서울! ✈️</h1>
         <div className="airplane-decoration">✈️</div>
       </div>
       <h2>로그인</h2>
 
-      <form className="member-form" onSubmit={handleLogin}>
+      <form className="member-form login-form" onSubmit={handleLogin}>
         <input
           type="text"
           placeholder="아이디"
@@ -76,7 +73,10 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit" className="member-button">
+        <button
+          type="submit"
+          className="member-button login-button default-login-button"
+        >
           로그인
         </button>
         
@@ -85,10 +85,12 @@ const Login = () => {
         <button
           type="button"
           onClick={handleKakaoLogin}
-          className="member-button"
-          style={{ backgroundColor: "#FEE500", color: "#3C1E1E" }} // 최소 스타일
+          className="member-button login-button kakao-button"
         >
-          카카오 로그인
+          <span className="kakao-icon" aria-hidden="true">
+            K
+          </span>
+          <span className="kakao-text">카카오 로그인</span>
         </button>
 
         {error && <p className="error-text">{error}</p>}
@@ -99,7 +101,7 @@ const Login = () => {
       <button
         type="button"
         onClick={() => navigate("/user/member/signup")}
-        className="member-button signup-button"
+        className="member-button signup-button compact-signup-button"
       >
         회원가입하기
       </button>

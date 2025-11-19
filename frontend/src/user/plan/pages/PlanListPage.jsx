@@ -755,7 +755,7 @@ function PlanDetailPage({ planId, onBack }) {
                         <div className="place-item-main">
                           {selectedCategory !== "bookmark" && (
                             <span className="place-rating">
-                              [⭐ {place.averageRating.toFixed(1)}]
+                              [⭐ {place.averageRating.toFixed(2)}]
                             </span>
                           )}
                           <span className="place-name">{place.placeName}</span>
@@ -928,7 +928,7 @@ function PlanDetailPage({ planId, onBack }) {
                                     <div className="place-item-main">
                                       {editSelectedCategory !== "bookmark" && (
                                         <span className="place-rating">
-                                          [⭐ {place.averageRating.toFixed(1)}]
+                                          [⭐ {place.averageRating.toFixed(2)}]
                                         </span>
                                       )}
                                       <span className="place-name">
