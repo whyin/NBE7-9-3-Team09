@@ -22,4 +22,5 @@ interface ReviewRepository : JpaRepository<Review, Long> {
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.place.id = :placeId")
     fun findAverageRating(@Param("placeId") placeId: Long?): Double
+    fun countByPlaceId(placeId: Long?): Long
 }
