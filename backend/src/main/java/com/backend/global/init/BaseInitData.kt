@@ -70,6 +70,48 @@ class BaseInitData(
                     nickname = "사용자2",
                 )
 
+                val member3 = Member.createLocal(
+                    memberId = "member3",
+                    password = passwordEncoder.encode("3333"),
+                    email = "member3@gmail.com",
+                    nickname = "사용자3",
+                )
+
+                val member4 = Member.createLocal(
+                    memberId = "member4",
+                    password = passwordEncoder.encode("4444"),
+                    email = "member4@gmail.com",
+                    nickname = "사용자4",
+                )
+
+                val member5 = Member.createLocal(
+                    memberId = "member5",
+                    password = passwordEncoder.encode("5555"),
+                    email = "member5@gmail.com",
+                    nickname = "사용자5",
+                )
+
+                val member6 = Member.createLocal(
+                    memberId = "member6",
+                    password = passwordEncoder.encode("6666"),
+                    email = "member6@gmail.com",
+                    nickname = "사용자6",
+                )
+
+                val member7 = Member.createLocal(
+                    memberId = "member7",
+                    password = passwordEncoder.encode("7777"),
+                    email = "member7@gmail.com",
+                    nickname = "사용자7",
+                )
+
+                val member8 = Member.createLocal(
+                    memberId = "member8",
+                    password = passwordEncoder.encode("8888"),
+                    email = "member8@gmail.com",
+                    nickname = "사용자8",
+                )
+
                 val admin = Member.createLocal(
                     memberId = "admin",
                     password = passwordEncoder.encode("admin1234"),
@@ -79,7 +121,12 @@ class BaseInitData(
                     role = Role.ADMIN
                 }
 
-                memberRepository.saveAll(List.of(member1, member2, admin))
+                memberRepository.saveAll(
+                    listOf(
+                        member1, member2, member3, member4, member5, member6, member7, member8,
+                        admin
+                    )
+                )
                 log.info { "초기 member 데이터 세팅 완료: " }
             }
             if(placeRepository.count() == 0L) {

@@ -2,7 +2,6 @@ package com.backend.domain.member.entity
 
 import com.backend.global.entity.BaseEntity
 import jakarta.persistence.*
-import lombok.*
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -42,7 +41,6 @@ class Member(
     @Column(name = "deleted_at")
     private var deletedAt: LocalDateTime? = null
 ) : BaseEntity() {
-    //TODO: name
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,8 +67,9 @@ class Member(
         this.nickname = newNickname
     }
 
-    /* === 정적 팩토리: 일반 회원 생성 === */
     companion object {
+
+        /* === 정적 팩토리: 일반 회원 생성 === */
         fun createLocal(
             memberId: String,
             password: String,
@@ -98,49 +97,12 @@ class Member(
             return Member(
                 provider = Provider.KAKAO,
                 providerId = providerId,
-                memberId = "social_" + java.util.UUID.randomUUID().toString().replace("-", "").take(16),      // 자동 생성
+                memberId = "kakao_" + UUID.randomUUID().toString().replace("-", "").take(16),      // 자동 생성
                 password = "{SOCIAL_LOGIN}",         // 소셜 회원 dummy PW
                 email = email,
                 nickname = nickname,
                 role = Role.USER,
                 status = MemberStatus.ACTIVE
-            )
-        }
-
-        @JvmStatic
-        fun builder() = Builder()
-    }
-
-    // === Builder 사용을 위한 팩토리 ===
-
-    class Builder {
-        private var id: Long? = null
-        private var memberId: String = ""
-        private var password: String = ""
-        private var email: String = ""
-        private var nickname: String = ""
-        private var role: Role = Role.USER
-        private var status: MemberStatus = MemberStatus.ACTIVE
-        private var deletedAt: LocalDateTime? = null
-
-        fun id(id: Long?) = apply { this.id = id }
-        fun memberId(memberId: String) = apply { this.memberId = memberId }
-        fun password(password: String) = apply { this.password = password }
-        fun email(email: String) = apply { this.email = email }
-        fun nickname(nickname: String) = apply { this.nickname = nickname }
-        fun role(role: Role) = apply { this.role = role }
-        fun status(status: MemberStatus) = apply { this.status = status }
-        fun deletedAt(deletedAt: LocalDateTime?) = apply { this.deletedAt = deletedAt }
-
-        fun build(): Member {
-            return Member(
-                memberId = memberId,
-                password = password,
-                email = email,
-                nickname = nickname,
-                role = role,
-                status = status,
-                deletedAt = deletedAt
             )
         }
     }
