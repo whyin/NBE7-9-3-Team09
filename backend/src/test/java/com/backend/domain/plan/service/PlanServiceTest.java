@@ -115,4 +115,12 @@ public class PlanServiceTest {
 
     }
 
+    @Test
+    @DisplayName("7. 내가 초대된 목록 조회")
+    void t7(){
+        List<PlanResponseBody> result= planService.getInvitedAcceptedPlan(1L);
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(1);
+    }
+
 }

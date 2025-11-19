@@ -1,167 +1,130 @@
-import React, { useState, useEffect, useRef } from "react";
-import { searchFriends } from "../../services/friendService";
+import React, { useState } from "react";
+import { apiRequest } from "../../../utils/api";
 import "./FriendInvitePanel.css";
 
-export default function FriendInvitePanel({ selectedFriends = [], onFriendsChange }) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const searchTimeoutRef = useRef(null);
-  const searchRef = useRef(null);
+export default function FriendInvitePanel({
+  invitedMembers = [],
+  onInvitesChange,
+}) {
+  const [emailInput, setEmailInput] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState("info");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 검색어 변경 시 디바운스 처리
-  useEffect(() => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
+  const showStatus = (message, type = "info") => {
+    setStatusMessage(message);
+    setStatusType(type);
+  };
 
-    if (searchQuery.trim().length === 0) {
-      setSearchResults([]);
-      setShowResults(false);
+  const clearStatus = () => {
+    setStatusMessage("");
+    setStatusType("info");
+  };
+
+  const handleInviteSubmit = async (event) => {
+    event.preventDefault();
+    clearStatus();
+
+    const trimmedEmail = emailInput.trim();
+
+    if (trimmedEmail.length === 0) {
+      showStatus("이메일을 입력해주세요.", "error");
       return;
     }
 
-    if (searchQuery.trim().length < 2) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(trimmedEmail)) {
+      showStatus("올바른 이메일 형식을 입력해주세요.", "error");
       return;
     }
 
-    searchTimeoutRef.current = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        const results = await searchFriends(searchQuery);
-        // 이미 선택된 친구는 제외
-        const filteredResults = results.filter(
-          (friend) => !selectedFriends.some((sf) => sf.id === friend.id)
-        );
-        setSearchResults(filteredResults);
-        setShowResults(true);
-      } catch (error) {
-        console.error("친구 검색 실패:", error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
+    if (invitedMembers.some((member) => member.email === trimmedEmail)) {
+      showStatus("이미 추가된 이메일입니다.", "warning");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await apiRequest(
+        `http://localhost:8080/api/members/search/email?email=${encodeURIComponent(
+          trimmedEmail
+        )}`
+      );
+
+      if (!response.ok) {
+        throw new Error("사용자를 찾을 수 없습니다.");
       }
-    }, 300);
 
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
+      const result = await response.json();
+      const memberId = result?.data?.id;
+
+      if (!memberId) {
+        throw new Error("해당 이메일의 사용자를 찾을 수 없습니다.");
       }
-    };
-  }, [searchQuery, selectedFriends]);
 
-  // 외부 클릭 시 검색 결과 닫기
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowResults(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleAddFriend = (friend) => {
-    if (!selectedFriends.some((sf) => sf.id === friend.id)) {
-      const newSelected = [...selectedFriends, friend];
-      onFriendsChange(newSelected);
-      setSearchQuery("");
-      setShowResults(false);
+      const updatedList = [
+        ...invitedMembers,
+        { id: memberId, email: trimmedEmail },
+      ];
+      onInvitesChange(updatedList);
+      showStatus("초대 목록에 추가했습니다.", "success");
+      setEmailInput("");
+    } catch (error) {
+      console.error("이메일 초대 실패:", error);
+      showStatus(error.message || "사용자를 찾을 수 없습니다.", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleRemoveFriend = (friendId) => {
-    const newSelected = selectedFriends.filter((sf) => sf.id !== friendId);
-    onFriendsChange(newSelected);
-  };
-
-  const getAvatarInitial = (name) => {
-    if (!name) return "?";
-    return name.charAt(0).toUpperCase();
+  const handleRemoveInvite = (memberId) => {
+    const updatedList = invitedMembers.filter((member) => member.id !== memberId);
+    onInvitesChange(updatedList);
   };
 
   return (
     <div className="friend-invite-panel">
       <div className="friend-invite-header">
         <h3 className="friend-invite-title">👥 친구 초대</h3>
-        <p className="friend-invite-subtitle">함께 여행할 친구를 추가해보세요</p>
+        <p className="friend-invite-subtitle">
+          함께 여행할 친구의 이메일을 입력하세요
+        </p>
       </div>
 
-      <div className="friend-invite-search" ref={searchRef}>
+      <form className="friend-invite-search" onSubmit={handleInviteSubmit}>
         <input
-          type="text"
+          type="email"
           className="friend-invite-search-input"
-          placeholder="닉네임 또는 이메일로 검색"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onFocus={() => {
-            if (searchResults.length > 0) {
-              setShowResults(true);
-            }
-          }}
+          placeholder="초대할 친구의 이메일을 입력"
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
         />
-        {isSearching && (
-          <div className="friend-invite-search-loading">검색 중...</div>
-        )}
-        {showResults && searchResults.length > 0 && (
-          <div className="friend-invite-search-results">
-            {searchResults.map((friend) => (
-              <div
-                key={friend.id}
-                className="friend-invite-search-result-item"
-                onClick={() => handleAddFriend(friend)}
-              >
-                <div className="friend-invite-avatar">
-                  {friend.profileImage ? (
-                    <img
-                      src={friend.profileImage}
-                      alt={friend.nickname}
-                      className="friend-invite-avatar-img"
-                    />
-                  ) : (
-                    <span className="friend-invite-avatar-initial">
-                      {getAvatarInitial(friend.nickname)}
-                    </span>
-                  )}
-                </div>
-                <div className="friend-invite-result-info">
-                  <div className="friend-invite-result-name">{friend.nickname}</div>
-                  <div className="friend-invite-result-email">{friend.email}</div>
-                </div>
-                <button
-                  className="friend-invite-add-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddFriend(friend);
-                  }}
-                >
-                  추가
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        {showResults && searchQuery.trim().length >= 2 && searchResults.length === 0 && !isSearching && (
-          <div className="friend-invite-search-results">
-            <div className="friend-invite-search-empty">검색 결과가 없습니다.</div>
-          </div>
-        )}
-      </div>
+        <button
+          type="submit"
+          className="friend-invite-add-btn primary"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "확인 중..." : "추가"}
+        </button>
+      </form>
 
-      {selectedFriends.length > 0 && (
+      {statusMessage && (
+        <div className={`friend-invite-status friend-invite-status-${statusType}`}>
+          {statusMessage}
+        </div>
+      )}
+
+      {invitedMembers.length > 0 && (
         <div className="friend-invite-selected">
-          <div className="friend-invite-selected-label">선택된 친구</div>
+          <div className="friend-invite-selected-label">초대된 친구</div>
           <div className="friend-invite-chips">
-            {selectedFriends.map((friend) => (
-              <div key={friend.id} className="friend-invite-chip">
-                <span className="friend-invite-chip-name">{friend.nickname}</span>
+            {invitedMembers.map((member) => (
+              <div key={member.id} className="friend-invite-chip">
+                <span className="friend-invite-chip-name">{member.email}</span>
                 <button
                   className="friend-invite-chip-remove"
-                  onClick={() => handleRemoveFriend(friend.id)}
+                  onClick={() => handleRemoveInvite(member.id)}
                   aria-label="제거"
                 >
                   ✕

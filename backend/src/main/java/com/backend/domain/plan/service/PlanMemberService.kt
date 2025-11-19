@@ -6,6 +6,7 @@ import com.backend.domain.plan.dto.PlanMemberAddRequestBody
 import com.backend.domain.plan.dto.PlanMemberAnswerRequestBody
 import com.backend.domain.plan.dto.PlanMemberMyResponseBody
 import com.backend.domain.plan.dto.PlanMemberResponseBody
+import com.backend.domain.plan.entity.Plan
 import com.backend.domain.plan.entity.PlanMember
 import com.backend.domain.plan.repository.PlanMemberRepository
 import com.backend.global.exception.BusinessException
@@ -13,6 +14,7 @@ import com.backend.global.response.ErrorCode
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.function.Supplier
 
 @Slf4j
@@ -30,6 +32,7 @@ class PlanMemberService(
         planMemberRepository.save<PlanMember?>(planMember)
         return PlanMemberResponseBody(planMember)
     }
+
 
     fun myInvitedPlanList(memberPkId: Long): List<PlanMemberMyResponseBody> {
         // TODO : 이후 ID 값만 있는 멤버 객체를 생성하는 방법 찾기
@@ -113,5 +116,10 @@ class PlanMemberService(
 
     //        return planMemberRepository.existsByMemberInPlanId(member.id?: throw BusinessException(ErrorCode.INVALID_MEMBER)
 //        , planId)
+    }
+
+    fun getPlanMembers(planId: Long, memberPkId: Long): List<PlanMemberResponseBody> {
+        val members : List<PlanMemberResponseBody> =planMemberRepository.myQueryGetPlanMembers(planId)
+        return members.filter { it.isComfirmed }
     }
 }

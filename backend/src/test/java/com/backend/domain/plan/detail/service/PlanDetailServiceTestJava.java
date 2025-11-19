@@ -129,13 +129,13 @@ public class PlanDetailServiceTestJava {
 
         assertThat(updated.getTitle()).isEqualTo("수정된 제목");
         assertThat(updated.getContent()).isEqualTo("수정된 내용");
-        assertThat(updated.getStartTime()).isEqualTo(request.startTime());
-        assertThat(updated.getEndTime()).isEqualTo(request.endTime());
-        assertThat(updated.getPlace().getId()).isEqualTo(request.placeId());
+        assertThat(updated.getStartTime()).isEqualTo(request.getStartTime());
+        assertThat(updated.getEndTime()).isEqualTo(request.getEndTime());
+        assertThat(updated.getPlace().getId()).isEqualTo(request.getPlaceId());
 
         // ResponseBody도 검증
-        assertThat(response.title()).isEqualTo("수정된 제목");
-        assertThat(response.content()).isEqualTo("수정된 내용");
+        assertThat(response.getTitle()).isEqualTo("수정된 제목");
+        assertThat(response.getContent()).isEqualTo("수정된 내용");
     }
 
     @Test

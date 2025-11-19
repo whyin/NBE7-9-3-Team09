@@ -1,6 +1,7 @@
 package com.backend.domain.plan.repository
 
 import com.backend.domain.member.entity.Member
+import com.backend.domain.plan.dto.PlanMemberResponseBody
 import com.backend.domain.plan.entity.Plan
 import com.backend.domain.plan.entity.PlanMember
 import org.springframework.data.jpa.repository.JpaRepository
@@ -56,5 +57,21 @@ AND pm.member.id = :memberId
     fun findByPlan_IdAndMember_Id(planId: Long, memberId: Long): PlanMember
     fun getPlanMembersByMemberIdAndPlan_Id(memberId: Long, planId: Long): MutableList<PlanMember>
 
-
+    @Query("""
+        SELECT 
+        m.memberId,
+        p.title,
+        pm.isConfirmed
+        FROM 
+        Member m,
+        Plan p,
+        PlanMember pm
+        WHERE 
+        p.id = :planId
+        AND
+        pm.plan.id = :planId
+        AND
+        m.id = pm.member.id
+    """)
+    fun myQueryGetPlanMembers(@Param("planId")planId: Long): List<PlanMemberResponseBody>
 }

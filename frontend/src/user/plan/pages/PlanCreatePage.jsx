@@ -23,7 +23,7 @@ export default function PlanCreateForm() {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedFriends, setSelectedFriends] = useState([]);
+  const [invitedMembers, setInvitedMembers] = useState([]);
 
   // 오늘 날짜와 10년 후 날짜 계산
   const today = new Date();
@@ -106,7 +106,7 @@ export default function PlanCreateForm() {
         content: formData.content,
         startDate: startDateTime,
         endDate: endDateTime,
-        friendIds: selectedFriends.map((f) => f.id),
+        inviteMembers: invitedMembers.map((member) => member.id),
       };
 
       const response = await apiRequest(
@@ -398,8 +398,8 @@ export default function PlanCreateForm() {
         {/* 우측: 친구 초대 패널 */}
         <div className="plan-create-panel-section">
           <FriendInvitePanel
-            selectedFriends={selectedFriends}
-            onFriendsChange={setSelectedFriends}
+            invitedMembers={invitedMembers}
+            onInvitesChange={setInvitedMembers}
           />
         </div>
       </div>

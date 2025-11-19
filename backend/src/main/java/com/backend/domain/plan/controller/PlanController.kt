@@ -49,7 +49,7 @@ class PlanController(
         return success<List<PlanResponseBody>>(plans)
     }
 
-    //초대가 승낙된 모임만 표시
+    //초대가 승낙된 모임만 표시 -> 위에서 동시 처리함
     @GetMapping("/myInvitedPlan")
     fun getMyInvitedPlan(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String
@@ -98,6 +98,16 @@ class PlanController(
 
         planService.deletePlanById(planId, memberPkId)
         return ResponseEntity<Any?>(HttpStatus.OK)
+    }
+
+    @GetMapping("/member/{planId}")
+    fun getPlanMemberList(
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) accessToken: String,
+        @PathVariable planId: @NotNull Long
+    ): ApiResponse<List<PlanMemberResponseBody>> {
+        val memberPkId = authService.getMemberId(accessToken)
+        val members : List<PlanMemberResponseBody> = planMemberService.getPlanMembers(planId, memberPkId);
+        return success<List<PlanMemberResponseBody>>(members)
     }
 
     @PostMapping("/member/invite")

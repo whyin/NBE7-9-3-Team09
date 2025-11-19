@@ -11,7 +11,8 @@ data class PlanCreateRequestBody(
     val title: @NotEmpty String,
     val content: String,
     val startDate: LocalDateTime,
-    val endDate: LocalDateTime
+    val endDate: LocalDateTime,
+    val inviteMembers: List<Long>,
 ) {
     fun toEntity(member: Member): Plan {
         return Plan(
