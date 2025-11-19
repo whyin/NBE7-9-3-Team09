@@ -97,7 +97,7 @@ class Member(
             return Member(
                 provider = Provider.KAKAO,
                 providerId = providerId,
-                memberId = "social_" + UUID.randomUUID().toString().replace("-", "").take(16),      // 자동 생성
+                memberId = "kakao_" + UUID.randomUUID().toString().replace("-", "").take(16),      // 자동 생성
                 password = "{SOCIAL_LOGIN}",         // 소셜 회원 dummy PW
                 email = email,
                 nickname = nickname,
