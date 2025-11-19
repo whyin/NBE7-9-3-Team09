@@ -1,12 +1,14 @@
 package com.backend.domain.plan.detail.service
 
 import com.backend.domain.member.entity.Member
+import com.backend.domain.member.entity.QMember.member
 import com.backend.domain.member.service.MemberService
 import com.backend.domain.place.service.PlaceService
 import com.backend.domain.plan.detail.dto.PlanDetailRequestBody
 import com.backend.domain.plan.detail.dto.PlanDetailResponseBody
 import com.backend.domain.plan.detail.dto.PlanDetailsElementBody
 import com.backend.domain.plan.detail.entity.PlanDetail
+import com.backend.domain.plan.detail.entity.QPlanDetail.planDetail
 import com.backend.domain.plan.detail.repository.PlanDetailRepository
 import com.backend.domain.plan.entity.Plan
 import com.backend.domain.plan.service.PlanMemberService
@@ -53,11 +55,10 @@ class PlanDetailService(
 
     @Transactional
     fun getPlanDetailsByPlanId(planId: Long, memberPkId: Long): List<PlanDetailsElementBody> {
-        getAvailableMember(planId, memberPkId)
-
-        val planDetails = planDetailRepository.getPlanDetailsByPlanId(planId)
-
-        val planDetailList : List<PlanDetailsElementBody> = planDetails.map{
+        if(!planMemberService.isAvailableAndAcceptedPlanMember(planId, memberPkId)) throw BusinessException(ErrorCode.NOT_ALLOWED_MEMBER)
+        // 위에서 검증하는데 굳이 아래에서 다시 한번 검증된 로직으로 처리할 필요가 있는지?
+        val planDetails = planDetailRepository.getPlanDetailsByPlanAndMemberIdWithInviteCheck(planId, memberPkId)
+        val planDetailList = planDetails.map{
             PlanDetailsElementBody(it)
         }.toList()
 
@@ -66,7 +67,7 @@ class PlanDetailService(
 
 
     fun getTodayPlanDetails(planId: Long, memberPkId: Long): List<PlanDetailsElementBody> {
-        getAvailableMember(planId, memberPkId)
+        if(planMemberService.isAvailableAndAcceptedPlanMember(planId, memberPkId)) throw BusinessException(ErrorCode.NOT_ALLOWED_MEMBER)
         val planDetails = planDetailRepository.getPlanDetailsByPlanId(planId)
         return planDetails.stream().filter { planDetail: PlanDetail ->
             planDetail.endTime.isAfter(
@@ -74,7 +75,7 @@ class PlanDetailService(
             ) && planDetail.startTime.isBefore(
                 LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX)
             )
-        }.map<PlanDetailsElementBody> { planDetail: PlanDetail? -> PlanDetailsElementBody(planDetail) }.toList()
+        }.map<PlanDetailsElementBody> { planDetail: PlanDetail -> PlanDetailsElementBody(planDetail) }.toList()
     }
 
     @Transactional
@@ -102,22 +103,14 @@ class PlanDetailService(
 
 
     private fun getPlanDetailById(planDetailId: Long): PlanDetail {
-        return planDetailRepository.getPlanDetailById(planDetailId).orElseThrow<BusinessException?>(Supplier {
-            BusinessException(
-                ErrorCode.NOT_FOUND_DETAIL_PLAN
-            )
-        })
+        return planDetailRepository.getPlanDetailById(planDetailId)?: throw BusinessException(ErrorCode.NOT_FOUND_DETAIL_PLAN)
     }
 
 
     private fun getAvailableMember(planId: Long, memberPkId: Long): Member {
         val member = memberService.findById(memberPkId)
         val plan = planService.getPlanById(planId)
-
-        if (!planMemberService.isAvailablePlanMember(planId, member)) {
-            throw BusinessException(ErrorCode.NOT_ALLOWED_MEMBER)
-        }
-
+        if (!planMemberService.isAvailablePlanMember(planId, memberPkId))throw BusinessException(ErrorCode.NOT_ALLOWED_MEMBER)
         return member
     }
 

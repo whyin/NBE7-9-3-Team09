@@ -47,9 +47,9 @@ export default function PlanDetailPage({ planId, onBack }) {
   const [editLoadingPlaces, setEditLoadingPlaces] = useState(false);
 
   const categories = [
-    { value: "hotel", label: "숙박" },
-    { value: "restaurant", label: "음식점" },
-    { value: "nightspot", label: "나이트스팟" },
+    { value: "HOTEL", label: "숙박" },
+    { value: "RESTAURANT", label: "음식점" },
+    { value: "NIGHTSPOT", label: "나이트스팟" },
   ];
 
   useEffect(() => {
@@ -495,16 +495,16 @@ export default function PlanDetailPage({ planId, onBack }) {
             onEdit={() => setIsEditing(true)}
             onSave={handleUpdate}
             onCancel={() => {
-                        setIsEditing(false);
-                        setEditData({
-                          title: plan.title,
-                          content: plan.content,
-                          startDate: plan.startDate,
-                          endDate: plan.endDate,
-                        });
-                      }}
+              setIsEditing(false);
+              setEditData({
+                title: plan.title,
+                content: plan.content,
+                startDate: plan.startDate,
+                endDate: plan.endDate,
+              });
+            }}
             onDelete={() => setShowDeleteConfirm(true)}
-                />
+          />
         </div>
 
         {/* 가운데 컬럼: 여행 상세 일정 */}
@@ -539,8 +539,8 @@ export default function PlanDetailPage({ planId, onBack }) {
             onCancelEditDetail={handleCancelEditDetail}
             onDeleteDetail={handleDeleteDetail}
             getDetailCategory={getDetailCategory}
-                  />
-                </div>
+          />
+        </div>
 
         {/* 오른쪽 컬럼: 함께하는 친구 */}
         <div className="plan-detail-column plan-detail-column-right">

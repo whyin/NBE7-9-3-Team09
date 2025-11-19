@@ -6,11 +6,13 @@ import jakarta.validation.constraints.NotNull
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.util.*
 
+@Repository
 interface PlanDetailRepository : JpaRepository<PlanDetail?, Long?> {
-    fun getPlanDetailById(planDetailId: Long): Optional<PlanDetail>
+    fun getPlanDetailById(planDetailId: Long): PlanDetail?
 
     fun getPlanDetailsByPlanId(planId: Long): MutableList<PlanDetail>
 
@@ -32,5 +34,25 @@ AND (:#{#detailId} IS NULL OR pd.id != :detailId)
 
     fun getPlanDetailsByMemberId(memberId: Long): MutableList<PlanDetail>
 
+    @Query("""
+        SELECT
+        pd
+        FROM
+        PlanDetail pd,
+        Plan p,
+        PlanMember pm
+        WHERE
+        pd.plan.id = :planId
+        AND 
+        p.id = :planId
+        AND
+        (pm.plan.id = :planId AND pm.member.id = :memberId)
+        AND 
+        pm.isConfirmed = 1
+    """)
+    fun getPlanDetailsByPlanAndMemberIdWithInviteCheck(
+        planId: Long,
+        memberId: Long
+    ): List<PlanDetail>
 
 }

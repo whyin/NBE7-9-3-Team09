@@ -1,12 +1,12 @@
 package com.backend.domain.plan.service
 
 import com.backend.domain.member.entity.Member
+import com.backend.domain.member.entity.QMember.member
 import com.backend.domain.member.service.MemberService
 import com.backend.domain.plan.dto.PlanMemberAddRequestBody
 import com.backend.domain.plan.dto.PlanMemberAnswerRequestBody
 import com.backend.domain.plan.dto.PlanMemberMyResponseBody
 import com.backend.domain.plan.dto.PlanMemberResponseBody
-import com.backend.domain.plan.entity.Plan
 import com.backend.domain.plan.entity.PlanMember
 import com.backend.domain.plan.repository.PlanMemberRepository
 import com.backend.global.exception.BusinessException
@@ -14,7 +14,6 @@ import com.backend.global.response.ErrorCode
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.function.Supplier
 
 @Slf4j
@@ -109,17 +108,16 @@ class PlanMemberService(
         return planMember
     }
 
-    fun isAvailablePlanMember(planId: Long?, member: Member): Boolean {
-        return planMemberRepository.existsByPlanIdAndMemberId(
-            planId?:throw BusinessException(ErrorCode.NOT_FOUND_PLAN),
-            member.id?:throw BusinessException(ErrorCode.INVALID_MEMBER))
+    fun isAvailablePlanMember(planId: Long, memberPkId: Long): Boolean {
+        return planMemberRepository.existsByPlanIdAndMemberId( planId, memberPkId)
+    }
 
-    //        return planMemberRepository.existsByMemberInPlanId(member.id?: throw BusinessException(ErrorCode.INVALID_MEMBER)
-//        , planId)
+    fun isAvailableAndAcceptedPlanMember(planId: Long, memberPkId: Long): Boolean {
+        return planMemberRepository.existsByPlanIdAndMemberIdAndIsConfirmed(planId, memberPkId,1);
     }
 
     fun getPlanMembers(planId: Long, memberPkId: Long): List<PlanMemberResponseBody> {
         val members : List<PlanMemberResponseBody> =planMemberRepository.myQueryGetPlanMembers(planId)
-        return members.filter { it.isComfirmed }
+        return members.filter { it.isConfirmed }
     }
 }

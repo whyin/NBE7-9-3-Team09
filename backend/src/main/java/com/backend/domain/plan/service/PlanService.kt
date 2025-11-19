@@ -107,7 +107,6 @@ open class PlanService(
         if (plan.startDate.isBefore(LocalDateTime.now().toLocalDate().atStartOfDay().minusSeconds(1))) throw BusinessException(ErrorCode.NOT_VALID_DATE)
         if (plan.endDate.isAfter(LocalDateTime.now().plusYears(10))) throw BusinessException(ErrorCode.NOT_VALID_DATE)
         if (planRepository.existsOverlappingPlan(plan.id, memberPkId,plan.startDate,plan.endDate)) throw BusinessException(ErrorCode.NOT_VALID_DATE)
-
     }
 
     private fun isSameMember(plan: Plan, member: Member) {
