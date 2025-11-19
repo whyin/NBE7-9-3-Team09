@@ -22,7 +22,6 @@ class CacheConfig {
     @Bean
     fun cacheManager(caffeine: Caffeine<Any?, Any?>): CacheManager {
         val cacheManager = CaffeineCacheManager(
-            "recommendTop5",  // 카테고리별 TOP5 추천
             "sortedPlaces" // 카테고리별 전체 정렬
         )
         cacheManager.setCaffeine(caffeine)
