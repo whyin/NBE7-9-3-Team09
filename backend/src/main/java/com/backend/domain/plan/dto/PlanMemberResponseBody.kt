@@ -6,7 +6,7 @@ import com.backend.domain.plan.entity.PlanMember
 data class PlanMemberResponseBody(
     val memberLoginId: String,
     val planTitle: String,
-    val isComfirmed: Boolean,
+    val isConfirmed: Boolean,
 ) {
     constructor(planMember: PlanMember) : this(
         planMember.member.memberId,
@@ -14,9 +14,9 @@ data class PlanMemberResponseBody(
         planMember.isConfirmed == 1
     )
 
-    constructor(memberLoginId: String,planTitle: String,isComfirmed: Int): this(
+    constructor(memberLoginId: String, planTitle: String, isConfirmed: Int): this(
         memberLoginId,
         planTitle,
-        isComfirmed == 1
+        isConfirmed == 1
     )
 }

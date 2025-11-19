@@ -7,7 +7,6 @@ import com.backend.domain.plan.dto.PlanMemberAnswerRequestBody;
 import com.backend.domain.plan.dto.PlanMemberMyResponseBody;
 import com.backend.domain.plan.dto.PlanMemberResponseBody;
 import com.backend.domain.plan.entity.Plan;
-import com.backend.domain.plan.entity.PlanMember;
 import com.backend.domain.plan.repository.PlanMemberRepository;
 import com.backend.domain.plan.repository.PlanRepository;
 import com.backend.global.exception.BusinessException;
@@ -58,8 +57,8 @@ public class PlanMemberServiceTest {
         Member member = memberRepository.findById(3L).get();
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(member.getMemberId(), result.memberLoginId());
-        Assertions.assertEquals(plan.getTitle(), result.planTitle());
+        Assertions.assertEquals(member.getMemberId(), result.getMemberLoginId());
+        Assertions.assertEquals(plan.getTitle(), result.getPlanTitle());
     }
 
     @Test
@@ -109,7 +108,7 @@ public class PlanMemberServiceTest {
         PlanMemberResponseBody result = planMemberService.acceptInvitePlanMember(request, 3L);
 
         //then
-        Assertions.assertTrue(result.isComfirmed());
+        Assertions.assertTrue(result.isConfirmed());
     }
 
     @Test
@@ -122,7 +121,7 @@ public class PlanMemberServiceTest {
         PlanMemberResponseBody result = planMemberService.denyInvitePlanMember(request, 3L);
 
         // then
-        Assertions.assertFalse(result.isComfirmed());
+        Assertions.assertFalse(result.isConfirmed());
     }
 
     @Test
@@ -132,7 +131,7 @@ public class PlanMemberServiceTest {
         Member member = memberRepository.getReferenceById(1L);
 
         // when
-        boolean exists = planMemberService.isAvailablePlanMember(1L, member);
+        boolean exists = planMemberService.isAvailablePlanMember(1L, member.getId());
 
         // then
         Assertions.assertTrue(exists);
@@ -143,7 +142,7 @@ public class PlanMemberServiceTest {
     void isAvailablePlanMember_fail() {
         Member member3 = memberRepository.getReferenceById(3L);
 
-        boolean exists = planMemberService.isAvailablePlanMember(1L, member3);
+        boolean exists = planMemberService.isAvailablePlanMember(1L, member3.getId());
 
         Assertions.assertFalse(exists);
     }
