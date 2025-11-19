@@ -1,236 +1,174 @@
+// 📁 src/user/components/organisms/ReviewForm.js
+
 import React, { useState, useEffect } from "react";
 import Card from "../atoms/Card";
 import Button from "../atoms/Button";
 import StarRating from "../atoms/StarRating";
-import { getCategories, getAllPlaces } from "../../services/placeService";
+import { getAllPlaces } from "../../services/placeService";
 import "./ReviewForm.css";
 
 const ReviewForm = ({
-  placeId,
-  placeName,
+  initialData = null,
+  isEditing = false,
   onSubmit,
   onCancel,
-  initialData = null,
-  isEditing = false
 }) => {
   const [formData, setFormData] = useState({
-    memberId: initialData?.memberId || "",
-    placeId: placeId || initialData?.placeId || "",
-    rating: initialData?.rating || 0,
-    Category: initialData?.Category || "",
-    placeName: placeName || initialData?.placeName || "",
+    placeId: initialData?.placeId || "",
+    placeName: initialData?.placeName || "",
+    category: initialData?.category || "",
     address: initialData?.address || "",
-    gu: initialData?.gu || ""
+    gu: initialData?.gu || "",
+    rating: initialData?.rating || 0,
+    content: initialData?.content || "", // ⭐ 한 줄 코멘트
+    reviewId: initialData?.reviewId || initialData?.id || null,
   });
-  const [error, setError] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [places, setPlaces] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  // 카테고리와 장소 목록 로드
+  const [places, setPlaces] = useState([]);
+  const [error, setError] = useState("");
+  const [loadingPlaces, setLoadingPlaces] = useState(false);
+
   useEffect(() => {
-    const loadData = async () => {
+    const loadPlaces = async () => {
       try {
-        setLoading(true);
-        const [categoriesResponse, placesResponse] = await Promise.all([
-          getCategories(),
-          getAllPlaces()
-        ]);
-        setCategories(categoriesResponse.data || []);
-        setPlaces(placesResponse.data || []);
-      } catch (err) {
-        console.error("데이터 로드 실패:", err);
-        setError("카테고리와 장소 정보를 불러오는데 실패했습니다.");
+        setLoadingPlaces(true);
+        const res = await getAllPlaces();
+        const list = Array.isArray(res) ? res : res?.data || [];
+        setPlaces(list);
+      } catch (e) {
+        console.error("장소 목록 불러오기 실패:", e);
+        setError("여행지 정보를 불러오는데 실패했습니다.");
       } finally {
-        setLoading(false);
+        setLoadingPlaces(false);
       }
     };
 
-    loadData();
+    loadPlaces();
   }, []);
 
-  const handleRatingChange = (newRating) => {
-    setFormData(prev => ({ ...prev, rating: newRating }));
-    if (error) {
-      setError("");
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (error) {
-      setError("");
-    }
-  };
-
-  // 장소 선택 시 해당 장소의 정보를 자동으로 채움
   const handlePlaceChange = (e) => {
-    const selectedPlaceId = parseInt(e.target.value);
-    const selectedPlace = places.find(place => place.id === selectedPlaceId);
-    
-    if (selectedPlace) {
-      setFormData(prev => ({
+    const selectedId = Number(e.target.value);
+    const selected = places.find((p) => p.id === selectedId);
+
+    if (selected) {
+      setFormData((prev) => ({
         ...prev,
-        placeId: selectedPlaceId,
-        Category: selectedPlace.category || "",
-        placeName: selectedPlace.placeName || "",
-        address: selectedPlace.address || "",
-        gu: selectedPlace.gu || ""
+        placeId: selected.id,
+        placeName: selected.placeName ?? "",
+        category: selected.category ?? "",
+        address: selected.address ?? "",
+        gu: selected.gu ?? "",
       }));
     } else {
-      setFormData(prev => ({ ...prev, placeId: selectedPlaceId }));
+      setFormData((prev) => ({ ...prev, placeId: selectedId }));
     }
-    
-    if (error) {
-      setError("");
-    }
+    if (error) setError("");
   };
 
-  const validateForm = () => {
-    if (formData.rating === 0) {
-      setError("평점을 선택해주세요.");
-      return false;
-    }
+  const handleRatingChange = (value) => {
+    setFormData((prev) => ({ ...prev, rating: value }));
+    if (error) setError("");
+  };
 
-    if (!formData.memberId.trim()) {
-      setError("사용자 ID를 입력해주세요.");
-      return false;
-    }
-
-    if (!formData.Category.trim()) {
-      setError("카테고리를 입력해주세요.");
-      return false;
-    }
-
-    if (!formData.placeName.trim()) {
-      setError("여행지 이름을 입력해주세요.");
-      return false;
-    }
-
-    if (!formData.address.trim()) {
-      setError("주소를 입력해주세요.");
-      return false;
-    }
-
-    if (!formData.gu.trim()) {
-      setError("구를 입력해주세요.");
-      return false;
-    }
-
-    return true;
+  const handleChangeContent = (e) => {
+    setFormData((prev) => ({ ...prev, content: e.target.value }));
+    if (error) setError("");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (validateForm()) {
-      const submitData = {
-        memberId: parseInt(formData.memberId),
-        placeId: parseInt(formData.placeId),
-        rating: formData.rating,
-        Category: formData.Category,
-        placeName: formData.placeName,
-        address: formData.address,
-        gu: formData.gu
-      };
-      onSubmit(submitData);
+    if (!formData.placeId && !isEditing) {
+      setError("여행지를 선택해주세요.");
+      return;
     }
+    if (!formData.rating || formData.rating <= 0) {
+      setError("평점을 선택해주세요.");
+      return;
+    }
+
+    const submitData = {
+      placeId: formData.placeId,
+      rating: formData.rating,
+      placeName: formData.placeName,
+      category: formData.category,
+      address: formData.address,
+      gu: formData.gu,
+      content: formData.content,
+      reviewId: formData.reviewId,
+    };
+
+    onSubmit(submitData);
   };
 
   return (
     <Card className="review-form-container">
       <div className="review-form-header">
         <h3>{isEditing ? "리뷰 수정" : "리뷰 작성"}</h3>
-        {placeName && (
-          <p className="place-name">{placeName}</p>
+        {formData.placeName && (
+          <p className="place-name">{formData.placeName}</p>
         )}
       </div>
 
       <form onSubmit={handleSubmit} className="review-form">
-        <div className="form-group">
-          <label className="form-label">사용자 ID</label>
-          <input
-            type="number"
-            name="memberId"
-            value={formData.memberId}
-            onChange={handleChange}
-            placeholder="사용자 ID를 입력하세요"
-            className="form-input"
-            disabled={isEditing} // 수정 시에는 사용자 ID 변경 불가
-          />
-        </div>
+        {/* 여행지 선택 (작성일 때만) */}
+        {!isEditing && (
+          <div className="form-group">
+            <label className="form-label">여행지 선택</label>
+            <select
+              name="placeId"
+              value={formData.placeId}
+              onChange={handlePlaceChange}
+              className="form-input"
+              required
+            >
+              <option value="">여행지를 선택하세요</option>
+              {places.map((place) => (
+                <option key={place.id} value={place.id}>
+                  {place.placeName} ({place.category}) - {place.address}
+                </option>
+              ))}
+            </select>
+            {loadingPlaces && (
+              <div className="loading-text">여행지 목록을 불러오는 중...</div>
+            )}
+          </div>
+        )}
 
-        <div className="form-group">
-          <label className="form-label">장소 선택</label>
-          <select
-            name="placeId"
-            value={formData.placeId}
-            onChange={handlePlaceChange}
-            className="form-input"
-            disabled={isEditing} // 수정 시에는 장소 변경 불가
-          >
-            <option value="">장소를 선택하세요</option>
-            {places.map((place) => (
-              <option key={place.id} value={place.id}>
-                {place.placeName} ({place.category}) - {place.address}
-              </option>
-            ))}
-          </select>
-        </div>
-
+        {/* 카테고리 */}
         <div className="form-group">
           <label className="form-label">카테고리</label>
           <input
             type="text"
-            name="Category"
-            value={formData.Category}
-            onChange={handleChange}
-            placeholder="카테고리 (자동 입력됨)"
+            value={formData.category}
             className="form-input"
             readOnly
           />
         </div>
 
-        <div className="form-group">
-          <label className="form-label">여행지 이름</label>
-          <input
-            type="text"
-            name="placeName"
-            value={formData.placeName}
-            onChange={handleChange}
-            placeholder="여행지 이름 (자동 입력됨)"
-            className="form-input"
-            readOnly
-          />
-        </div>
-
+        {/* 주소 */}
         <div className="form-group">
           <label className="form-label">주소</label>
           <input
             type="text"
-            name="address"
             value={formData.address}
-            onChange={handleChange}
-            placeholder="주소 (자동 입력됨)"
             className="form-input"
             readOnly
           />
         </div>
 
+        {/* 구 */}
         <div className="form-group">
           <label className="form-label">구</label>
           <input
             type="text"
-            name="gu"
             value={formData.gu}
-            onChange={handleChange}
-            placeholder="구 (자동 입력됨)"
             className="form-input"
             readOnly
           />
         </div>
 
+        {/* 평점 */}
         <div className="form-group">
           <label className="form-label">평점</label>
           <div className="rating-container">
@@ -240,24 +178,32 @@ const ReviewForm = ({
               size="large"
             />
             <span className="rating-text">
-              {formData.rating > 0 ? `${formData.rating}/5` : "평점을 선택해주세요"}
+              {formData.rating > 0
+                ? `${formData.rating}/5`
+                : "평점을 선택해주세요"}
             </span>
           </div>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {/* ⭐ 한 줄 코멘트 입력 */}
+        <div className="form-group">
+          <label className="form-label">한 줄 코멘트</label>
+          <input
+            type="text"
+            value={formData.content}
+            onChange={handleChangeContent}
+            className="form-input"
+            placeholder="리뷰 한 줄을 입력하세요"
+          />
+        </div>
 
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-            장소 정보를 불러오는 중...
-          </div>
-        )}
+        {error && <div className="error-message">{error}</div>}
 
         <div className="form-actions">
           <Button type="button" variant="outline" onClick={onCancel}>
             취소
           </Button>
-          <Button type="submit" variant="primary" disabled={loading}>
+          <Button type="submit" variant="primary">
             {isEditing ? "수정하기" : "리뷰 작성"}
           </Button>
         </div>
