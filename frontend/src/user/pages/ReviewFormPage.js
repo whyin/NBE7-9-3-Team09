@@ -31,7 +31,7 @@ const ReviewFormPage = ({ isEdit = false }) => {
       navigate("/user/review/list");
     } catch (err) {
       console.error("리뷰 저장 실패:", err);
-      alert("리뷰 저장에 실패했습니다.");
+      alert("이미 등록된 리뷰입니다.");
     }
   };
 
