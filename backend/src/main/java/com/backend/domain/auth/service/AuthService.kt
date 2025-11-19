@@ -117,7 +117,7 @@ class AuthService(
         // 5. 새 AccessToken 발급
         val newAccessToken = jwtTokenProvider.generateAccessToken(memberPk, member.role)
 
-        log.info { "${"[Auth] AccessToken 재발급 완료: memberPk={}, reissuedAt={}"} $memberPk ${LocalDateTime.now()}" }
+        log.info { "[Auth] AccessToken 재발급 완료: memberPk=$memberPk, reissuedAt=${LocalDateTime.now()}"}
 
         return TokenResponse.fromTokens(
             newAccessToken,
@@ -130,7 +130,7 @@ class AuthService(
     fun logout(accessTokenHeader: String) {
         val memberPk = jwtTokenProvider.getMemberIdFromToken(extractToken(accessTokenHeader))
         refreshTokenRepository.deleteByMemberPk(memberPk)
-        log.info { "${"[Auth] 로그아웃 완료: memberPk={}, deletedAt={}"} $memberPk ${LocalDateTime.now()}" }
+        log.info { "[Auth] 로그아웃 완료: memberPk= $memberPk, deletedAt=${LocalDateTime.now()}"}
     }
 
     /** RefreshToken 저장/갱신 */

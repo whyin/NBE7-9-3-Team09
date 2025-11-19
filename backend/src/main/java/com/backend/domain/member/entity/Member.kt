@@ -67,8 +67,9 @@ class Member(
         this.nickname = newNickname
     }
 
-    /* === 정적 팩토리: 일반 회원 생성 === */
     companion object {
+
+        /* === 정적 팩토리: 일반 회원 생성 === */
         fun createLocal(
             memberId: String,
             password: String,
