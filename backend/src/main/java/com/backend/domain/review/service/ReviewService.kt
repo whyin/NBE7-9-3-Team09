@@ -179,11 +179,11 @@ class ReviewService(
      * 베이지안 가중치 계산
      */
     fun getWeightByBayesian(
-        averageRating: Double,
-        reviewCount: Double,
-        globalAverageRating: Double
+        averageRating: Double,              // 특정 장소의 평균 평점
+        reviewCount: Double,                // 특정 장소의 리뷰 개수
+        globalAverageRating: Double         // 전체 리뷰의 평균 평점
     ): Double {
-        val threshold = 10.0 // 신뢰도 임계값
+        val threshold = 10.0 // 가중치값 : 10 (10으로 고정한 이유 : 리뷰가 10개 이상이면 어느정도 신뢰할 수 있다고 판단)
         return (reviewCount / (reviewCount + threshold)) * averageRating +
                 (threshold / (reviewCount + threshold)) * globalAverageRating
     }
