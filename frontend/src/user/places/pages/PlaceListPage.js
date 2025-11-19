@@ -28,13 +28,19 @@ const PlaceListPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(0);
+  const [size] = useState(12);
+  const [pageInfo, setPageInfo] = useState({
+    totalPages:0,
+    totalElements:0,
+  });
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
 
   useEffect(() => {
     fetchPlaces();
     fetchBookmarks();
-  }, [categoryId]);
+  }, [categoryId,page]);
 
   const loadScriptElement = (resolve, reject) => {
     console.log("📥 Loading Kakao Maps SDK dynamically...");
@@ -219,13 +225,22 @@ const PlaceListPage = () => {
   const fetchPlaces = async () => {
     try {
       setLoading(true);
-      const response = await getPlacesByCategory(categoryId);
+      const response = await getPlacesByCategory(categoryId,page,size);
+
+      const body = response.data;
+      const pageData = body.data ?? body;
+      const content = pageData.content ?? [];
 
       // 별점순으로 정렬 (높은 별점부터)
-      const sortedPlaces = response.data.sort(
+      const sortedPlaces = [...content].sort(
         (a, b) => (b.ratingAvg || 0) - (a.ratingAvg || 0)
       );
       setPlaces(sortedPlaces);
+      setPageInfo({
+        totalPages: pageData.totalPages ?? 0,
+        totalElements: pageData.totalElements ?? 0,
+      });
+
       console.log("📍 places from API:", sortedPlaces);
       setError(null);
     } catch (err) {
@@ -340,7 +355,7 @@ const PlaceListPage = () => {
           <p>
             {loading
               ? "여행지를 불러오는 중..."
-              : `${filteredPlaces.length}개의 여행지가 있습니다`}
+              : `${pageInfo.totalElements||0}개의 여행지가 있습니다`}
           </p>
         </div>
       </header>
@@ -377,6 +392,7 @@ const PlaceListPage = () => {
       ) : (
         <div className="places-container">
           {filteredPlaces.length > 0 ? (
+            <>
             <div className="places-grid">
               {filteredPlaces.map((place) => (
                 <div
@@ -430,6 +446,32 @@ const PlaceListPage = () => {
                 </div>
               ))}
             </div>
+            {/* ⭐ 페이징 컨트롤 추가 */}
+        <div className="pagination-controls">
+          <button
+            className="px-3 py-1 border rounded text-sm"
+            disabled={page === 0}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+          >
+            이전
+          </button>
+
+          <span className="text-sm text-gray-700">
+            페이지 {page + 1} / {pageInfo.totalPages || 1}
+            <span style={{ marginLeft: 8, color: "#888", fontSize: 12 }}>
+              (총 {pageInfo.totalElements || 0}개)
+            </span>
+          </span>
+
+          <button
+            className="px-3 py-1 border rounded text-sm"
+            disabled={page + 1 >= pageInfo.totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            다음
+          </button>
+        </div>
+      </>
           ) : (
             <div className="no-results">
               <div className="no-results-icon">🔍</div>
