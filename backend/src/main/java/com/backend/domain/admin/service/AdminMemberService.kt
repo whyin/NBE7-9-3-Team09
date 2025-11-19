@@ -11,6 +11,8 @@ import com.backend.global.response.ErrorCode
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 
 @Service
 @Transactional(readOnly = true)
@@ -21,6 +23,11 @@ class AdminMemberService(
     fun getAllMembers(): List<MemberAdminResponse> =
         memberRepository.findAll().map(::from)
 
+    /** 전체 회원 조회 - 페이징 */
+    fun getAllMembers(pageable: Pageable): Page<MemberAdminResponse> {
+        val members = memberRepository.searchMembers(pageable)
+        return members.map { from(it) }
+    }
 
     fun getMemberById(id: Long): MemberAdminResponse =
         from(getMember(id))
