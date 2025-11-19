@@ -1,10 +1,11 @@
+/* 📁 src/user/pages/HomePage.css */
+
 .home-page {
   min-height: 100vh;
   background-color: white;
-  padding-top: 0; /* 불필요한 상단 여백 제거 */
 }
 
-.home-page__search-panel {
+.home-page-inner {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
@@ -13,11 +14,7 @@
   z-index: 10;
 }
 
-.home-page__category-tabs {
-  margin-top: 48px;
-}
-
-.home-page__recommendation {
+.home-page-recommend {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 16px 16px 16px;

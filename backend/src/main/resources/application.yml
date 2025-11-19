@@ -45,7 +45,7 @@ custom:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
     access-token:
-      expire-time: 30000    # 30분 1800000 30000
+      expire-time: 1800000    # 30분 1800000 30000
 
     refresh-token:
       expire-time: 604800000     # 7일

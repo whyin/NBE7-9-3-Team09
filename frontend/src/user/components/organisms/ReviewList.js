@@ -1,47 +1,34 @@
+// 📁 src/user/components/organisms/ReviewList.js
 import React from "react";
 import ReviewCard from "../molecules/ReviewCard";
 import "./ReviewList.css";
 
-const ReviewList = ({
-  reviews,
-  loading,
-  error,
-  onEdit,
-  onDelete,
-  canEdit = false,
-}) => {
+const ReviewList = ({ reviews, loading, error, onEdit, onDelete, canEdit }) => {
   if (loading) {
-    return (
-      <div className="review-list-loading">
-        <div className="loading-spinner"></div>
-        <p>리뷰를 불러오는 중...</p>
-      </div>
-    );
+    return <div className="review-list-message">리뷰를 불러오는 중입니다...</div>;
   }
 
   if (error) {
     return (
-      <div className="review-list-error">
-        <p>❌ {error}</p>
+      <div className="review-list-message review-list-error">
+        {error}
       </div>
     );
   }
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="review-list-empty">
-        <p>아직 작성된 리뷰가 없습니다.</p>
-        <p>첫 번째 리뷰를 작성해보세요!</p>
+      <div className="review-list-message">
+        등록된 리뷰가 없습니다.
       </div>
     );
   }
 
   return (
-    <div className="review-list">
-      {/* ✅ 아래쪽 리뷰 목록 텍스트 제거 */}
+    <div className="review-list-grid">
       {reviews.map((review) => (
         <ReviewCard
-          key={review.reviewId}
+          key={review.reviewId ?? review.id}
           review={review}
           onEdit={onEdit}
           onDelete={onDelete}

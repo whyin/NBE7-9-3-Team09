@@ -1,3 +1,5 @@
+/* 📁 src/user/components/organisms/ReviewForm.css */
+
 .review-form-container {
   max-width: 600px;
   margin: 0 auto;
@@ -52,7 +54,8 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.form-input:disabled {
+.form-input:disabled,
+.form-input[readonly] {
   background-color: #f8f9fa;
   cursor: not-allowed;
 }
@@ -83,4 +86,9 @@
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
   border-radius: 4px;
+}
+
+.loading-text {
+  font-size: 13px;
+  color: #888;
 }

@@ -6,9 +6,9 @@ data class ReviewRequestDto(
     val placeId: Long,
     val rating: Int,
     val content: String,
-    val Category: String,
-    val placeName: String,
-    val address: String,
-    val gu: String
+    val category: String? = null, // ✅ 소문자! JSON 키랑 맞추기
+    val placeName: String? = null,
+    val address: String? = null,
+    val gu: String? = null,
 
 )
