@@ -122,7 +122,7 @@ const RecommendedPlaces = ({ category = "hotel" }) => {
                 </p>
                 {place.ratingAvg && (
                   <p className="place-rating">
-                    ⭐ {place.ratingAvg.toFixed(1)}
+                    ⭐ {place.ratingAvg.toFixed(2)}
                   </p>
                 )}
               </div>

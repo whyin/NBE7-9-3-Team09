@@ -248,7 +248,8 @@ class BaseInitData(
 
             if(reviewRepository.count() == 0L) {
                 val hotelPlaces = placeRepository.findByCategory_Name("HOTEL")
-
+                val restourantPlaces = placeRepository.findByCategory_Name("맛집")
+                val nightSpotPlaces = placeRepository.findByCategory_Name("NIGHTSPOT")
                 for (place in hotelPlaces) {
                     // member1 리뷰
 
@@ -279,6 +280,67 @@ class BaseInitData(
                     // ⭐ 추천 테이블 업데이트 (베이지안 평균 계산)
                     reviewService.updateRecommend(place)
                 }
+                for (place in restourantPlaces) {
+                    // member1 리뷰
+
+                    val rating1 = (((place.id!! - 1) % 5) + 1).toInt()
+                    val review1 = Review(
+                        place,
+                        writer1,
+                        rating1,
+                        "이곳은 정말 멋진 장소입니다! 별점: " + rating1
+                    )
+                    review1.onCreate()
+                    reviewRepository.save<Review?>(review1)
+
+                    // member2 리뷰
+                    val rating2 = (((place.id)!! % 5) + 1).toInt()
+                    val review2 = Review(
+                        place,
+                        writer2,
+                        rating2,
+                        "여기도 꽤 괜찮네요! 별점: " + rating2
+                    )
+                    review2.onCreate()
+                    reviewRepository.save<Review?>(review2)
+
+                    //                    place.setRatingCount(2);
+                    placeRepository.save<Place?>(place)
+
+                    // ⭐ 추천 테이블 업데이트 (베이지안 평균 계산)
+                    reviewService.updateRecommend(place)
+                }
+                for (place in nightSpotPlaces) {
+                    // member1 리뷰
+
+                    val rating1 = (((place.id!! - 1) % 5) + 1).toInt()
+                    val review1 = Review(
+                        place,
+                        writer1,
+                        rating1,
+                        "이곳은 정말 멋진 장소입니다! 별점: " + rating1
+                    )
+                    review1.onCreate()
+                    reviewRepository.save<Review?>(review1)
+
+                    // member2 리뷰
+                    val rating2 = (((place.id)!! % 5) + 1).toInt()
+                    val review2 = Review(
+                        place,
+                        writer2,
+                        rating2,
+                        "여기도 꽤 괜찮네요! 별점: " + rating2
+                    )
+                    review2.onCreate()
+                    reviewRepository.save<Review?>(review2)
+
+                    //                    place.setRatingCount(2);
+                    placeRepository.save<Place?>(place)
+
+                    // ⭐ 추천 테이블 업데이트 (베이지안 평균 계산)
+                    reviewService.updateRecommend(place)
+                }
+
             }
 
 
