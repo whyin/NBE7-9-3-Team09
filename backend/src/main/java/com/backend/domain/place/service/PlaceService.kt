@@ -59,8 +59,8 @@ class PlaceService(
     }
 
     // 페이징 가져오기
-    fun getPagedPlaces(categoryId: Long, pageable: Pageable): Page<ResponsePlaceDto> {
-        return placeRepository.findPagedByCategoryId(categoryId, pageable)
+    fun getPagedPlaces(categoryId: Long, keyword: String?, pageable: Pageable): Page<ResponsePlaceDto> {
+        return placeRepository.findPagedByCategoryId(categoryId, keyword, pageable)
             .map (ResponsePlaceDto::from)
     }
 }

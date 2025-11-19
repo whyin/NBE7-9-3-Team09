@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface PlaceRepositoryCustom {
-    fun findPagedByCategoryId(categoryId: Long, pageable: Pageable): Page<Place>
+    fun findPagedByCategoryId(categoryId: Long, keyword:String?, pageable: Pageable): Page<Place>
 }

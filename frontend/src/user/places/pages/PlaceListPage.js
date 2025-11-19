@@ -37,10 +37,14 @@ const PlaceListPage = () => {
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
 
+useEffect(()=>{
+  setPage(0);
+},[searchTerm]);
+  
   useEffect(() => {
     fetchPlaces();
     fetchBookmarks();
-  }, [categoryId,page]);
+  }, [categoryId,page,searchTerm]);
 
   const loadScriptElement = (resolve, reject) => {
     console.log("📥 Loading Kakao Maps SDK dynamically...");
@@ -201,31 +205,31 @@ const PlaceListPage = () => {
     };
   }, [filteredPlaces]);
 
-  // 검색 기능
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredPlaces(places);
-    } else {
-      const filtered = places.filter((place) => {
-        const name = (place.placeName || "").toLowerCase();
-        const address = (place.address || "").toLowerCase();
-        const gu = (place.gu || "").toLowerCase();
-        const search = searchTerm.toLowerCase();
+  // // 검색 기능
+  // useEffect(() => {
+  //   if (searchTerm.trim() === "") {
+  //     setFilteredPlaces(places);
+  //   } else {
+  //     const filtered = places.filter((place) => {
+  //       const name = (place.placeName || "").toLowerCase();
+  //       const address = (place.address || "").toLowerCase();
+  //       const gu = (place.gu || "").toLowerCase();
+  //       const search = searchTerm.toLowerCase();
 
-        return (
-          name.includes(search) ||
-          address.includes(search) ||
-          gu.includes(search)
-        );
-      });
-      setFilteredPlaces(filtered);
-    }
-  }, [places, searchTerm]);
+  //       return (
+  //         name.includes(search) ||
+  //         address.includes(search) ||
+  //         gu.includes(search)
+  //       );
+  //     });
+  //     setFilteredPlaces(filtered);
+  //   }
+  // }, [places, searchTerm]);
 
   const fetchPlaces = async () => {
     try {
       setLoading(true);
-      const response = await getPlacesByCategory(categoryId,page,size);
+      const response = await getPlacesByCategory(categoryId,page,size,searchTerm.trim());
 
       const body = response.data;
       const pageData = body.data ?? body;
@@ -236,6 +240,7 @@ const PlaceListPage = () => {
         (a, b) => (b.ratingAvg || 0) - (a.ratingAvg || 0)
       );
       setPlaces(sortedPlaces);
+      setFilteredPlaces(sortedPlaces);
       setPageInfo({
         totalPages: pageData.totalPages ?? 0,
         totalElements: pageData.totalElements ?? 0,
@@ -355,6 +360,8 @@ const PlaceListPage = () => {
           <p>
             {loading
               ? "여행지를 불러오는 중..."
+              : searchTerm.trim()
+              ? `검색 결과 ${pageInfo.totalElements||0}개의 여행지가 있습니다`
               : `${pageInfo.totalElements||0}개의 여행지가 있습니다`}
           </p>
         </div>
