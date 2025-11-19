@@ -361,133 +361,149 @@ useEffect(()=>{
             {loading
               ? "여행지를 불러오는 중..."
               : searchTerm.trim()
-              ? `검색 결과 ${pageInfo.totalElements||0}개의 여행지가 있습니다`
-              : `${pageInfo.totalElements||0}개의 여행지가 있습니다`}
+              ? `검색 결과 ${pageInfo.totalElements || 0}개의 여행지가 있습니다`
+              : `${pageInfo.totalElements || 0}개의 여행지가 있습니다`}
           </p>
         </div>
       </header>
-
-      <div className="search-container">
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="여행지명, 주소, 구로 검색하세요..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          <div className="search-icon">🔍</div>
+  
+      {/* 🔻 헤더 아래 메인 레이아웃: 왼쪽(검색+지도) / 오른쪽(목록) */}
+      <div className="place-main-layout">
+        {/* 👈 왼쪽 패널: 검색 + 지도 (sticky) */}
+        <div className="left-panel">
+          <div className="search-container">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="여행지명, 주소, 구로 검색하세요..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <div className="search-icon">🔍</div>
+            </div>
+          </div>
+  
+          <div className="map-container">
+            <div
+              id="map"
+              style={{
+                width: "100%",
+                height: "400px",
+                borderRadius: "16px",
+              }}
+            />
+          </div>
         </div>
-      </div>
-
-      {/* Kakao 지도 영역 - 검색 박스 바로 아래에 배치 (항상 렌더링) */}
-      <div className="map-container">
-        <div
-          id="map"
-          style={{
-            width: "100%",
-            height: "400px",
-            borderRadius: "16px",
-          }}
-        />
-      </div>
-
-      {error && <div className="error">{error}</div>}
-
-      {loading ? (
-        <div className="loading">여행지를 불러오는 중...</div>
-      ) : (
-        <div className="places-container">
-          {filteredPlaces.length > 0 ? (
-            <>
-            <div className="places-grid">
-              {filteredPlaces.map((place) => (
-                <div
-                  key={place.id}
-                  className="place-card"
-                  onClick={() => handlePlaceClick(place)}
-                >
-                  <div className="place-header">
-                    <h3 className="place-name">
-                      {place.placeName || "여행지명 없음"}
-                    </h3>
+  
+        {/* 👉 오른쪽 패널: 여행지 목록 + 페이지네이션 (스크롤 영역) */}
+        <div className="right-panel">
+          {error && <div className="error">{error}</div>}
+  
+          {loading ? (
+            <div className="loading">여행지를 불러오는 중...</div>
+          ) : (
+            <div className="places-container">
+              {filteredPlaces.length > 0 ? (
+                <>
+                  <div className="places-grid">
+                    {filteredPlaces.map((place) => (
+                      <div
+                        key={place.id}
+                        className="place-card"
+                        onClick={() => handlePlaceClick(place)}
+                      >
+                        <div className="place-header">
+                          <h3 className="place-name">
+                            {place.placeName || "여행지명 없음"}
+                          </h3>
+                          <button
+                            className={`bookmark-button ${
+                              bookmarks.has(place.id) ? "bookmarked" : ""
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation(); // 카드 클릭이랑 분리
+                              handleBookmarkToggle(place.id);
+                            }}
+                            title={
+                              bookmarks.has(place.id)
+                                ? "북마크에서 제거"
+                                : "북마크에 추가"
+                            }
+                          >
+                            {bookmarks.has(place.id) ? "❤️" : "🤍"}
+                          </button>
+                        </div>
+  
+                        <div className="place-info">
+                          <p className="place-address">
+                            📍 {place.address || "주소 정보 없음"}
+                          </p>
+                          <p className="place-gu">
+                            🏘️ {place.gu || "구 정보 없음"}
+                          </p>
+                        </div>
+  
+                        <div className="place-rating">
+                          <div className="stars">
+                            {renderStars(place.ratingAvg)}
+                          </div>
+                          <span className="rating-text">
+                            <strong>
+                              {(Number(place.ratingAvg) || 0).toFixed(2)}
+                            </strong>
+                            <span className="rating-count">
+                              &nbsp;· {place.ratingCount || 0}개 리뷰
+                            </span>
+                          </span>
+                        </div>
+  
+                        {place.description && (
+                          <div className="place-description">
+                            <p>{place.description}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+  
+                  {/* 👉 오른쪽 목록 맨 아래 페이지네이션 */}
+                  <div className="pagination-controls">
                     <button
-                      className={`bookmark-button ${
-                        bookmarks.has(place.id) ? "bookmarked" : ""
-                      }`}
-                      onClick={() => handleBookmarkToggle(place.id)}
-                      title={
-                        bookmarks.has(place.id)
-                          ? "북마크에서 제거"
-                          : "북마크에 추가"
-                      }
+                      className="page-button"
+                      disabled={page === 0}
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
                     >
-                      {bookmarks.has(place.id) ? "❤️" : "🤍"}
+                      이전
                     </button>
-                  </div>
-
-                  <div className="place-info">
-                    <p className="place-address">
-                      📍 {place.address || "주소 정보 없음"}
-                    </p>
-                    <p className="place-gu">🏘️ {place.gu || "구 정보 없음"}</p>
-                  </div>
-
-                  <div className="place-rating">
-                    <div className="stars">
-                      {renderStars(place.ratingAvg)}
-                    </div>
-                    <span className="rating-text">
-                      <strong>{(Number(place.ratingAvg) || 0).toFixed(2)}</strong>
-                      <span className="rating-count">
-                        &nbsp;· {place.ratingCount || 0}개 리뷰
+  
+                    <span className="page-info-text">
+                      페이지 {page + 1} / {pageInfo.totalPages || 1}
+                      <span className="page-total-text">
+                        (총 {pageInfo.totalElements || 0}개)
                       </span>
                     </span>
+  
+                    <button
+                      className="page-button"
+                      disabled={page + 1 >= pageInfo.totalPages}
+                      onClick={() => setPage((p) => p + 1)}
+                    >
+                      다음
+                    </button>
                   </div>
-
-                  {place.description && (
-                    <div className="place-description">
-                      <p>{place.description}</p>
-                    </div>
-                  )}
+                </>
+              ) : (
+                <div className="no-results">
+                  <div className="no-results-icon">🔍</div>
+                  <h3>검색 결과가 없습니다</h3>
+                  <p>다른 검색어로 시도해보세요.</p>
                 </div>
-              ))}
-            </div>
-            {/* ⭐ 페이징 컨트롤 추가 */}
-        <div className="pagination-controls">
-          <button
-            className="px-3 py-1 border rounded text-sm"
-            disabled={page === 0}
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-          >
-            이전
-          </button>
-
-          <span className="text-sm text-gray-700">
-            페이지 {page + 1} / {pageInfo.totalPages || 1}
-            <span style={{ marginLeft: 8, color: "#888", fontSize: 12 }}>
-              (총 {pageInfo.totalElements || 0}개)
-            </span>
-          </span>
-
-          <button
-            className="px-3 py-1 border rounded text-sm"
-            disabled={page + 1 >= pageInfo.totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            다음
-          </button>
-        </div>
-      </>
-          ) : (
-            <div className="no-results">
-              <div className="no-results-icon">🔍</div>
-              <h3>검색 결과가 없습니다</h3>
-              <p>다른 검색어로 시도해보세요.</p>
+              )}
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
