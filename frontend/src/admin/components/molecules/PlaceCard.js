@@ -40,7 +40,7 @@ const PlaceCard = ({ place, onEdit, onDelete }) => {
           <strong>구:</strong> {place.gu || "구 정보 없음"}
         </div>
         <div className="place-rating">
-          <strong>평점:</strong> {place.ratingAvg?.toFixed(1) || "0.0"}
+          <strong>평점:</strong> {place.ratingAvg?.toFixed(2) || "0.0"}
           <span className="rating-count">
             ({place.ratingCount || 0}개 리뷰)
           </span>

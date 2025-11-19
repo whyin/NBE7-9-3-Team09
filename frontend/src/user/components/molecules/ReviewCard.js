@@ -122,7 +122,7 @@ const ReviewCard = ({ review, onEdit, onDelete, canEdit }) => {
               color: "#4b5563",
             }}
           >
-            {rating ? `${rating.toFixed(1)}점` : "평점 없음"}
+            {rating ? `${rating}점` : "평점 없음"}
           </div>
         </div>
       </div>

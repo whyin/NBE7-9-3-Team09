@@ -5,8 +5,6 @@ import Card from "../atoms/Card";
 import Button from "../atoms/Button";
 import StarRating from "../atoms/StarRating";
 import { getAllPlaces } from "../../services/placeService";
-// ❌ CSS import 제거 (inline 스타일로만 처리)
-// import "./ReviewForm.css";
 
 const ReviewForm = ({
   initialData = null,
@@ -21,7 +19,7 @@ const ReviewForm = ({
     address: initialData?.address || "",
     gu: initialData?.gu || "",
     rating: initialData?.rating || 0,
-    content: initialData?.content || "", // ⭐ 한 줄 코멘트
+    content: initialData?.content || "",
     reviewId: initialData?.reviewId || initialData?.id || null,
   });
 
@@ -29,6 +27,7 @@ const ReviewForm = ({
   const [error, setError] = useState("");
   const [loadingPlaces, setLoadingPlaces] = useState(false);
 
+  // 여행지 목록 불러오기
   useEffect(() => {
     const loadPlaces = async () => {
       try {
@@ -102,37 +101,52 @@ const ReviewForm = ({
     onSubmit(submitData);
   };
 
+  // 공통 스타일 헬퍼
+  const fieldWrapperStyle = {
+    marginBottom: 16,
+    textAlign: "left",
+  };
+
+  const labelStyle = {
+    display: "block",
+    marginBottom: 6,
+    fontSize: "0.9rem",
+    fontWeight: 500,
+    color: "#374151",
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "10px 12px",
+    borderRadius: 8,
+    border: "1px solid #e5e7eb",
+    fontSize: "0.9rem",
+    boxSizing: "border-box",
+    color: "#111827",
+    backgroundColor: "#ffffff",
+    outline: "none",
+  };
+
   return (
-    <div
-      style={{
-        maxWidth: "640px",
-        margin: "0 auto",
-        padding: "24px 16px",
-      }}
-    >
-      <Card
+    <Card>
+      <div
         style={{
-          width: "100%",
+          maxWidth: 600,
+          margin: "40px auto",
+          padding: 24,
           background: "#ffffff",
-          borderRadius: "12px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-          padding: "24px 20px",
-          boxSizing: "border-box",
+          borderRadius: 16,
+          boxShadow: "0 12px 30px rgba(0,0,0,0.06)",
+          border: "1px solid #fee2e2",
         }}
       >
         {/* 헤더 */}
-        <div
-          style={{
-            marginBottom: "20px",
-            textAlign: "center",
-          }}
-        >
+        <div style={{ marginBottom: 24, textAlign: "center" }}>
           <h3
             style={{
               margin: 0,
-              marginBottom: "6px",
-              fontSize: "20px",
-              fontWeight: 600,
+              fontSize: "1.4rem",
+              fontWeight: 700,
               color: "#111827",
             }}
           >
@@ -141,8 +155,8 @@ const ReviewForm = ({
           {formData.placeName && (
             <p
               style={{
-                margin: 0,
-                fontSize: "14px",
+                marginTop: 8,
+                fontSize: "0.9rem",
                 color: "#6b7280",
               }}
             >
@@ -151,39 +165,21 @@ const ReviewForm = ({
           )}
         </div>
 
-        {/* 폼 */}
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           {/* 여행지 선택 (작성일 때만) */}
           {!isEditing && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "#374151",
-                }}
-              >
-                여행지 선택
-              </label>
+            <div style={fieldWrapperStyle}>
+              <label style={labelStyle}>여행지 선택</label>
               <select
                 name="placeId"
                 value={formData.placeId}
                 onChange={handlePlaceChange}
-                required
                 style={{
-                  padding: "10px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid #d1d5db",
-                  fontSize: "14px",
-                  outline: "none",
+                  ...inputStyle,
+                  cursor: "pointer",
+                  backgroundColor: "#f9fafb",
                 }}
+                required
               >
                 <option value="">여행지를 선택하세요</option>
                 {places.map((place) => (
@@ -195,8 +191,9 @@ const ReviewForm = ({
               {loadingPlaces && (
                 <div
                   style={{
-                    fontSize: "13px",
-                    color: "#6b7280",
+                    marginTop: 6,
+                    fontSize: "0.8rem",
+                    color: "#9ca3af",
                   }}
                 >
                   여행지 목록을 불러오는 중...
@@ -206,96 +203,46 @@ const ReviewForm = ({
           )}
 
           {/* 카테고리 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label
-              style={{
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#374151",
-              }}
-            >
-              카테고리
-            </label>
+          <div style={fieldWrapperStyle}>
+            <label style={labelStyle}>카테고리</label>
             <input
               type="text"
               value={formData.category}
               readOnly
-              style={{
-                padding: "10px 12px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db",
-                fontSize: "14px",
-                backgroundColor: "#f9fafb",
-              }}
+              style={{ ...inputStyle, backgroundColor: "#f9fafb" }}
             />
           </div>
 
           {/* 주소 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label
-              style={{
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#374151",
-              }}
-            >
-              주소
-            </label>
+          <div style={fieldWrapperStyle}>
+            <label style={labelStyle}>주소</label>
             <input
               type="text"
               value={formData.address}
               readOnly
-              style={{
-                padding: "10px 12px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db",
-                fontSize: "14px",
-                backgroundColor: "#f9fafb",
-              }}
+              style={{ ...inputStyle, backgroundColor: "#f9fafb" }}
             />
           </div>
 
           {/* 구 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label
-              style={{
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#374151",
-              }}
-            >
-              구
-            </label>
+          <div style={fieldWrapperStyle}>
+            <label style={labelStyle}>구</label>
             <input
               type="text"
               value={formData.gu}
               readOnly
-              style={{
-                padding: "10px 12px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db",
-                fontSize: "14px",
-                backgroundColor: "#f9fafb",
-              }}
+              style={{ ...inputStyle, backgroundColor: "#f9fafb" }}
             />
           </div>
 
           {/* 평점 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label
-              style={{
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#374151",
-              }}
-            >
-              평점
-            </label>
+          <div style={fieldWrapperStyle}>
+            <label style={labelStyle}>평점</label>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "12px",
+                gap: 12,
               }}
             >
               <StarRating
@@ -303,12 +250,7 @@ const ReviewForm = ({
                 onRatingChange={handleRatingChange}
                 size="large"
               />
-              <span
-                style={{
-                  fontSize: "14px",
-                  color: "#4b5563",
-                }}
-              >
+              <span style={{ fontSize: "0.9rem", color: "#4b5563" }}>
                 {formData.rating > 0
                   ? `${formData.rating}/5`
                   : "평점을 선택해주세요"}
@@ -316,29 +258,15 @@ const ReviewForm = ({
             </div>
           </div>
 
-          {/* ⭐ 한 줄 코멘트 입력 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label
-              style={{
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#374151",
-              }}
-            >
-              한 줄 코멘트
-            </label>
+          {/* 한 줄 코멘트 */}
+          <div style={fieldWrapperStyle}>
+            <label style={labelStyle}>한 줄 코멘트</label>
             <input
               type="text"
               value={formData.content}
               onChange={handleChangeContent}
               placeholder="리뷰 한 줄을 입력하세요"
-              style={{
-                padding: "10px 12px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db",
-                fontSize: "14px",
-                outline: "none",
-              }}
+              style={inputStyle}
             />
           </div>
 
@@ -346,13 +274,13 @@ const ReviewForm = ({
           {error && (
             <div
               style={{
-                marginTop: "4px",
+                marginTop: 8,
+                marginBottom: 16,
                 padding: "8px 10px",
-                borderRadius: "6px",
+                borderRadius: 8,
                 backgroundColor: "#fef2f2",
-                border: "1px solid #fecaca",
-                fontSize: "13px",
                 color: "#b91c1c",
+                fontSize: "0.85rem",
               }}
             >
               {error}
@@ -362,10 +290,10 @@ const ReviewForm = ({
           {/* 버튼 영역 */}
           <div
             style={{
-              marginTop: "12px",
+              marginTop: 20,
               display: "flex",
               justifyContent: "flex-end",
-              gap: "8px",
+              gap: 10,
             }}
           >
             <Button type="button" variant="outline" onClick={onCancel}>
@@ -376,8 +304,8 @@ const ReviewForm = ({
             </Button>
           </div>
         </form>
-      </Card>
-    </div>
+      </div>
+    </Card>
   );
 };
 

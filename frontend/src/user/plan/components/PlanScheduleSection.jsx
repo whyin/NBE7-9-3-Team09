@@ -101,7 +101,7 @@ export default function PlanScheduleSection({
                     }`}
                   >
                     <div className="plan-schedule-place-name">
-                      ⭐ {place.averageRating.toFixed(1)} {place.placeName}
+                      ⭐ {place.averageRating.toFixed(2)} {place.placeName}
                     </div>
                     <div className="plan-schedule-place-address">
                       {place.address}
@@ -250,7 +250,7 @@ export default function PlanScheduleSection({
                               }`}
                             >
                               <div className="plan-schedule-place-name">
-                                ⭐ {place.averageRating.toFixed(1)}{" "}
+                                ⭐ {place.averageRating.toFixed(2)}{" "}
                                 {place.placeName}
                               </div>
                               <div className="plan-schedule-place-address">
