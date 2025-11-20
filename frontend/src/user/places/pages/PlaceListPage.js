@@ -1,7 +1,7 @@
 // Kakao 지도 초기화 추가
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPlacesByCategory } from "../../services/categoryService";
+import { getPlacesByCategory, getCategories } from "../../services/categoryService";
 import {
   addBookmark,
   removeBookmark,
@@ -25,6 +25,7 @@ const PlaceListPage = () => {
   const [places, setPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [bookmarks, setBookmarks] = useState(new Set());
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,6 +43,7 @@ useEffect(()=>{
 },[searchTerm]);
   
   useEffect(() => {
+    fetchCategories();
     fetchPlaces();
     fetchBookmarks();
   }, [categoryId,page,searchTerm]);
@@ -315,14 +317,28 @@ useEffect(()=>{
     }
   };
 
-  const getCategoryName = (categoryId) => {
-    const categoryMap = {
-      1: "관광지",
-      2: "맛집",
-      3: "야경명소",
-      4: "숙소",
+  const fetchCategories = async () => {
+    try {
+      const response = await getCategories();
+      setCategories(response.data || []);
+    } catch (err) {
+      console.error("카테고리 목록 조회 오류:", err);
+    }
+  };
+
+  const getCategoryDisplayName = (categoryName) => {
+    const nameMap = {
+      NIGHTSPOT: "야경명소",
+      맛집: "맛집",
     };
-    return categoryMap[categoryId] || "여행지";
+    return nameMap[categoryName] || categoryName;
+  };
+
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(
+      (c) => String(c.id) === String(categoryId)
+    );
+    return category ? getCategoryDisplayName(category.name) : "여행지";
   };
 
   const renderStars = (rating = 0) => {
