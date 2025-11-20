@@ -189,8 +189,8 @@ class ReviewService(
                 (threshold / (reviewCount + threshold)) * globalAverageRating
     }
 
-    fun recommendPlace(categoryName: String): List<RecommendResponse?> {
-        val sorted: List<RecommendResponse?> = sortPlaces(categoryName) // 캐시됨
+    fun recommendPlace(categoryName: String): List<RecommendResponse> {
+        val sorted: List<RecommendResponse> = sortPlaces(categoryName) // 캐시됨
         return sorted.stream().limit(5).toList()
     }
 
