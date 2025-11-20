@@ -339,6 +339,7 @@ class BaseInitData(
 
                     // ⭐ 추천 테이블 업데이트 (베이지안 평균 계산)
                     reviewService.updateRecommend(place)
+//                    reviewService.updateAllRecommend()
                 }
 
             }
