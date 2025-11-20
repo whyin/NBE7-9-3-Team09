@@ -17,6 +17,7 @@ import com.backend.global.exception.BusinessException
 import com.backend.global.response.ErrorCode
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,7 +34,7 @@ class ReviewService(
      * 리뷰 생성
      */
     @Transactional
-    @CacheEvict(cacheNames = ["recommendTop5", "sortedPlaces"], allEntries = true)
+    @CacheEvict(cacheNames = ["sortedPlaces"], allEntries = true)
     fun createReview(dto: ReviewRequestDto, memberId: Long): ReviewResponseDto {
         val member = getMemberEntity(memberId)
         val place = getPlaceEntity(dto.placeId)
@@ -62,7 +63,7 @@ class ReviewService(
         placeRepository.save(place)
 
         // Recommend 갱신
-        updateRecommend(place)
+//        updateRecommend(place)
 
         // DTO 변환 (기존 from(..) 패턴 사용한다고 가정)
         return ReviewResponseDto.from(saved)
@@ -72,7 +73,7 @@ class ReviewService(
      * 리뷰 수정
      */
     @Transactional
-    @CacheEvict(cacheNames = ["recommendTop5", "sortedPlaces"], allEntries = true)
+    @CacheEvict(cacheNames = ["sortedPlaces"], allEntries = true)
     fun modifyReview(memberId: Long, reviewId: Long, modifyRating: Int, content: String) {
         val review = reviewRepository.findByMemberIdAndId(memberId, reviewId)
             ?: throw BusinessException(ErrorCode.NOT_FOUND_REVIEW)
@@ -90,14 +91,14 @@ class ReviewService(
         placeRepository.save(place)
 
         // Recommend 갱신
-        updateRecommend(place)
+//        updateRecommend(place)
     }
 
     /**
      * 리뷰 삭제
      */
     @Transactional
-    @CacheEvict(cacheNames = ["recommendTop5", "sortedPlaces"], allEntries = true)
+    @CacheEvict(cacheNames = ["sortedPlaces"], allEntries = true)
     fun deleteReview(memberId: Long, reviewId: Long) {
         if (!validWithReviewId(memberId, reviewId)) {
             throw BusinessException(ErrorCode.ACCESS_DENIED)
@@ -114,7 +115,7 @@ class ReviewService(
         reviewRepository.delete(review)
 
         // Recommend 갱신
-        updateRecommend(place)
+//        updateRecommend(place)
     }
 
     /**
@@ -188,18 +189,12 @@ class ReviewService(
                 (threshold / (reviewCount + threshold)) * globalAverageRating
     }
 
-    // ───────────────── Recommend / 캐시 영역 ─────────────────
-
-    @Cacheable(cacheNames = ["recommendTop5"], key = "#categoryName")
-    fun recommendPlace(categoryName: String): List<RecommendResponse> {
-        val recommends = recommendRepository
-            .findTop5ByPlaceCategoryNameOrderByBayesianRatingDesc(categoryName)
-
-        return recommends.map {
-            val place = it?.place ?: throw IllegalStateException("Recommend.place is null")
-            RecommendResponse.from(place, it.bayesianRating)
-        }
+    fun recommendPlace(categoryName: String): List<RecommendResponse?> {
+        val sorted: List<RecommendResponse?> = sortPlaces(categoryName) // 캐시됨
+        return sorted.stream().limit(5).toList()
     }
+
+    // ───────────────── Recommend / 캐시 영역 ─────────────────
 
     @Cacheable(cacheNames = ["sortedPlaces"], key = "#categoryName")
     fun sortPlaces(categoryName: String): List<RecommendResponse> {
@@ -211,6 +206,9 @@ class ReviewService(
             RecommendResponse.from(place, it.bayesianRating)
         }
     }
+
+
+
 
     /**
      * 전체 리뷰의 글로벌 평균 평점
@@ -250,4 +248,16 @@ class ReviewService(
         place.ratingCount = reviewCount.toInt()
         placeRepository.save(place)
     }
+
+
+    @Scheduled(cron = "0 */10 * * * ?") // 10분마다 실행
+    @Transactional
+    fun updateAllRecommend() {
+        val places = placeRepository.findAll()
+
+        places.forEach { place ->
+            updateRecommend(place)
+        }
+    }
+
 }
