@@ -12,9 +12,13 @@ export const getCategories = async () => {
 };
 
 // 카테고리별 여행지 목록 조회 (사용자용)
-export const getPlacesByCategory = async (categoryId) => {
+export const getPlacesByCategory = async (categoryId, page = 0, size = 12, keyword ="") => {
   try {
-    const response = await api.get(`/api/place/category/${categoryId}`);
+    const response = await api.get(`/api/place/category/${categoryId}/paged`,
+      {
+        params:{page,size,...(keyword ? {keyword}:{})}
+      }
+    );
     return response;
   } catch (error) {
     console.error("카테고리별 여행지 목록 조회 실패:", error);

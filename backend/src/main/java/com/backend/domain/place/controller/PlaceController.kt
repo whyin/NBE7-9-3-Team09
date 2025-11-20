@@ -39,14 +39,15 @@ class PlaceController(
         return ApiResponse.success(data)
     }
 
-    // GET /api/place/category/1/paged?page=0&size=10
+    // GET /api/place/category/1/paged?page=0&size=10&keyword=영등포구
 
     @GetMapping("/category/{categoryId}/paged")
     fun getPagedPlace(
         @PathVariable @Min(1) categoryId: Long,
-        pageable: Pageable
+        pageable: Pageable,
+        @RequestParam(required = false) keyword: String?
     ): ApiResponse<Page<ResponsePlaceDto>> {
-        val page = placeService.getPagedPlaces(categoryId,pageable)
+        val page = placeService.getPagedPlaces(categoryId,keyword,pageable)
         return ApiResponse.success(page)
     }
 
