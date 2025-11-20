@@ -47,8 +47,13 @@ const RecommendedPlaces = ({ category = "hotel" }) => {
       // 해당 카테고리의 장소 목록 가져오기
       const placesResponse = await getPlacesByCategory(targetCategory.id);
 
+      // 페이지네이션된 응답 구조 처리
+      const body = placesResponse.data;
+      const pageData = body.data ?? body;
+      const content = pageData.content ?? [];
+
       // 별점순으로 정렬 (높은 별점부터)
-      const sortedPlaces = placesResponse.data
+      const sortedPlaces = [...content]
         .sort((a, b) => (b.ratingAvg || 0) - (a.ratingAvg || 0))
         .slice(0, 3); // 상위 3개만 선택
 
