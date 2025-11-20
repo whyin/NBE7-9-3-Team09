@@ -63,6 +63,14 @@ const CategoryListPage = () => {
     return icons[categoryName] || "📍";
   };
 
+  const getCategoryDisplayName = (categoryName) => {
+    const nameMap = {
+      NIGHTSPOT: "야경명소",
+      맛집: "맛집",
+    };
+    return nameMap[categoryName] || categoryName;
+  };
+
   const handleCategoryClick = (categoryId) => {
     navigate(`/user/places/category/${categoryId}`);
   };
@@ -90,7 +98,9 @@ const CategoryListPage = () => {
             onClick={() => handleCategoryClick(category.id)}
           >
             <div className="category-icon">{category.icon}</div>
-            <h3 className="category-title">{category.name}</h3>
+            <h3 className="category-title">
+              {getCategoryDisplayName(category.name)}
+            </h3>
             <p className="category-description">{category.description}</p>
             <div className="category-count">
               {category.placeCount}개의 여행지
