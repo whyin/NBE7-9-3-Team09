@@ -1,7 +1,6 @@
 // 📁 src/user/components/organisms/ReviewForm.js
 
 import React, { useState, useEffect } from "react";
-import Card from "../atoms/Card";
 import Button from "../atoms/Button";
 import StarRating from "../atoms/StarRating";
 import { getAllPlaces } from "../../services/placeService";
@@ -128,18 +127,19 @@ const ReviewForm = ({
   };
 
   return (
-    <Card>
-      <div
-        style={{
-          maxWidth: 600,
-          margin: "40px auto",
-          padding: 24,
-          background: "#ffffff",
-          borderRadius: 16,
-          boxShadow: "0 12px 30px rgba(0,0,0,0.06)",
-          border: "1px solid #fee2e2",
-        }}
-      >
+    <div
+      style={{
+        maxWidth: 600,
+        margin: "40px auto",
+        padding: 24,
+        background: "#ffffff",
+        borderRadius: 16,
+        boxShadow: "0 12px 30px rgba(0,0,0,0.06)",
+        border: "1px solid #fee2e2",
+        position: "relative",
+        zIndex: 1,
+      }}
+    >
         {/* 헤더 */}
         <div style={{ marginBottom: 24, textAlign: "center" }}>
           <h3
@@ -305,7 +305,6 @@ const ReviewForm = ({
           </div>
         </form>
       </div>
-    </Card>
   );
 };
 
