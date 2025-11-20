@@ -63,7 +63,7 @@ class ReviewService(
         placeRepository.save(place)
 
         // Recommend 갱신
-//        updateRecommend(place)
+        updateRecommend(place)
 
         // DTO 변환 (기존 from(..) 패턴 사용한다고 가정)
         return ReviewResponseDto.from(saved)
@@ -91,7 +91,7 @@ class ReviewService(
         placeRepository.save(place)
 
         // Recommend 갱신
-//        updateRecommend(place)
+        updateRecommend(place)
     }
 
     /**
@@ -115,7 +115,7 @@ class ReviewService(
         reviewRepository.delete(review)
 
         // Recommend 갱신
-//        updateRecommend(place)
+        updateRecommend(place)
     }
 
     /**
@@ -189,8 +189,8 @@ class ReviewService(
                 (threshold / (reviewCount + threshold)) * globalAverageRating
     }
 
-    fun recommendPlace(categoryName: String): List<RecommendResponse?> {
-        val sorted: List<RecommendResponse?> = sortPlaces(categoryName) // 캐시됨
+    fun recommendPlace(categoryName: String): List<RecommendResponse> {
+        val sorted: List<RecommendResponse> = sortPlaces(categoryName) // 캐시됨
         return sorted.stream().limit(5).toList()
     }
 
@@ -250,14 +250,14 @@ class ReviewService(
     }
 
 
-    @Scheduled(cron = "0 */10 * * * ?") // 10분마다 실행
-    @Transactional
-    fun updateAllRecommend() {
-        val places = placeRepository.findAll()
-
-        places.forEach { place ->
-            updateRecommend(place)
-        }
-    }
+//    @Scheduled(cron = "0 */10 * * * ?") // 10분마다 실행
+//    @Transactional
+//    fun updateAllRecommend() {
+//        val places = placeRepository.findAll()
+//
+//        places.forEach { place ->
+//            updateRecommend(place)
+//        }
+//    }
 
 }
